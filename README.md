@@ -1,3 +1,13 @@
+JUST A QUICK WARNING
+THIS IS AN EXPERIMENTAL BUILD
+USE AT YOUR OWN RISK!
+
+it includes very imporvements, hotkey rebinding and a slightly cleaner code base i hope
+please note there are currently references to classes not currently in the upload
+ahk's default behaviour should allow the script to continue running despite these
+being in and basically should do nothing
+
+
 <div align="center" style="text-align: center;">
 <h1><img src="icon.ico" height="30px">&nbsp;&nbsp;fishSol Macro</h1>
 <p>A macro for the Roblox game Sol's RNG, specifically to automate its fishing minigame.</p>
@@ -12,7 +22,10 @@
 ## Installation
 1. Download [AutoHotKey v1.1](https://www.autohotkey.com/) (not v2.0) and install it
 2. Download the [latest release](https://github.com/ivelchampion249/FishSol-Macro/releases/latest) of fishSol, and extract the .zip file into an empty folder
-3. Run fishSol through the .ahk file by double-clicking it, or right-clicking it and selecting "Run script"
+3. For first time launch please use LaunchMacro.ahk as this builds the plugin manager for use with the macro. for debug purposes the prebuilt version with all plugins is included by default
+4. Run fishSol through the .ahk file by double-clicking it, or right-clicking it and selecting "Run script"
+
+if a plugin is missing just relaunch the LaunchMacro.ahk to rebuild the PluginManager and hopefully fix the issue
 
 ## Plugins
 Download your desired plugin from the [release](https://github.com/ivelchampion249/FishSol-Macro/releases/latest) or from the plugins folder in the source code, and drag it into the plugins folder. A tab for the plugin should automatically show up when you restart the macro.
