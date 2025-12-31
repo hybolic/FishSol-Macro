@@ -2,11 +2,12 @@ JUST A QUICK WARNING
 THIS IS AN EXPERIMENTAL BUILD
 USE AT YOUR OWN RISK!
 
-it includes very imporvements, hotkey rebinding and a slightly cleaner code base i hope
+it includes "Various Imporvements", hotkey rebinding and a slightly cleaner code base i hope
 please note there are currently references to classes not currently in the upload
 ahk's default behaviour should allow the script to continue running despite these
 being in and basically should do nothing
-
+please be aware i did the rebasing of this during new years and as such im running on caffine
+and zero rest, so gnight and love you all lmao
 
 <div align="center" style="text-align: center;">
 <h1><img src="icon.ico" height="30px">&nbsp;&nbsp;fishSol Macro</h1>

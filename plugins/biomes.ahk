@@ -6,7 +6,8 @@ Height: 1440
 */
 class BiomesPlugin extends Plugin
 {
-
+    ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
+    ;               added to the list when the loader is called
     PluginRun()
     {
         global
@@ -122,16 +123,16 @@ global BiomesPlugin_read_log_regex := """state"":""((?:\\.|[^""])*)"".*?""largeI
 
 global BiomesPlugin_can_run := True
 
-;internal and external RESOURCES
+;internal and external resource locations
  global maxstellar_biome_thumbnail := "https://maxstellar.github.io/biome_thumb/"
  global Gui_Biomes_Png   := A_ScriptDir . "\gui\Biomes.png"
  EnvGet, LocalAppData, LOCALAPPDATA
  global logDir := LocalAppData "\Roblox\logs"
 ;
 
-
 goto Biome_EOF
 
+;[DEV COMMENT] alot of this is untouched but just moved here
 UpdateBiomesPrivateServer:
     Gui, Submit, nohide
     biomesPrivateServerLink := BiomesPrivateServerInput
@@ -147,6 +148,7 @@ CheckBiome:
         SetTimer, CheckBiome, -1
 return
 
+;[DEV COMMENT] unchanged for now
 SaveBiomeToggles:
     Gui, Submit, NoHide
     IniWrite, %BiomeNormal%, %iniFilePath%, "Biomes", BiomeNormal
@@ -165,6 +167,7 @@ SaveBiomeToggles:
     IniWrite, %BiomeNull%, %iniFilePath%, "Biomes", BiomeNull
 return
 
+;[DEV COMMENT] check below comment
 ProcessExist(Name) {
     ;[DEV COMMENT] would <if WinExist("ahk_exe " . Name)> be faster? - Nadir
     for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process")
@@ -196,15 +199,16 @@ CheckBiomeFunction()
     file := FileOpen(newestFile, "r")
     if !IsObject(file)
         return
-
-    ; Read only the last ~10 KB (adjust if needed)
-    size := file.Length
-    chunkSize := 10240
-    if (size > chunkSize)
-        file.Seek(-chunkSize, 2) ; 2 = from end of file
-    content := file.Read()
-    file.Close()
-
+    ;                                     [DEV COMMENT] i do have an alternative version of this part that only
+    ;                                                     reads what has changed and within a limit of 10kb
+    ; Read only the last ~10 KB (adjust if needed)          ;    to reduce the amount of read calls
+    size := file.Length ;<----------------------------------;
+    chunkSize := 10240                                      ;
+    if (size > chunkSize)                                   ;
+        file.Seek(-chunkSize, 2) ; 2 = from end of file     ;
+    content := file.Read()                                  ;
+    file.Close()                                            ;
+    ;^------------------------------------------------------;
     lines_array := StrSplit(content, "`n")
 
     ; Read upward for the last BloxstrapRPC
@@ -212,7 +216,7 @@ CheckBiomeFunction()
     {
         line := lines_array[lines_array.MaxIndex() - A_Index + 1]
         if InStr(line, "[BloxstrapRPC]")
-        {
+        {        ;[DEV COMMENT] Moved to global so it doesn't need to be reassigned every call
             if RegExMatch(line, BiomesPlugin_read_log_regex, m) {
                 state := m1
                 biome := m2
@@ -227,6 +231,7 @@ CheckBiomeFunction()
         biomeKey := "Biome" StrReplace(biome, " ", "")
         IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
 
+        ;[DEV COMMENT] one off isSpecial check instead of recalling the same thing multiple times
         if  (biome = "GLITCHED" or biome = "DREAMSPACE" or biome = "CYBERSPACE")
             isSpecial := true
         else
@@ -297,7 +302,7 @@ CheckBiomeFunction()
         prevState := state
     }
 }
-
+;[DEV COMMENT]  unchanged
 LoadBiomeToggles() {
     global
     IniRead, BiomeNormal, %iniFilePath%, "Biomes", BiomeNormal, 1

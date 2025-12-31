@@ -6,7 +6,8 @@ Height: 1
 */
 class SnowmanPathingPlugin extends Plugin
 {
-    ;techincally size doesn't matter for this one
+    ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
+    ;               added to the list when the loader is called
 
     ;OVERRIDE THIS FUNCTION AND CALL |PLUGIN_NAME|.RUN()
     PluginRun()
@@ -128,6 +129,7 @@ class SnowmanPathingPlugin extends Plugin
     {
         global
         Toggle_GuiControl("SnowmanPathingStatus", snowmanPathing, "autoCrafterWebhook")
+        ;[DEV COMMENT] is this used anywhere?
         GuiControl,, SnowmanIntervalInput, % (snowmanInterval / 60000)
     }
 }
@@ -166,6 +168,7 @@ Toggle_GuiControl("SnowmanPathingStatus", snowmanPathing, "snowmanPathing")
     ; }
 return
 
+;[DEV COMMENT] mostly unchanged for now
 RunSnowmanPathing() {
     if (pathingMode = "Non Vip Pathing") {
         RunSnowmanPathingNonVip()

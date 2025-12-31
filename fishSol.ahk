@@ -2,7 +2,7 @@
 #NoEnv
 #SingleInstance Force
 
-;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test
+;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
 ;#include core\RobloxWindow.ahk
 
 #include core\log.ahk
@@ -27,7 +27,7 @@ if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
 }
 
-global version  := "fishSol v1.9.4.260101-AltA"
+global version  := "fishSol v1.9.4.260101-AltB"
 global icon_url := "https://maxstellar.github.io/fishSol%20icon.png"
 
 global res := "1080p"
@@ -96,7 +96,9 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
 ;
 
 ;Randimised the Devs
-    Random,, A_TickCount
+    Random,, A_TickCount ;[DEV COMMENT] is this needed?
+    
+    ;[DEV COMMENT] only random number needed is for the random message lol
     Random, messageRand, 1, 10
 
     randomMessages := ["Go catch some fish IRL sometime!"
@@ -144,8 +146,12 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
             }
         }
     }
-    
+
     Devs := []
+    ;[DEV COMMENT]        | this was marked as role?                  i am very confused about the 
+    ;                     |       | and this was marked as discord?   variables names and im going to need 
+    ;                     V       v                                   some clarification on this later sorry
+    ;             name, thing?, role, image file, link, opt link
     Devs.Push(new DeveloperDetails("maxstellar"
                                  , "Twitch"
                                  , "Lead Developer"
@@ -167,17 +173,19 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
 
 
     Randomised_DevOrder := ""
-
+    ;[DEV COMMENT] Build the number list that will soon be randomised
     loop % Devs.Length()
     {
         Randomised_DevOrder .= A_Index
         if (A_Index) < (Devs.Length())
             Randomised_DevOrder .= "|"
     }
-
+    ;[DEV COMMENT] randomise that number list
     Sort, Randomised_DevOrder, Random D|
+    ;[DEV COMMENT] split the list into individual numbers to make incrementing easier
     Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
     
+    ;[DEV COMMENT] loops over the devs list and asigns them to global variables
     ; or just set to 3 if the list never grows
     loop % Devs.Length()
     {
@@ -241,6 +249,7 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
 
 
 ;GuiControl Changes ect
+    ;[DEV COMMENT] switch resolution based on res, soon won't be needed but left in for compatabilty
     switch res
     {
         case "1080p" : 
@@ -254,7 +263,7 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
             res := "1080p"
     }
 
-    ;[DEV COMMENT] Multipurpose guistate and ini updator - Nadir
+    ;[DEV COMMENT] Multipurpose gui state and ini updator - Nadir
     Toggle_GuiControl(the_control, active, Name:="", Catagory:="Macro")
     {
         global
@@ -263,6 +272,7 @@ global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|W
         color        := (active ? "+c0x00DD00" : "+c0xFF4444")
         state        := (active ? "ON" : "OFF")
         
+        ;[DEV COMMENT] jank rename to fix variable not getting called
         name_fix     := """" Name """"
         catagory_fix := """" Catagory """"
 
@@ -773,62 +783,94 @@ ManualGUIUpdate() {
     }
 }
 
-START_SCRIPT:
-    if (!res) {
-        res := "1080p"
-    }
-    if (!toggle) {
-        Gui, Submit, nohide
-        GuiControl, Disable, AllowStartRebind_CHECKBOX
-        GuiControl, Disable, AllowPauseRebind_CHECKBOX
-        GuiControl, Disable, AllowStopRebind_CHECKBOX
-        GuiControl, Hide, AllowStartRebind_CHECKBOX
-        GuiControl, Hide, AllowPauseRebind_CHECKBOX
-        GuiControl, Hide, AllowStopRebind_CHECKBOX
-        if (MaxLoopInput > 0) {
-            maxLoopCount := MaxLoopInput
+;[DEV COMMENT] Renamed to allow hotkeys to be bound to the functions directly
+;HOTKEYS SCRIPT
+    START_SCRIPT:
+        if (!res) {
+            res := "1080p"
         }
-        if (FishingLoopInput > 0) {
-            fishingLoopCount := FishingLoopInput
-        }
-        toggle := true
-        Return
-        if (hasBiomesPlugin) {
-        Run, "%A_ScriptDir%\plugins\biomes.ahk"
-        biomeDetectionRunning := true
-        }
-        strangeControllerLastRun := 0
-        biomeRandomizerLastRun := 0
-        snowmanPathingLastRun := 0
-        if (startTick = "") {
-            startTick := A_TickCount
-        }
-        if (cycleCount = "") {
-            cycleCount := 0
-        }
-        strangeControllerLastRun := 0
-        biomeRandomizerLastRun := 0
-        snowmanPathingLastRun := 0
-        IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+        if (!toggle) {
+            Gui, Submit, nohide
+            GuiControl, Disable, AllowStartRebind_CHECKBOX
+            GuiControl, Disable, AllowPauseRebind_CHECKBOX
+            GuiControl, Disable, AllowStopRebind_CHECKBOX
+            GuiControl, Hide, AllowStartRebind_CHECKBOX
+            GuiControl, Hide, AllowPauseRebind_CHECKBOX
+            GuiControl, Hide, AllowStopRebind_CHECKBOX
+            if (MaxLoopInput > 0) {
+                maxLoopCount := MaxLoopInput
+            }
+            if (FishingLoopInput > 0) {
+                fishingLoopCount := FishingLoopInput
+            }
+            toggle := true
+            Return
+            if (hasBiomesPlugin) {
+            Run, "%A_ScriptDir%\plugins\biomes.ahk"
+            biomeDetectionRunning := true
+            }
+            strangeControllerLastRun := 0
+            biomeRandomizerLastRun := 0
+            snowmanPathingLastRun := 0
+            if (startTick = "") {
+                startTick := A_TickCount
+            }
+            if (cycleCount = "") {
+                cycleCount := 0
+            }
+            strangeControllerLastRun := 0
+            biomeRandomizerLastRun := 0
+            snowmanPathingLastRun := 0
+            IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
+            IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+            IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
 
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        ManualGUIUpdate()
-        SetTimer, UpdateGUI, 1000
-        if (res = "1080p") {
-            SetTimer, DoMouseMove, 100
-        } else if (res = "1440p") {
-            SetTimer, DoMouseMove2, 100
-        } else if (res = "1366x768") {
-            SetTimer, DoMouseMove3, 100
+            WinActivate, ahk_exe RobloxPlayerBeta.exe
+            ManualGUIUpdate()
+            SetTimer, UpdateGUI, 1000
+            if (res = "1080p") {
+                SetTimer, DoMouseMove, 100
+            } else if (res = "1440p") {
+                SetTimer, DoMouseMove2, 100
+            } else if (res = "1366x768") {
+                SetTimer, DoMouseMove3, 100
+            }
+            try SendWebhook(":green_circle: Macro Started!", "7909721")
         }
-        try SendWebhook(":green_circle: Macro Started!", "7909721")
-    }
-Return
+    Return
 
-PAUSE_SCRIPT:
-    if (toggle) {
+    PAUSE_SCRIPT:
+        if (toggle) {
+            if (biomeDetectionRunning) {
+                DetectHiddenWindows, On
+                SetTitleMatchMode, 2
+
+                target := "biomes.ahk"
+                WinGet, id, ID, %target% ahk_class AutoHotkey
+                if (id) {
+                    WinClose, ahk_id %id%
+                }
+                biomeDetectionRunning := false
+            }
+            toggle := false
+            firstLoop := true
+            SetTimer, DoMouseMove, Off
+            SetTimer, DoMouseMove2, Off
+            SetTimer, DoMouseMove3, Off
+            SetTimer, UpdateGUI, Off
+            ManualGUIUpdate()
+            GuiControl, Enable, AllowStartRebind_CHECKBOX
+            GuiControl, Enable, AllowPauseRebind_CHECKBOX
+            GuiControl, Enable, AllowStopRebind_CHECKBOX
+            GuiControl, Show, AllowStartRebind_CHECKBOX
+            GuiControl, Show, AllowPauseRebind_CHECKBOX
+            GuiControl, Show, AllowStopRebind_CHECKBOX
+            ToolTip
+            try SendWebhook(":yellow_circle: Macro Paused", "16632664")
+        }
+    Return
+
+    STOP_SCRIPT:
         if (biomeDetectionRunning) {
             DetectHiddenWindows, On
             SetTitleMatchMode, 2
@@ -840,38 +882,9 @@ PAUSE_SCRIPT:
             }
             biomeDetectionRunning := false
         }
-        toggle := false
-        firstLoop := true
-        SetTimer, DoMouseMove, Off
-        SetTimer, DoMouseMove2, Off
-        SetTimer, DoMouseMove3, Off
-        SetTimer, UpdateGUI, Off
-        ManualGUIUpdate()
-        GuiControl, Enable, AllowStartRebind_CHECKBOX
-        GuiControl, Enable, AllowPauseRebind_CHECKBOX
-        GuiControl, Enable, AllowStopRebind_CHECKBOX
-        GuiControl, Show, AllowStartRebind_CHECKBOX
-        GuiControl, Show, AllowPauseRebind_CHECKBOX
-        GuiControl, Show, AllowStopRebind_CHECKBOX
-        ToolTip
-        try SendWebhook(":yellow_circle: Macro Paused", "16632664")
-    }
-Return
-
-STOP_SCRIPT:
-    if (biomeDetectionRunning) {
-        DetectHiddenWindows, On
-        SetTitleMatchMode, 2
-
-        target := "biomes.ahk"
-        WinGet, id, ID, %target% ahk_class AutoHotkey
-        if (id) {
-            WinClose, ahk_id %id%
-        }
-        biomeDetectionRunning := false
-    }
-    try SendWebhook(":red_circle: Macro Stopped.", "14495300")
-ExitApp
+        try SendWebhook(":red_circle: Macro Stopped.", "14495300")
+    ExitApp
+;end
 
 ;1080p
 DoMouseMove:
@@ -2785,6 +2798,7 @@ SelectPathing:
     pathingMode := PathingMode
 return
 
+;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1NameClick:
     global ClickIndex := 1
     goto DoNameClick
@@ -2802,7 +2816,7 @@ DoNameClick:
     DeveloperDetails.click_website(ClickIndex)
 return
 
-
+;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1LinkClick:
     global ClickIndex := 1
     goto DoLinkClick
@@ -3120,6 +3134,7 @@ class CorePlugin extends Plugin
                 Gui, Add, Text, x47 y427 w150 h25 BackgroundTrans, Pause`tHotkey:
                 Gui, Add, Text, x47 y471 w150 h25 BackgroundTrans, Stop`tHotKey:
                 
+                ;[DEV COMMENT] Start Key
                 Gui, Add, Progress, x41 y392 w1 h27 Background696868
                 Gui, Add, Progress, x190 y392 w1 h27 Background696868
                 Gui, Add, Progress, x41 y418 w149 h1 Background696868
@@ -3131,6 +3146,7 @@ class CorePlugin extends Plugin
                 Gui, Font, s10 cWhite Bold
                 Gui, Add, Button, gRebindHotkeyStart x320 y392 h25 w80 vStart_hotkey_REBIND_BUTTON, Accept
                 
+                ;[DEV COMMENT] Pause Key
                 Gui, Add, Progress, x41 y436 w1 h27 Background696868
                 Gui, Add, Progress, x190 y436 w1 h27 Background696868
                 Gui, Add, Progress, x41 y462 w149 h1 Background696868
@@ -3142,6 +3158,7 @@ class CorePlugin extends Plugin
                 Gui, Font, s10 cWhite Bold
                 Gui, Add, Button, gRebindHotkeyPause x320 y436 h25 w80 vPause_hotkey_REBIND_BUTTON, Accept
                 
+                ;[DEV COMMENT] Stop Key
                 Gui, Add, Progress, x41 y480 w1 h27 Background696868
                 Gui, Add, Progress, x190 y480 w1 h27 Background696868
                 Gui, Add, Progress, x41 y506 w149 h1 Background696868
@@ -3261,39 +3278,44 @@ class CorePlugin extends Plugin
             Gui, Add, Picture, x14 y80 w574 h590, %Gui_Credits_Png%
 
             Gui, Font, s10 cWhite Normal
-            loop % Devs.Count()
-            {
-                ;y offset 65
-                yFULL_OFFSET := 65 * (A_INDEX - 1)
-                yoff1 := 130 + yFULL_OFFSET
-                yoff2 := 135 + yFULL_OFFSET
-                yoff3 := 155 + yFULL_OFFSET
-                yoff4 := 170 + yFULL_OFFSET
-                dev_img     := "dev" A_INDEX "_img"
-                dev_name    := "dev" A_INDEX "_name"
-                dev_role    := "dev" A_INDEX "_role"
-                dev_discord := "dev" A_INDEX "_discord"
-                dev_img     := %dev_img%
-                dev_name    := %dev_name%
-                dev_role    := %dev_role%
-                dev_discord := %dev_discord%
-                Gui, Font, s11 cWhite Normal Bold
-                Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
+            
+            ;[DEV COMMENT] Loop over the number of devs and add them to their randomly assigned variables from before
+                loop % Devs.Count()
+                {
+                    ;y offset 65?
+                    yFULL_OFFSET := 65 * (A_INDEX - 1)
+                    yoff1 := 130 + yFULL_OFFSET
+                    yoff2 := 135 + yFULL_OFFSET
+                    yoff3 := 155 + yFULL_OFFSET
+                    yoff4 := 170 + yFULL_OFFSET
+                    dev_img     := "dev" A_INDEX "_img"
+                    dev_name    := "dev" A_INDEX "_name" ;[DEV COMMENT] check the <DeveloperDetails> class above to find these variables
+                    dev_role    := "dev" A_INDEX "_role"
+                    dev_discord := "dev" A_INDEX "_discord"
+                    dev_img     := %dev_img%
+                    dev_name    := %dev_name%
+                    dev_role    := %dev_role%
+                    dev_discord := %dev_discord%
+                    Gui, Font, s11 cWhite Normal Bold
+                    Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
 
-                Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, %dev_name%
+                    Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, %dev_name%
 
-                Gui, Font, s9 c0xCCCCCC Normal
-                Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, %dev_role%
-                Gui, Font, s9 c0xCCCCCC Normal Underline
-                Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, %dev_discord%
-            }
+                    Gui, Font, s9 c0xCCCCCC Normal
+                    Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, %dev_role%
+                    Gui, Font, s9 c0xCCCCCC Normal Underline
+                    Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, %dev_discord%
+                }
+            ;end
 
+            ;[DEV COMMENT] Grab donor's txt from github?
             url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
 
             Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
             Http.Open("GET", url, false)
             Http.Send()
-
+            ;[DEV COMMENT] remove last \r\n from the response text if its there
+            ;                      just makes the Edit look a little cleaner
             content := RTrim(Http.ResponseText, "`r`n")
 
             Gui, Font, s10 cWhite Normal Bold
@@ -3320,227 +3342,233 @@ class CorePlugin extends Plugin
     IniRead()
     {
         global
-
+        ;[DEV COMMENT] a very very rough regex to exclude any unwanted keys from being assigned by the ini file in an attempt to bypas
+        ;                   the settings of the Hotkey gui
         temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|Win|Tab|Left|Right|Up|Down|Enter|Backspace|\b[\w\/]\b"
-
-        IniRead, temp_start_keybind, %iniFilePath%, "Keybinds", "StartScript"
-        if (temp_start_keybind != "ERROR")
-        {
-            ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-            REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Pause_hotkey . "|" . Stop_hotkey
-            if temp_start_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_start_keybind) ~= REGEX_KEYS_CHECK 
-                Start_hotkey := "F1"
-            else
-                Start_hotkey := temp_start_keybind
-        }
-        Else
-            IniWrite, % "F1", %iniFilePath%, "Keybinds", "StartScript"
-        Hotkey, %Start_hotkey%, START_SCRIPT
-        IniRead, temp_pause_keybind, %iniFilePath%, "Keybinds", "PauseScript"
-        if (temp_pause_keybind != "ERROR")
-        {
-            ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-            REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Stop_hotkey
-            if temp_pause_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_pause_keybind) ~= REGEX_KEYS_CHECK 
-                Pause_hotkey := "F2"
-            else
-                Pause_hotkey := temp_pause_keybind
-        }
-        Else
-            IniWrite, % "F2", %iniFilePath%, "Keybinds", "PauseScript"
-        Hotkey, %Pause_hotkey%, PAUSE_SCRIPT
-        
-        IniRead, temp_stop_keybind, %iniFilePath%, "Keybinds", "StopScript"
-        if (temp_stop_keybind != "ERROR")
-        {
-            ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-            REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Pause_hotkey
-            if temp_stop_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_stop_keybind) ~= REGEX_KEYS_CHECK 
-                Stop_hotkey := "F3"
-            else
-                Stop_hotkey := temp_stop_keybind
-        }
-        Else
-            IniWrite, % "F3", %iniFilePath%, "Keybinds", "StopScript"
-        Hotkey, %Stop_hotkey%, STOP_SCRIPT
-        
-        IniRead, tempRes, %iniFilePath%, "Macro", "resolution"
-        if (tempRes != "ERROR")
-        {
-            res := tempRes
-        }
-        Else
-            IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-
-        IniRead, tempMaxLoop, %iniFilePath%, "Macro", "maxLoopCount"
-        if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
-        {
-            maxLoopCount := tempMaxLoop
-        }
-        Else
-            IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-
-        IniRead, tempFishingLoop, %iniFilePath%, "Macro", "fishingLoopCount"
-        if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
-        {
-            fishingLoopCount := tempFishingLoop
-        }
-        Else
-            IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
-
-        IniRead, tempSellAll, %iniFilePath%, "Macro", "sellAllToggle"
-        if (tempSellAll != "ERROR")
-        {
-            sellAllToggle := (tempSellAll = "true" || tempSellAll = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "sellAllToggle"
-
-        IniRead, tempPathing, %iniFilePath%, "Macro", "pathingMode"
-        if (tempPathing != "ERROR")
-        {
-            pathingMode := tempPathing
-        }
-        Else
-            IniWrite, %pathingMode%, %iniFilePath%, "Macro", "pathingMode"
-
-        IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-        if (tempAzerty != "ERROR")
-        {
-            azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
-
-        IniRead, tempPrivateServer, %iniFilePath%, "Macro", "privateServerLink"
-        if (tempPrivateServer != "ERROR")
-        {
-            privateServerLink := tempPrivateServer
-            code := ""
-            if RegExMatch(privateServerLink, "code=([^&]+)", m)
+        ;[DEV COMMENT] Keybinds
+            IniRead, temp_start_keybind, %iniFilePath%, "Keybinds", "StartScript"
+            if (temp_start_keybind != "ERROR")
             {
-                code := m1
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Pause_hotkey . "|" . Stop_hotkey
+                if temp_start_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_start_keybind) ~= REGEX_KEYS_CHECK 
+                    Start_hotkey := "F1"
+                else
+                    Start_hotkey := temp_start_keybind
             }
-        }
-        Else
-            IniWrite, % "", %iniFilePath%, "Macro", "privateServerLink"
+            Else
+                IniWrite, % "F1", %iniFilePath%, "Keybinds", "StartScript"
 
-        IniRead, tempAdvancedDetection, %iniFilePath%, "Macro", "advancedFishingDetection"
-        if (tempAdvancedDetection != "ERROR")
-        {
-            advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "advancedFishingDetection"
+            Hotkey, %Start_hotkey%, START_SCRIPT
+            IniRead, temp_pause_keybind, %iniFilePath%, "Keybinds", "PauseScript"
+            if (temp_pause_keybind != "ERROR")
+            {
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Stop_hotkey
+                if temp_pause_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_pause_keybind) ~= REGEX_KEYS_CHECK 
+                    Pause_hotkey := "F2"
+                else
+                    Pause_hotkey := temp_pause_keybind
+            }
+            Else
+                IniWrite, % "F2", %iniFilePath%, "Keybinds", "PauseScript"
+            Hotkey, %Pause_hotkey%, PAUSE_SCRIPT
+            
+            IniRead, temp_stop_keybind, %iniFilePath%, "Keybinds", "StopScript"
+            if (temp_stop_keybind != "ERROR")
+            {
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Pause_hotkey
+                if temp_stop_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_stop_keybind) ~= REGEX_KEYS_CHECK 
+                    Stop_hotkey := "F3"
+                else
+                    Stop_hotkey := temp_stop_keybind
+            }
+            Else
+                IniWrite, % "F3", %iniFilePath%, "Keybinds", "StopScript"
+            Hotkey, %Stop_hotkey%, STOP_SCRIPT
+        ;end
 
-        IniRead, tempFishingFailsafe, %iniFilePath%, "Macro", "fishingFailsafeTime"
-        if (tempFishingFailsafe != "ERROR" && tempFishingFailsafe > 0)
-        {
-            fishingFailsafeTime := tempFishingFailsafe
-        }
-        Else
-            IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
+        ;[DEV COMMENT] Vanilla ini reading
+            IniRead, tempRes, %iniFilePath%, "Macro", "resolution"
+            if (tempRes != "ERROR")
+            {
+                res := tempRes
+            }
+            Else
+                IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
 
-        IniRead, tempPathingFailsafe, %iniFilePath%, "Macro", "pathingFailsafeTime"
-        if (tempPathingFailsafe != "ERROR" && tempPathingFailsafe > 0)
-        {
-            pathingFailsafeTime := tempPathingFailsafe
-        }
-        Else
-            IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
+            IniRead, tempMaxLoop, %iniFilePath%, "Macro", "maxLoopCount"
+            if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
+            {
+                maxLoopCount := tempMaxLoop
+            }
+            Else
+                IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
 
-        IniRead, tempAutoRejoinFailsafe, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-        if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
-        {
-            autoRejoinFailsafeTime := tempAutoRejoinFailsafe
-        }
-        Else
-            IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+            IniRead, tempFishingLoop, %iniFilePath%, "Macro", "fishingLoopCount"
+            if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
+            {
+                fishingLoopCount := tempFishingLoop
+            }
+            Else
+                IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
 
-        IniRead, tempAutoUnequip, %iniFilePath%, "Macro", "autoUnequip"
-        if (tempAutoUnequip != "ERROR")
-        {
-            autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "autoUnequip"
+            IniRead, tempSellAll, %iniFilePath%, "Macro", "sellAllToggle"
+            if (tempSellAll != "ERROR")
+            {
+                sellAllToggle := (tempSellAll = "true" || tempSellAll = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "sellAllToggle"
 
-        IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-        if (tempAzerty != "ERROR")
-        {
-            azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
+            IniRead, tempPathing, %iniFilePath%, "Macro", "pathingMode"
+            if (tempPathing != "ERROR")
+            {
+                pathingMode := tempPathing
+            }
+            Else
+                IniWrite, %pathingMode%, %iniFilePath%, "Macro", "pathingMode"
 
-        IniRead, tempAdvancedThreshold, %iniFilePath%, "Macro", "advancedFishingThreshold"
-        if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
-        {
-            advancedFishingThreshold := tempAdvancedThreshold
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "advancedFishingThreshold"
+            IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
+            if (tempAzerty != "ERROR")
+            {
+                azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
 
-        IniRead, tempStrangeController, %iniFilePath%, "Macro", "strangeController"
-        if (tempStrangeController != "ERROR")
-        {
-            strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "strangeController"
+            IniRead, tempPrivateServer, %iniFilePath%, "Macro", "privateServerLink"
+            if (tempPrivateServer != "ERROR")
+            {
+                privateServerLink := tempPrivateServer
+                code := ""
+                if RegExMatch(privateServerLink, "code=([^&]+)", m)
+                {
+                    code := m1
+                }
+            }
+            Else
+                IniWrite, % "", %iniFilePath%, "Macro", "privateServerLink"
 
-        IniRead, tempBiomeRandomizer, %iniFilePath%, "Macro", "biomeRandomizer"
-        if (tempBiomeRandomizer != "ERROR")
-        {
-            biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "biomeRandomizer"
+            IniRead, tempAdvancedDetection, %iniFilePath%, "Macro", "advancedFishingDetection"
+            if (tempAdvancedDetection != "ERROR")
+            {
+                advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "advancedFishingDetection"
 
-        IniRead, tempAutoCloseChat, %iniFilePath%, "Macro", "autoCloseChat"
-        if (tempAutoCloseChat != "ERROR")
-        {
-            autoCloseChat := (tempAutoCloseChat = "true" || tempAutoCloseChat = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "autoCloseChat"
+            IniRead, tempFishingFailsafe, %iniFilePath%, "Macro", "fishingFailsafeTime"
+            if (tempFishingFailsafe != "ERROR" && tempFishingFailsafe > 0)
+            {
+                fishingFailsafeTime := tempFishingFailsafe
+            }
+            Else
+                IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
 
-        IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
-        if (tempWebhook != "ERROR")
-        {
-            webhookURL := tempWebhook
-        }
-        Else
-            IniWrite, % "", %iniFilePath%, "Macro", "webhookURL"
+            IniRead, tempPathingFailsafe, %iniFilePath%, "Macro", "pathingFailsafeTime"
+            if (tempPathingFailsafe != "ERROR" && tempPathingFailsafe > 0)
+            {
+                pathingFailsafeTime := tempPathingFailsafe
+            }
+            Else
+                IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
 
-        IniRead, tempFsWebhook, %iniFilePath%, "Macro", "failsafeWebhook"
-        if (tempFsWebhook != "ERROR")
-        {
-            failsafeWebhook := (tempFsWebhook = "true" || tempFsWebhook = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "failsafeWebhook"
+            IniRead, tempAutoRejoinFailsafe, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+            if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
+            {
+                autoRejoinFailsafeTime := tempAutoRejoinFailsafe
+            }
+            Else
+                IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
 
-        IniRead, tempPathingWebhook, %iniFilePath%, "Macro", "pathingWebhook"
-        if (tempPathingWebhook != "ERROR")
-        {
-            pathingWebhook := (tempPathingWebhook = "true" || tempPathingWebhook = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "pathingWebhook"
+            IniRead, tempAutoUnequip, %iniFilePath%, "Macro", "autoUnequip"
+            if (tempAutoUnequip != "ERROR")
+            {
+                autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "autoUnequip"
 
-        IniRead, tempItemWebhook, %iniFilePath%, "Macro", "itemWebhook"
-        if (tempItemWebhook != "ERROR")
-        {
-            itemWebhook := (tempItemWebhook = "true" || tempItemWebhook = "1")
-        }
-        Else
-            IniWrite, false, %iniFilePath%, "Macro", "itemWebhook"
+            IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
+            if (tempAzerty != "ERROR")
+            {
+                azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
+
+            IniRead, tempAdvancedThreshold, %iniFilePath%, "Macro", "advancedFishingThreshold"
+            if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
+            {
+                advancedFishingThreshold := tempAdvancedThreshold
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "advancedFishingThreshold"
+
+            IniRead, tempStrangeController, %iniFilePath%, "Macro", "strangeController"
+            if (tempStrangeController != "ERROR")
+            {
+                strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "strangeController"
+
+            IniRead, tempBiomeRandomizer, %iniFilePath%, "Macro", "biomeRandomizer"
+            if (tempBiomeRandomizer != "ERROR")
+            {
+                biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "biomeRandomizer"
+
+            IniRead, tempAutoCloseChat, %iniFilePath%, "Macro", "autoCloseChat"
+            if (tempAutoCloseChat != "ERROR")
+            {
+                autoCloseChat := (tempAutoCloseChat = "true" || tempAutoCloseChat = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "autoCloseChat"
+
+            IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
+            if (tempWebhook != "ERROR")
+            {
+                webhookURL := tempWebhook
+            }
+            Else
+                IniWrite, % "", %iniFilePath%, "Macro", "webhookURL"
+
+            IniRead, tempFsWebhook, %iniFilePath%, "Macro", "failsafeWebhook"
+            if (tempFsWebhook != "ERROR")
+            {
+                failsafeWebhook := (tempFsWebhook = "true" || tempFsWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "failsafeWebhook"
+
+            IniRead, tempPathingWebhook, %iniFilePath%, "Macro", "pathingWebhook"
+            if (tempPathingWebhook != "ERROR")
+            {
+                pathingWebhook := (tempPathingWebhook = "true" || tempPathingWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "pathingWebhook"
+
+            IniRead, tempItemWebhook, %iniFilePath%, "Macro", "itemWebhook"
+            if (tempItemWebhook != "ERROR")
+            {
+                itemWebhook := (tempItemWebhook = "true" || tempItemWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "itemWebhook"
+        ;end
     }
     
     ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
     GuiControlChecks()
-    {        
+    {
+        ;[DEV COMMENT] using <Toggle_GuiControl> function from above to quickly loop over a bunch of duplicate code
         Toggle_GuiControl("SellAllStatus", sellAllToggle)
         Toggle_GuiControl("AdvancedFishingDetectionStatus", advancedFishingDetection)
         Toggle_GuiControl("azertyPathing", AzertyPathingStatus)

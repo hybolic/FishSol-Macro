@@ -1,3 +1,4 @@
+;[DEV COMMENT] will eventually contain settings
 class Debugger
 {
     static PerformanceTest      := true
@@ -23,7 +24,7 @@ class Debugger
 
 
 }
-
+;[DEV COMMENT] the log class
 class Log
 {
     
@@ -36,7 +37,7 @@ class Log
     static ConsoleLogHandle := ""
     static ConsoleGuiHandle := ""
     static ConsoleOpenLogDirButton := ""
-
+    ;[DEV COMMENT] disabled for now
     CleanUpLogs()
     {
         ; CLEANUP DISABLED DUE TO FILE LOGGING BEING DISABLED ON UPLOAD
@@ -146,11 +147,13 @@ class Log
         ;     Log.message("", " huh? guess there was a mistake!", false, true, true)
     }
 
+    ;[DEV COMMENT] log the current error given
     Error(message, startNewLine:=true)
     {
         Log.message("ERROR", message, true, true, startNewLine)
     }
 
+    ;[DEV COMMENT] log the current exception given
     Exception(message, exc, startNewLine:=true)
     {
         Log.message("EXCEPTION-", message, true, true, startNewLine)
@@ -160,33 +163,37 @@ class Log
             Log.message("EXCEPTION+", "no message given!", true, true, startNewLine)
     }
 
+    ;[DEV COMMENT] log an info message
     Info(message, startNewLine:=true)
     {
         if Debugger.Log_Basic_Info
-            Log.message("INFO", message, false, false, startNewLine)
+            Log.message("INFO", message, false, true, startNewLine)
     }
 
+    ;[DEV COMMENT] log a low info message, usually these don't even get pushed to file
     Low_Info(value, startNewLine:=true)
     {
         if Debugger.Log_More_Info
             Log.message("LOWINFO", value, false, false, startNewLine)
     }
-
+    ;[DEV COMMENT] two part messaeg first containing the info message and the second the extra details that won't get logged
     ExtraInfo(message, message2, startNewLine:=true)
     {
         throw Exception("WHY ARE YOU STILL USING THIS!!!")
         if Debugger.Log_Basic_Info
-            Log.message("INFO", message, false, false, startNewLine)
+            Log.message("INFO", message, false, true, startNewLine)
         if Debugger.Log_More_Info
             Log.message("INFO+", message2, false, false, startNewLine)
     }
 
+    ;[DEV COMMENT]  better version of the one above
     Info_With_Extra(message, message2, pushToFile:=false, startNewLine:=true)
     {
         if Debugger.Log_Basic_Info
             Log.message("INFO", message . (Debugger.Log_More_Info ? message2 : ""), false, pushToFile, startNewLine)
     }
 
+    ;[DEV COMMENT] worst option but here anyway
     ExtraInfo2(message, message2, pushToFile:=false, startNewLine:=true)
     {
         throw Exception("WHY ARE YOU STILL USING THIS!!!")
@@ -197,7 +204,8 @@ class Log
     }
     
     static Temp_Disable_Log2File_switch := -1
-    
+    ;[DEV COMMENT] temporarily disables the log to file function to allow the dev to
+    ;                 dump large amounts of stuff to the console but not to file
     Temp_Disable_Log2File()
     {
         if(Debugger.LogToFile) and (not Temp_Disable_Log2File_switch)
@@ -205,7 +213,7 @@ class Log
         Debugger.LogToFile := False
         return this
     }
-
+    ;[DEV COMMENT] brains of the Logger
     message(prefix, value, openConsoleWindow:=false, pushToFile:=false, newLineStarter := true)
     {
         message_string :=  ""
@@ -243,8 +251,8 @@ class Log
             ConsoleLogHandle := Log.ConsoleLogHandle
             GuiControl, GuiConsoleWindow:, %ConsoleLogHandle%, % Log.StoredConsoleLog
         }
-        
-;       File Logging REMOVED FOR NOW
+
+;[DEV COMMENT] File Logging REMOVED FOR NOW to reduce spam in files
 ;        if (Debugger.LogToFile or pushToFile)
 ;            FileAppend, % (FileExist(Log.getCurrentLog()) ? newLine : "") . message_string, % Log.getCurrentLog()
 
@@ -254,7 +262,8 @@ class Log
             Temp_Disable_Log2File_switch := -1
         }
     }
-
+    
+    ;[DEV COMMENT] gets current directory for the log files to go into
     getCurrentLogDirectory()
     {
         if not (FileExist(A_ScriptDir . Log.Log_Directory) ~= "D")
@@ -264,14 +273,16 @@ class Log
         }
         return A_ScriptDir . Log.Log_Directory
     }
-
+    
+    ;[DEV COMMENT] gets the current log file name with directory
     getCurrentLog()
     {
         if (not (Log.Log_File)) or StrLen(Log.Log_File) = 0
             Log.Log_File := Log.getCurrentLogDirectory() . "\" . Log.getTimeDate("dd-MM-yyyy-HHmm") . ".log"
         return Log.Log_File
     }
-
+    
+    ;[DEV COMMENT] quick time date function
     getTimeDate(time_date_style:="dd/MM/yy HH:mm:ss", prefix:="",postfix:="")
     {
         FormatTime, __TimeDate,, %time_date_style%
@@ -279,17 +290,22 @@ class Log
         return __TimeDate
     }
 
-    dumpRectToConsole(object)
+    ;[DEV COMMENT] formally <dumpRectToConsole()> now <dumpObjectToConsole>
+    ;                does as it says, just straight dumps the contents of the object to
+    ;                   the logger
+    dumpObjectToConsole(object, spacer:="", cleanup:=false, pushtofile:=false)
     {
-        Log.log(object)
+        Log.message("DUMP",JSONStringify(object, spacer, cleanup), true, pushtofile, true)
     }
 
+    ;[DEV COMMENT] forcefully show the debug console
     ShowConsole()
     {
         Log.ShowConsoleWindow := true
         Gui, GuiConsoleWindow:Show
     }
 
+    ;[DEV COMMENT] makes the console, should only need to be called once
     MakeConsole()
     {
         global
@@ -338,7 +354,7 @@ class Log
     }
     
     static WM_SYSCOMMAND := 0x112, SC_CLOSE := 0xF060
-
+    ;[DEV COMMENT] stops the gui from being deleted when closed but instead hides it
     GuiClose(gui_, wp, lp, msg, hwnd) {
         if (gui_ = hwnd && wp = Log.SC_CLOSE){
             Log.ShowConsoleWindow:= false
@@ -347,6 +363,7 @@ class Log
         }
     }
 
+    ;[DEV COMMENT] opens the log file directory
     OpenLogDir(p*)
     {
         run, % "explorer.exe /expand, " . Log.getCurrentLogDirectory()
@@ -551,8 +568,12 @@ return
 LOG_AHK_SKIP_LABELS:
 
 Log.message("LogStartup", "Logging Started at " . Log.getTimeDate("HH:mm:ss"),False,True,True)
+
+;[DEV COMMENT] MAKE THAT CONSOLE WINDOW
 Log.MakeConsole()
 
+;[DEV COMMENT] check the Tray icon on the bottom right, 
+;       right click and at the top of the menu we have the console window opener
 Menu, Tray, NoStandard
 Menu, Tray, Add, % "&Open Logs", ToggleConsole
 Menu, Tray, Add, % ""

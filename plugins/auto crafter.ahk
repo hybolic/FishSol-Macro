@@ -7,7 +7,8 @@ Height: 123
 */
 class AutoCrafterPlugin extends Plugin
 {
-    ;techincally size doesn't matter for this one
+    ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
+    ;               added to the list when the loader is called
 
     ;OVERRIDE THIS FUNCTION AND CALL |PLUGIN_NAME|.RUN()
     PluginRun()
@@ -96,15 +97,6 @@ goto AutoCrafter_EOF
 ToggleAutoCrafter:
     autoCrafter := !autoCrafter
     Toggle_GuiControl("AutoCrafterStatus", autoCrafter, "autoCrafter")
-    if (autoCrafter) {
-        GuiControl,, AutoCrafterStatus, ON
-        GuiControl, +c0x00DD00, AutoCrafterStatus
-        IniWrite, true, %iniFilePath%, "Macro", "autoCrafter"
-    } else {
-        GuiControl,, AutoCrafterStatus, OFF
-        GuiControl, +c0xFF4444, AutoCrafterStatus
-        IniWrite, false, %iniFilePath%, "Macro", "autoCrafter"
-    }
 return
 
 
