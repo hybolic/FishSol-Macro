@@ -6,16 +6,17 @@ class Debugger
     static Log_More_Info        := true
     static Log_Basic_Info       := true
     static DoMouseClick         := false
-    static DoMouseMove          := true
-    static DoSendKeystrokes     := true
+    static DoMouseMove          := false
+    static DoSendKeystrokes     := false
+    static DoSleep              := false
 
     static ForceHideLabels      := false
     static Visual_ShowObjectKey := false
     static ForceHideViews       := false
-    static Internal_FPS         := 60
+    static Internal_FPS         := 1
     static Internal_States_FTU  := 1
     static Internal_Window_FTU  := 1
-    static _Internal_Logs_FTU   := 60 * 5
+    static _Internal_Logs_FTU   := 1 * 5
     Internal_Logs_FTU(val:=-1)
     {
         if val = -1
@@ -249,8 +250,8 @@ class Log
 
         StoredLogLength := StrLen(RegExReplace(Log.StoredConsoleLog, "[^\n]*"))
         MaxSizeOfStoredLog := min(StoredLogLength, Log.__TB_MAX - 1)
-        ; if (StoredLogLength > MaxSizeOfStoredLog)
-        ;     Log.StoredConsoleLog := RegExReplace(Log.StoredConsoleLog, ".+?[\n\r]{1,2}",r,o, StoredLogLength - MaxSizeOfStoredLog)
+        if (StoredLogLength > MaxSizeOfStoredLog)
+            Log.StoredConsoleLog := RegExReplace(Log.StoredConsoleLog, ".+?[\n\r]{1,2}",r,o, StoredLogLength - MaxSizeOfStoredLog)
         
         if (Log.ConsoleLogHandle)
         {

@@ -15,13 +15,6 @@ global MAX_SPEED := -1
 global STANDARD_SPEED := A_BatchLines
 SetBatchLines, %MAX_SPEED%
 
-
-; Log.Info("[PLUGIN=>""CORE""]" . " Finished Loading!")
-
-
-
-
-
 global RobloxWindow := new _RobloxWindow
 
 Loading_Times := new StopWatch
@@ -79,17 +72,29 @@ SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
 
-iniFilePath := A_ScriptDir "\settings.ini"
-
-iconFilePath := A_ScriptDir "\img\icon.ico"
-if (FileExist(iconFilePath)) {
-    Menu, Tray, Icon, %iconFilePath%
-}
+;SYSTEM RESOURCES
+    iniFilePath := A_ScriptDir "\settings.ini"
+    iconFilePath := A_ScriptDir "\img\icon.ico"
+    if (FileExist(iconFilePath)) {
+        Menu, Tray, Icon, %iconFilePath%
+    }
+    global DiscordPNG        := A_ScriptDir . "\img\Discord.png"
+    global RobloxPNG         := A_ScriptDir . "\img\Robux.png"
+    global Gui_Main_Png      := A_ScriptDir . "\gui\Main.png"
+    global Gui_Misc_Png      := A_ScriptDir . "\gui\Misc.png"
+    global Gui_Failsafe_Png  := A_ScriptDir . "\gui\Failsafes.png"
+    global Gui_Webhook_Png   := A_ScriptDir . "\gui\Webhook.png"
+    global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
+;end
 
 global version  := "fishSol v1.9.4 2601-AltC"
-global icon_url := "https://maxstellar.github.io/fishSol%20icon.png"
 
-global res := "1080p"
+;WEB RESOURCES
+    global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
+    global icon_url := "https://maxstellar.github.io/fishSol%20icon.png"
+;end
+
+global res := "1080p" ; [DEV NOTE] TO BE REMOVED
 global maxLoopCount := 15
 global fishingLoopCount := 15
 global sellAllToggle := false
@@ -123,24 +128,16 @@ global fishingFailsafeRan := false
 global advancedFishingThreshold := 25
 global webhookURL := ""
 
-;[DEV COMMENT] added hotkeys check misc - Nadir
+;[DEV COMMENT] added hotkeys rebinding look in misc tab - Nadir
 global Start_hotkey := "F1"
 global Pause_hotkey := "F2"
 global Stop_hotkey  := "F3"
-global temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|Win|Tab|Left|Right|Up|Down|Enter|Backspace|\b[\w\/]\b"
+
+;basic regex to prevent certain keys being used for the macro when being assigned
+global REGEX_KeybindBase := "Escape|Button|Wheel|Space|Alt|Control|Shift|Win|Tab|Left|Right|Up|Down|Enter|Backspace|\b[\w\/]\b"
 
 ;[DEV COMMENT] unused - Nadir
-; auroraDetection := false 
-
-;internal RESOURCES
-    global DiscordPNG        := A_ScriptDir . "\img\Discord.png"
-    global RobloxPNG         := A_ScriptDir . "\img\Robux.png"
-    global Gui_Main_Png      := A_ScriptDir . "\gui\Main.png"
-    global Gui_Misc_Png      := A_ScriptDir . "\gui\Misc.png"
-    global Gui_Failsafe_Png  := A_ScriptDir . "\gui\Failsafes.png"
-    global Gui_Webhook_Png   := A_ScriptDir . "\gui\Webhook.png"
-    global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
-;end
+; auroraDetection := false
 
 startBench()
 LoadPlugins()
@@ -378,163 +375,69 @@ stopBench("GuiControls")
 SetBatchLines, %STANDARD_SPEED%
 ms := FullAppTimer.Stop().getTimeData().get_ms()
 Log.message("BENCHMARK", "fishSol took " . ms . "ms to load!", false, true, true)
-plugin_timer := ""
-FullAppTimer := ""
-;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
+ms                  := "" ; this is just hopeful thinking and
+plugin_timer.Data   := "" ;    at this point, removing bytes
+plugin_timer        := "" ; set to be garbage collected
+Loading_Times.Data  := "" ; set to be garbage collected
+Loading_Times       := "" ; set to be garbage collected
+FullAppTimer.Data   := "" ; set to be garbage collected
+FullAppTimer        := "" ; set to be garbage collected
+
 return
-
-
+;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
-
-HideLabels:
+ 
+ HideLabels:
     Debugger.ForceHideLabels := not Debugger.ForceHideLabels
-return
-
-HideViews:
+ return
+ 
+ HideViews:
     Debugger.ForceHideViews := not Debugger.ForceHideViews
-return
-
-ToggleDebug:
+ return
+ 
+ ToggleDebug:
     Debugger.DoMouseClick     := not Debugger.DoMouseClick
     Debugger.DoMouseMove      := not Debugger.DoMouseMove
     Debugger.DoSendKeystrokes := not Debugger.DoSendKeystrokes
-return
-
+ return
+ 
 ;;;;;;;;;;;;;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
 
+#Include, core\IniSettings.ahk
 
 TabChange:
 return
 
-UpdateLoopCount:
-    Gui, Submit, nohide
-    if (MaxLoopInput > 0) {
-        maxLoopCount := MaxLoopInput
-        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-    }
-    if (FishingLoopInput > 0) {
-        fishingLoopCount := FishingLoopInput
-        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
-    }
-return
-
-ToggleSellAll:
-    sellAllToggle := !sellAllToggle
-    Toggle_GuiControl("SellAllStatus", sellAllToggle, "sellAllToggle")
-return
-
-ToggleAdvancedFishingDetection:
-    advancedFishingDetection := !advancedFishingDetection
-    Toggle_GuiControl("AdvancedFishingDetectionStatus", advancedFishingDetection, "sellAllToggle")
-return
-
-ToggleAzertyPathing:
-    azertyPathing := !azertyPathing
-    Toggle_GuiControl("AzertyPathingStatus", azertyPathing, "azertyPathing")
-return
-
-ToggleAutoUnequip:
-    autoUnequip := !autoUnequip
-    Toggle_GuiControl("AutoUnequipStatus", autoUnequip, "autoUnequip")
-return
-
-ToggleAutoCloseChat:
-    autoCloseChat := !autoCloseChat
-    Toggle_GuiControl("AutoCloseChatStatus", autoCloseChat, "autoCloseChat")
-return
-
-ToggleStrangeController:
-    strangeController := !strangeController
-    Toggle_GuiControl("StrangeControllerStatus", strangeController, "strangeController")
-return
-
-ToggleBiomeRandomizer:
-    biomeRandomizer := !biomeRandomizer
-    Toggle_GuiControl("BiomeRandomizerStatus", biomeRandomizer, "biomeRandomizer")
-return
-
-ToggleFailsafeWebhook:
-    failsafeWebhook := !failsafeWebhook
-    Toggle_GuiControl("failsafeWebhookStatus", failsafeWebhook, "failsafeWebhook")
-return
-
-TogglePathingWebhook:
-    pathingWebhook := !pathingWebhook
-    Toggle_GuiControl("pathingWebhookStatus", pathingWebhook, "pathingWebhook")
-return
-
-ToggleItemWebhook:
-    itemWebhook := !itemWebhook
-    Toggle_GuiControl("itemWebhookStatus", itemWebhook, "itemWebhook")
-return
-
-UpdatePrivateServer:
-    Gui, Submit, nohide
-    privateServerLink := PrivateServerInput
-    IniWrite, %privateServerLink%, %iniFilePath%, "Macro", "privateServerLink"
-return
-
-UpdateFishingFailsafe:
-    Gui, Submit, nohide
-    if (FishingFailsafeInput > 0) {
-        fishingFailsafeTime := FishingFailsafeInput
-        IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
-    }
-return
-
-UpdatePathingFailsafe:
-    Gui, Submit, nohide
-    if (PathingFailsafeInput > 0) {
-        pathingFailsafeTime := PathingFailsafeInput
-        IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
-    }
-return
-
-UpdateAutoRejoinFailsafe:
-    Gui, Submit, nohide
-    if (AutoRejoinFailsafeInput > 0) {
-        autoRejoinFailsafeTime := AutoRejoinFailsafeInput
-        IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-    }
-return
-
-UpdateAdvancedThreshold:
-    Gui, Submit, nohide
-    if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
-        advancedFishingThreshold := AdvancedThresholdInput
-        IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
-    }
-return
-
-UpdateWebhook:
-    Gui, Submit, nohide
-    webhookURL := WebhookInput
-    IniWrite, %webhookURL%, %iniFilePath%, "Macro", "webhookURL"
-return
+getTimeNow()
+{
+    time := A_NowUTC
+    timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+    return timestamp
+}
 
 ; webhooks!
 SendWebhook(title, color := "16777215") {
-    global webhookURL
+    global ;just assume global
+    local json, timestamp, http
     if (!InStr(webhookURL, "discord")) {
         return
     }
-    time := A_NowUTC
-    timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+
+    timestamp := getTimeNow()
 
     json := "{"
-    . """embeds"": ["
-    . "{"
-    . "    ""title"": """ title ""","
-    . "    ""color"": " color ","
-    . "    ""footer"": {""text"": """ version """, ""icon_url"": """ . icon_url . " ""},"
-    . "    ""timestamp"": """ timestamp """"
-    . "  }"
-    . "],"
-    . """content"": """""
-    . "}"
-
+          . """embeds"": ["
+          . "{"
+          . "    ""title"": """ title ""","
+          . "    ""color"": " color ","
+          . "    ""footer"": {""text"": """ version """, ""icon_url"": """ . icon_url . " ""},"
+          . "    ""timestamp"": """ timestamp """"
+          . "  }"
+          . "],"
+          . """content"": """""
+          . "}"
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
@@ -556,8 +459,6 @@ UpdateGUI:
         GuiControl, +c0x00DD00, RuntimeText
         GuiControl,, CyclesText, %cycleCount%
         GuiControl, +c0x00DD00, CyclesText
-
-
     } else {
         GuiControl,, StatusText, Stopped
         GuiControl, +c0xFF4444, StatusText
@@ -695,639 +596,52 @@ ManualGUIUpdate() {
     ExitApp
 ;end
 
-;1080p
-; DoMouseMove:
-;     if (toggle) {
+; class PluginInterrupts
+ ; {
+ ;     PrePluginRun(the_class, byref loopCount, byref restartPathing)
+ ;     {
+ ;         pre_reset_inter := Interrupts.GetInterrupts("PrePluginRun_" . the_class.__Class)
+ ;         for _, regi in pre_reset_inter
+ ;         {
+ ;             regi_function := regi.FuncCall
+ ;             theClass := regi.This_Class
+ ;             func1 := theClass[regi_function]
+ ;             if(regi.CanForceEnd)
+ ;             {
+ ;                 try return_value := %func1%(loopCount, restartPathing)
+ ;                 if not return_value = "" and not return_value = 0
+ ;                     return return_value
+ ;             }
+ ;             else
+ ;             {
+ ;                 try return_value := theClass[regi_function](loopCount, restartPathing)
+ ;             }
+ ;         }
+ ;     }
+ ;     PostPluginRun(the_class, byref loopCount, byref restartPathing)
+ ;     {
+ ;         pre_reset_inter := Interrupts.GetInterrupts("PostPluginRun_" . the_class.__Class)
+ ;         for _, regi in pre_reset_inter
+ ;         {
+ ;             regi_function := regi.FuncCall
+ ;             theClass := regi.This_Class
+ ;             func1 := theClass[regi_function]
+ ;             if(regi.CanForceEnd)
+ ;             {
+ ;                 try return_value := %func1%(loopCount, restartPathing)
+ ;                 if not return_value = "" and not return_value = 0
+ ;                     return return_value
+ ;             }
+ ;             else
+ ;             {
+ ;                 try return_value := theClass[regi_function](loopCount, restartPathing)
+ ;             }
+ ;         }
+ ;     }
+;}
 
-;     global pathingMode
-;     global privateServerLink
-;     global globalFailsafeTimer
-;     global azertyPathing
-;     global autoUnequip
-;     global autoCloseChat
-;     global code
-;     global strangeController
-;     global biomeRandomizer
-;     global strangeControllerTime
-;     global biomeRandomizerTime
-;     global strangeControllerInterval
-;     global biomeRandomizerInterval
-;     global strangeControllerLastRun
-;     global biomeRandomizerLastRun
-;     global snowmanPathingLastRun
-;     global startTick
-;     global failsafeWebhook
-;     global pathingWebhook
-;     global hasCrafterPlugin
-;     global crafterToggle
-;     global autoCrafterDetection
-;     global autoCrafterLastCheck
-;     global autoCrafterCheckInterval
-;     loopCount := 0
-;     keyW := azertyPathing ? "z" : "w"
-;     keyA := azertyPathing ? "q" : "a"
-;     restartPathing := false
-;     Loop {
-;         if (!toggle) {
-;             break
-;         }
-
-
-;         ; ; SC Toggle
-;         ; if (strangeController) {
-;         ;     elapsed := A_TickCount - startTick
-;         ;     if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
-;         ;         RunStrangeController()
-;         ;         strangeControllerLastRun := elapsed
-;         ;     } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-;         ;         RunStrangeController()
-;         ;         strangeControllerLastRun := elapsed
-;         ;     }
-;         ; }
-
-;         ; ; Snowman Pathing Toggle
-;         ; if (snowmanPathing) {
-;         ;     elapsed := A_TickCount - startTick
-;         ;     if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
-;         ;         Send, {Esc}
-;         ;         Sleep, 650
-;         ;         Send, R
-;         ;         Sleep, 650
-;         ;         Send, {Enter}
-;         ;         sleep 2600
-
-;         ;         if (snowmanPathingWebhook) {
-;         ;             try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
-;         ;         }
-;         ;         RunSnowmanPathing()
-;         ;         snowmanPathingLastRun := elapsed
-
-;         ;         restartPathing := true
-;         ;         continue
-;         ;     }
-;         ; }
-
-;         ; ; Auto Crafter Detection (copy and pasted, need to change the coords)
-;         ; if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
-;         ;     currentTime := A_TickCount
-;         ;     if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
-;         ;         autoCrafterLastCheck := currentTime
-;         ;         PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
-;         ;         if (!ErrorLevel) {
-;         ;             RunAutoCrafter()
-;         ;         }
-;         ;     }
-;         ; }
-
-;         ; More snowman pathing
-;         loopCount++
-;         if (loopCount > maxLoopCount || restartPathing) {
-;             restartPathing := false
-
-;             if (snowmanPathing) {
-;             Sleep, 2000
-
-;         }
-
-;             if (pathingWebhook) {
-;                 try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
-;             }
-
-;             if (autoUnequip) {
-;             MouseMove, 45, 412, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 830, 441, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 634, 638, 3
-;             this.Sleep()
-;             Click, Left
-;             sleep 1200
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 1425, 303, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;         }
-;         if (autoCloseChat) {
-;             this.Sleep()
-;             Send {/}
-;             this.Sleep()
-;             MouseMove, 149, 40, 3
-;             this.Sleep()
-;             MouseClick, Left
-;             this.Sleep()
-;         }
-
-;         Send, {Esc}
-;         Sleep, 650
-;         Send, R
-;         Sleep, 650
-;         Send, {Enter}
-;         sleep 2600
-;         MouseMove, 47, 467, 3
-;         sleep 220
-;         Click, Left
-;         sleep 220
-;         MouseMove, 382, 126, 3
-;         sleep 220
-;         Click, Left
-;         sleep 220
-;         Click, WheelUp 80
-;         sleep 500
-;         Click, WheelDown 45
-;         this.Sleep()
-
-;         if (pathingMode = "Non Vip Pathing") {
-;             ; Non VIP Pathing
-;             Send, {%keyW% Down}
-;             Send, {%keyA% Down}
-;             sleep 5190
-;             Send, {%keyW% Up}
-;             sleep 800
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 550
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {d Down}
-;             sleep 240
-;             Send {d Up}
-;             sleep 150
-;             Send {%keyW% Down}
-;             sleep 1450
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {s Down}
-;             this.Sleep()
-;             Send {s Up}
-;             this.Sleep()
-;             Send {Space Down}
-;             sleep 25
-;             Send {%keyW% Down}
-;             sleep 1100
-;             Send {Space Up}
-;             sleep 520
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-;             MouseMove, 956, 803, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 956, 938, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 828, 404, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 680, 804, 3
-;                 } else {
-;                     MouseMove, 512, 804, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 801, 626, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1458, 266, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 1400
-;             Send, {%keyA% Up}
-;             sleep 75
-;             Send, {%keyW% Down}
-;             sleep 3300
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         } else if (pathingMode = "Vip Pathing") {
-;             ; VIP Pathing
-;             Send, {%keyW% Down}
-;             Send, {%keyA% Down}
-;             sleep 4150
-;             Send, {%keyW% Up}
-;             sleep 600
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 400
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {d Down}
-;             sleep 180
-;             Send {d Up}
-;             sleep 150
-;             Send {%keyW% Down}
-;             sleep 1100
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {s Down}
-;             this.Sleep()
-;             Send {s Up}
-;             this.Sleep()
-;             Send {Space Down}
-;             sleep 25
-;             Send {%keyW% Down}
-;             sleep 1200
-;             Send {Space Up}
-;             sleep 200
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-;             MouseMove, 956, 803, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 956, 938, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 828, 404, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 680, 804, 3
-;                 } else {
-;                     MouseMove, 512, 804, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 801, 626, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1458, 266, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 1400
-;             Send, {%keyA% Up}
-;             sleep 75
-;             Send, {%keyW% Down}
-;             sleep 2670
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         } else if (pathingMode = "Abyssal Pathing") {
-;             ; Abyssal Pathing
-;             MouseMove, 30, 406, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 947, 335, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 100
-;             MouseMove, 1102, 367, 3
-;             sleep 100
-;             MouseClick, Left
-;             sleep 100
-;             ClipBoard := "Abyssal Hunter"
-;             sleep 100
-;             Send, ^v
-;             sleep 200
-;             MouseMove, 819, 434, 3
-;             sleep 200
-;             Click, WheelUp 100
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-
-;             ErrorLevel := 0
-;             PixelSearch, px, py, 576, 626, 666, 645, 0xfc7f98, 3, Fast RGB
-;             if (ErrorLevel != 0) {
-;                 MouseMove, 623, 634, 3
-;                 sleep 200
-;                 MouseClick, Left
-;             }
-
-;             sleep 200
-;             MouseMove, 1412, 296, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-
-;             Send, {%keyW% Down}
-;             sleep 500
-;             Send, {%keyA% Down}
-;             sleep 2650
-;             Send, {%keyW% Up}
-;             sleep 600
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 500
-;             Send {%keyW% Up}
-;             sleep 200
-;             Send {s Down}
-;             sleep 120
-;             Send {s Up}
-;             sleep 100
-;             Send {d Down}
-;             sleep 280
-;             Send {d Up}
-;             sleep 200
-;             Send {%keyA% Down}
-;             sleep 50
-;             Send {Space Down}
-;             sleep 730
-;             Send {Space Up}
-;             sleep 200
-;             Send {%keyA% Up}
-;             sleep 100
-;             Send {%keyW% Down}
-;             sleep 810
-;             Send {%keyW% Up}
-;             sleep 150
-;             Send {space Down}
-;             sleep 15
-;             Send {d Down}
-;             sleep 150
-;             Send {space Up}
-;             sleep 580
-;             Send {d Up}
-;             sleep 100
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-
-;             MouseMove, 981, 805, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 967, 948, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 838, 413, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 678, 810, 3
-;                 } else {
-;                     MouseMove, 525, 809, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 801, 626, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1469, 271, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 800
-;             Send, {%keyA% Up}
-;             sleep 100
-;             Send, {%keyW% Down}
-;             sleep 1760
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         }
-;     }
-
-;         MouseMove, 862, 843, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         barColor := 0
-;         otherBarColor := 0
-
-;         ; Check for white pixel
-;         startWhitePixelSearch := A_TickCount
-;         if (globalFailsafeTimer = 0) {
-;         globalFailsafeTimer := A_TickCount
-;         }
-;         fishingFailsafeRan := false
-;         Loop {
-;         PixelGetColor, color, 1176, 836, RGB
-;         if (color = 0xFFFFFF) {
-;         MouseMove, 950, 880, 3
-;         ; Get randomized bar color
-;         Sleep 50
-;         PixelGetColor, barColor, 955, 767, RGB
-;         SetTimer, DoMouseMove, Off
-;         globalFailsafeTimer := 0
-;         break
-;         }
-
-;         ; Auto Rejoin Failsafe
-;         if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-;         PixelGetColor, checkColor, 1175, 837, RGB
-;         if (checkColor != 0xFFFFFF) {
-;         Process, Close, RobloxPlayerBeta.exe
-;         sleep 500
-;         Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-;         sleep 5000
-;         WinActivate, ahk_exe RobloxPlayerBeta.exe
-;         sleep 7000
-;         MouseMove, 960, 540, 3
-;         sleep 200
-;         MouseClick, Left
-;         sleep 6000
-
-;         ; Start button
-;         sleep 1000
-;         Loop {
-;         ErrorLevel := 0
-;         PixelSearch, px, py, 205, 1019, 325, 978, 0x82ff95, 5, Fast RGB
-;         if (ErrorLevel = 0) {
-;         sleep 1000
-;         MouseMove, 267, 1000, 3
-;         sleep 350
-;         MouseClick, Left
-;         break
-;         }
-;         }
-
-;         this.Sleep()0
-;         restartPathing := true
-;         try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
-;         break
-;         }
-;         }
-
-;         ; Fishing Failsafe
-;         if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-;         MouseMove, 1268, 941, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         MouseMove, 1167, 476, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         MouseMove, 1113, 342, 3
-;         this.Sleep()
-;         MouseClick, left
-;         this.Sleep()
-;         MouseMove, 851, 832, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         fishingFailsafeRan := true
-;         if (failsafeWebhook) {
-;             try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
-;         }
-;         }
-;         ; Pathing Failsafe
-;         if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
-;         restartPathing := true
-;         if (failsafeWebhook) {
-;             try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
-;         }
-;         break
-;         }
-;         if (!toggle) {
-;         Return
-;         }
-;         }
-
-;         if (restartPathing) {
-;         continue
-;         }
-
-;         ; PixelSearch loop
-;         startTime := A_TickCount
-;         Loop {
-;         if (!toggle)
-;         break
-;         if (A_TickCount - startTime > 9000)
-;         break
-
-;         ; Advanced detection
-;         if (advancedFishingDetection) {
-;             ErrorLevel := 0
-;             PixelSearch, leftX, leftY, 757, 767, 1161, 767, barColor, 5, Fast RGB
-;             if (ErrorLevel = 0) {
-;                 rightX := leftX
-;                 Loop {
-;                     testX := rightX + 1
-;                     if (testX > 1161)
-;                         break
-;                     PixelGetColor, testColor, %testX%, 767, RGB
-;                     if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-;                         rightX := testX
-;                     } else {
-;                         break
-;                     }
-;                 }
-;                 barWidth := rightX - leftX
-;                 if (barWidth < advancedFishingThreshold) {
-;                     MouseClick, left
-;                     sleep 25
-;                 }
-;             } else {
-;                 MouseClick, left
-;             }
-;             sleep 10
-;         } else {
-;             ; Normal detection
-;             ErrorLevel := 0
-;             PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
-;             if (ErrorLevel = 0) {
-;             } else {
-;                 MouseClick, left
-;             }
-;         }
-;         }
-;         this.Sleep()
-;         MouseMove, 1113, 342, 3
-;         Sleep 700
-;         /*
-;         Loop {
-;         PixelGetColor, color, 1112, 342, RGB
-;         if (color = 0xFFFFFF) {
-;         break
-;         }
-;         if (!toggle) {
-;         Return
-;         }
-;         }
-;         */
-;         MouseClick, Left
-;         this.Sleep()
-;         cycleCount++
-;     }
-;     }
-; Return
-
-; SendMouseClick(Button)
-; {
-;     Log.Info("MouseClick, " . Button)
-;     ; MouseClick, %Button%
-; }
-; SendMouseMove(X,Y,Speed)
-; {
-;     Log.Info("MouseMove, " . X . ", " . Y . ", " . Speed)
-;     ; MouseMove, %X%, %Y%, %Speed%
-; }
-; DoSleep(ms:=300)
-; {
-;     Log.Info("Sleep " . ms)
-;     sleep %ms%
-; }
-; SendKey(key_press)
-; {
-;     Log.Info("Send " . key_press)
-;     ; Send %key_press%
-; }
-
-
-
-
-
-
-
-;1440p
+;main DoMouseMove due to highest precision
+;      1440p
 DoMouseMove2:
     Log.Info("RUN DoMouseMove2")
     if (toggle) {
@@ -1357,8 +671,8 @@ DoMouseMove2:
         global autoCrafterCheckInterval
         global fishingFailsafeRan := false
         loopCount := 0
-        keyW := azertyPathing ? "z" : "w"
-        keyA := azertyPathing ? "q" : "a"
+        global keyW := azertyPathing ? "z" : "w"
+        global keyA := azertyPathing ? "q" : "a"
         restartPathing := false
         Top_Loop:
         Loop {
@@ -1368,643 +682,35 @@ DoMouseMove2:
             }
 
             for _, plugin_class in PLUGINS_LIST
-            {                     
+            {   ;disabled majority of experimental interrupts until release of plugin support            
+                ;PoP_Intr_Ret := PluginInterrupts.PrePluginRun(plugin_class, loopCount, restartPathing)
+                ;if not PoP_Intr_Ret = ""      ; find a better way to do this
+                ;    if PoP_Intr_Ret = 1       ; but will be keeping the one inside core as i feel it
+                ;        Continue              ; has some use for now
+                ;    Else if PoP_Intr_Ret = 2  ; 
+                ;        Return                ; 
                 if not plugin_class.PluginRun(restartPathing)
                 {
                     Continue Top_Loop
                 }
+                ;PrP_Intr_Ret := PluginInterrupts.PostPluginRun(plugin_class, loopCount, restartPathing)
+                ;if not PrP_Intr_Ret = ""
+                ;    if PrP_Intr_Ret = 1
+                ;        Continue
+                ;    Else if PrP_Intr_Ret = 2
+                ;        Return
             }
 
             loopCount++
-            RunOutput := CorePlugin.RunLoop(loopCount, restartPathing)
+            RunOutput := CORE_PLUGIN0.RunLoop(loopCount, restartPathing)
             ;[DEV COMMENT] Will not work inside a switch statement because of <Return> just being the end of block statement for <Case #:>
-            if RunOutput = 2
-                Return
-            else if RunOutput = 1
+            if RunOutput = 2                                                    ;atleast the documentation makes it seem like it is
+                Return                                                          ; upon further reading i may have been wrong and switch
+            else if RunOutput = 1                                               ; switch might be possible to use
                 Continue
         }
     }
 Return
-;786p
-; DoMouseMove3:
-;     if (toggle) {
-
-;     global pathingMode
-;     global privateServerLink
-;     global globalFailsafeTimer
-;     global azertyPathing
-;     global autoUnequip
-;     global autoCloseChat
-;     global code
-;     global strangeController
-;     global biomeRandomizer
-;     global strangeControllerTime
-;     global biomeRandomizerTime
-;     global strangeControllerInterval
-;     global biomeRandomizerInterval
-;     global strangeControllerLastRun
-;     global biomeRandomizerLastRun
-;     global snowmanPathingLastRun
-;     global startTick
-;     global failsafeWebhook
-;     global pathingWebhook
-;     global hasCrafterPlugin
-;     global crafterToggle
-;     global autoCrafterDetection
-;     global autoCrafterLastCheck
-;     global autoCrafterCheckInterval
-;     loopCount := 0
-;     keyW := azertyPathing ? "z" : "w"
-;     keyA := azertyPathing ? "q" : "a"
-;     restartPathing := false
-;     Loop {
-;         if (!toggle) {
-;             break
-;         }
-
-
-;         ; SC Toggle
-;         ; if (strangeController) {
-;         ;     elapsed := A_TickCount - startTick
-;         ;     if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
-;         ;         RunStrangeController()
-;         ;         strangeControllerLastRun := elapsed
-;         ;     } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-;         ;         RunStrangeController()
-;         ;         strangeControllerLastRun := elapsed
-;         ;     }
-;         ; ; }
-
-;         ; ; Snowman Pathing
-;         ; if (snowmanPathing) {
-;         ;     elapsed := A_TickCount - startTick
-;         ;     if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
-;         ;         if (snowmanPathingWebhook) {
-;         ;             try SendWebhook(":moneybag: Resetting character after snowman pathing...", "16636040")
-;         ;         }
-;         ;         Send, {Esc}
-;         ;         Sleep, 650
-;         ;         Send, R
-;         ;         Sleep, 650
-;         ;         Send, {Enter}
-;         ;         sleep 2600
-
-;         ;         if (snowmanPathingWebhook) {
-;         ;             try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
-;         ;         }
-;         ;         RunSnowmanPathing()
-;         ;         snowmanPathingLastRun := elapsed
-
-;         ;         restartPathing := true
-;         ;         continue
-;         ;     }
-;         ; }
-
-;         ; ; BR Toggle
-;         ; if (biomeRandomizer) {
-;         ;     elapsed := A_TickCount - startTick
-;         ;     if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
-;         ;         RunBiomeRandomizer()
-;         ;         biomeRandomizerLastRun := elapsed
-;         ;     } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
-;         ;         RunBiomeRandomizer()
-;         ;         biomeRandomizerLastRun := elapsed
-;         ; ;     }
-;         ; ; }
-
-;         ; ; Auto Crafter Detection (copy and pasted, need to change the coords)
-;         ; if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
-;         ;     currentTime := A_TickCount
-;         ;     if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
-;         ;         autoCrafterLastCheck := currentTime
-;         ;         PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
-;         ;         if (!ErrorLevel) {
-;         ;             RunAutoCrafter()
-;         ;         }
-;         ;     }
-;         ; }
-
-;         ; More snowman pathing
-;         loopCount++
-;         if (loopCount > maxLoopCount || restartPathing) {
-;             restartPathing := false
-
-;             if (snowmanPathing) {
-;             Sleep, 2000
-
-;         }
-
-;             if (pathingWebhook) {
-;                 try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
-;             }
-
-;             if (autoUnequip) {
-;             MouseMove, 38, 292, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 594, 314, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 458, 457, 3
-;             this.Sleep()
-;             Click, Left
-;             sleep 1200
-;             Click, Left
-;             this.Sleep()
-;             MouseMove, 1016, 218, 3
-;             this.Sleep()
-;             Click, Left
-;             this.Sleep()
-;         }
-;         if (autoCloseChat) {
-;             this.Sleep()
-;             Send {/}
-;             this.Sleep()
-;             MouseMove, 151, 42, 3
-;             this.Sleep()
-;             MouseClick, Left
-;             this.Sleep()
-;         }
-;         Send, {Esc}
-;         Sleep, 650
-;         Send, R
-;         Sleep, 650
-;         Send, {Enter}
-;         sleep 2600
-;         MouseMove, 26, 325, 3
-;         sleep 220
-;         Click, Left
-;         sleep 220
-;         MouseMove, 273, 106, 3
-;         sleep 220
-;         Click, Left
-;         sleep 220
-; 		Click, WheelUp 80
-; 		sleep 500
-; 		Click, WheelDown 90
-; 		this.Sleep()
-
-;         if (pathingMode = "Non Vip Pathing") {
-;             ; Non VIP Pathing
-;             Send, {%keyW% Down}
-;             Send, {%keyA% Down}
-;             sleep 5190
-;             Send, {%keyW% Up}
-;             sleep 800
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 550
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {d Down}
-;             sleep 240
-;             Send {d Up}
-;             sleep 150
-;             Send {%keyW% Down}
-;             sleep 1450
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {s Down}
-;             this.Sleep()
-;             Send {s Up}
-;             this.Sleep()
-;             Send {Space Down}
-;             sleep 25
-;             Send {%keyW% Down}
-;             sleep 1100
-;             Send {Space Up}
-;             sleep 520
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-;             MouseMove, 682, 563, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 682, 667, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 586, 287, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 486, 570, 3
-;                 } else {
-;                     MouseMove, 365, 570, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 573, 447, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1050, 197, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 1400
-;             Send, {%keyA% Up}
-;             sleep 75
-;             Send, {%keyW% Down}
-;             sleep 3300
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         } else if (pathingMode = "Vip Pathing") {
-;             ; VIP Pathing
-;             Send, {%keyW% Down}
-;             Send, {%keyA% Down}
-;             sleep 4150
-;             Send, {%keyW% Up}
-;             sleep 600
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 400
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {d Down}
-;             sleep 180
-;             Send {d Up}
-;             sleep 150
-;             Send {%keyW% Down}
-;             sleep 1100
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {s Down}
-;             this.Sleep()
-;             Send {s Up}
-;             this.Sleep()
-;             Send {Space Down}
-;             sleep 25
-;             Send {%keyW% Down}
-;             sleep 1200
-;             Send {Space Up}
-;             sleep 200
-;             Send {%keyW% Up}
-;             this.Sleep()
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-;             MouseMove, 682, 563, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 682, 667, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 586, 287, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 486, 570, 3
-;                 } else {
-;                     MouseMove, 365, 570, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 573, 447, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1050, 197, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 1400
-;             Send, {%keyA% Up}
-;             sleep 75
-;             Send, {%keyW% Down}
-;             sleep 2670
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         } else if (pathingMode = "Abyssal Pathing") {
-;             ; Abyssal Pathing
-;             MouseMove, 21, 289, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 675, 239, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 100
-;             MouseMove, 786, 261, 3
-;             sleep 100
-;             MouseClick, Left
-;             sleep 100
-;             ClipBoard := "Abyssal Hunter"
-;             sleep 100
-;             Send, ^v
-;             sleep 200
-;             MouseMove, 584, 310, 3
-;             sleep 200
-;             Click, WheelUp 100
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-
-;             ErrorLevel := 0
-;             PixelSearch, px, py, 411, 446, 475, 460, 0xed7389, 3, Fast RGB
-;             if (ErrorLevel != 0) {
-;                 MouseMove, 444, 452, 3
-;                 sleep 200
-;                 MouseClick, Left
-;             }
-
-;             sleep 200
-;             MouseMove, 1007, 211, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-
-;             Send, {%keyW% Down}
-;             sleep 500
-;             Send, {%keyA% Down}
-;             sleep 2650
-;             Send, {%keyW% Up}
-;             sleep 600
-;             Send {%keyA% Up}
-;             sleep 200
-;             Send {%keyW% Down}
-;             sleep 500
-;             Send {%keyW% Up}
-;             sleep 200
-;             Send {s Down}
-;             sleep 120
-;             Send {s Up}
-;             sleep 100
-;             Send {d Down}
-;             sleep 280
-;             Send {d Up}
-;             sleep 200
-;             Send {%keyA% Down}
-;             sleep 50
-;             Send {Space Down}
-;             sleep 730
-;             Send {Space Up}
-;             sleep 200
-;             Send {%keyA% Up}
-;             sleep 100
-;             Send {%keyW% Down}
-;             sleep 810
-;             Send {%keyW% Up}
-;             sleep 150
-;             Send {space Down}
-;             sleep 15
-;             Send {d Down}
-;             sleep 150
-;             Send {space Up}
-;             sleep 580
-;             Send {d Up}
-;             sleep 100
-;             Send {e Down}
-;             this.Sleep()
-;             Send {e Up}
-;             this.Sleep()
-
-;             MouseMove, 699, 574, 3
-;             sleep 50
-;             MouseClick, Left
-;             sleep 50
-;             MouseClick, Left
-;             sleep 200
-;             MouseMove, 689, 676, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 800
-;             loopCount := 0
-
-;             while (loopCount < fishingLoopCount) {
-;                 MouseMove, 597, 294, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 200
-;                 if (sellAllToggle) {
-;                     MouseMove, 484, 577, 3
-;                 } else {
-;                     MouseMove, 374, 576, 3
-;                 }
-;                 sleep 200
-;                 MouseClick, Left
-;                 this.Sleep()
-;                 MouseMove, 573, 447, 3
-;                 sleep 200
-;                 MouseClick, Left
-;                 sleep 1000
-;                 loopCount++
-;             }
-
-;             MouseMove, 1047, 193, 3
-;             sleep 200
-;             MouseClick, Left
-;             sleep 200
-;             Send, {%keyA% Down}
-;             sleep 800
-;             Send, {%keyA% Up}
-;             sleep 100
-;             Send, {%keyW% Down}
-;             sleep 1760
-;             Send, {%keyW% Up}
-;             loopCount := 0
-;         }
-;     }
-
-;         MouseMove, 603, 597, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         barColor := 0
-;         otherBarColor := 0
-
-;         ; Check for white pixel
-;         startWhitePixelSearch := A_TickCount
-;         if (globalFailsafeTimer = 0) {
-;         globalFailsafeTimer := A_TickCount
-;         }
-;         fishingFailsafeRan := false
-;         Loop {
-;         ErrorLevel := 0
-;         PixelSearch, px, py, 866, 593, 865, 593, 0xFFFFFF, 10, Fast RGB
-;         if (ErrorLevel = 0) {
-;         MouseMove, 676, 638, 3
-;         ; Determine randomized bar color
-;         Sleep 50
-;         PixelGetColor, barColor, 674, 533, RGB
-;         SetTimer, DoMouseMove, Off
-;         break
-;         }
-
-;         ; Auto Rejoin Failsafe
-;         if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-;         PixelGetColor, checkColor, 865, 593, RGB
-;         if (checkColor != 0xFFFFFF) {
-;         Process, Close, RobloxPlayerBeta.exe
-;         sleep 500
-;         Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-;         sleep 5000
-;         WinActivate, ahk_exe RobloxPlayerBeta.exe
-;         sleep 7000
-;         MouseMove, 683, 384, 3
-;         sleep 200
-;         MouseClick, Left
-;         sleep 6000
-
-;         ; Start button
-;         sleep 1000
-;         Loop {
-;         ErrorLevel := 0
-;         PixelSearch, px, py, 160, 734, 244, 708, 0x82ff95, 5, Fast RGB
-;         if (ErrorLevel = 0) {
-;         sleep 1000
-;         MouseMove, 200, 715, 3
-;         sleep 350
-;         MouseClick, Left
-;         break
-;         }
-;         }
-
-;         this.Sleep()0
-;         restartPathing := true
-;         try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
-;         break
-;         }
-;         }
-
-;         ; Fishing Failsafe
-;         if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-;         MouseMove, 902, 668, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         MouseMove, 858, 331, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         this.Sleep()
-;         MouseMove, 817, 210, 3
-;         this.Sleep()
-;         MouseClick, left
-;         this.Sleep()
-;         MouseMove, 588, 588, 3
-;         this.Sleep()
-;         MouseClick, Left
-;         fishingFailsafeRan := true
-;         if (failsafeWebhook) {
-;             try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
-;         }
-;         }
-;         ; Pathing Failsafe
-;         if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
-;         restartPathing := true
-;         if (failsafeWebhook) {
-;             try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
-;         }
-;         break
-;         }
-;         if (!toggle) {
-;         Return
-;         }
-;         }
-
-;         if (restartPathing) {
-;         continue
-;         }
-
-;         ; PixelSearch loop
-;         startTime := A_TickCount
-;         Loop {
-;         if (!toggle)
-;         break
-;         if (A_TickCount - startTime > 9000)
-;         break
-
-;         ; Advanced detection
-;         if (advancedFishingDetection) {
-;             ErrorLevel := 0
-;             PixelSearch, leftX, leftY, 513, 531, 856, 549, barColor, 5, Fast RGB
-;             if (ErrorLevel = 0) {
-;                 rightX := leftX
-;                 Loop {
-;                     testX := rightX + 1
-;                     if (testX > 856)
-;                         break
-;                     PixelGetColor, testColor, %testX%, 531, RGB
-;                     if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-;                         rightX := testX
-;                     } else {
-;                         break
-;                     }
-
-;                 }
-;                 barWidth := rightX - leftX
-;                 if (barWidth < advancedFishingThreshold) {
-;                     MouseClick, left
-;                     sleep 25
-;                 }
-;             } else {
-;                 MouseClick, left
-;             }
-;             sleep 10
-;         } else {
-;             ; Normal detection
-;             ErrorLevel := 0
-;             PixelSearch, FoundX, FoundY, 513, 531, 856, 549, barColor, 5, Fast RGB
-;             if (ErrorLevel = 0) {
-;             } else {
-;                 MouseClick, left
-;             }
-;         }
-;         }
-;         this.Sleep()
-;         MouseMove, 829, 218, 3
-;         Sleep 700
-;         /*
-;         Loop {
-;         ErrorLevel := 0
-;         PixelSearch, px, py, 816, 211, 8616, 211, 0xFEFEFE, 10, Fast RGB
-;         if (ErrorLevel = 0) {
-;         break
-;         }
-;         if (!toggle) {
-;         Return
-;         }
-;         }
-;         */
-;         MouseClick, Left
-;         this.Sleep()
-;         cycleCount++
-;     }
-;     }
-; Return
 
 ; StartScript(res) {
  ;    if (!toggle) {
@@ -2044,19 +750,6 @@ Return
  ;    return
 ; }
 
-SelectRes:
-    Gui, Submit, nohide
-    res := Resolution
-    IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-    ManualGUIUpdate()
-return
-
-SelectPathing:
-    Gui, Submit, nohide
-    IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
-    pathingMode := PathingMode
-return
-
 ;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1NameClick:
     global ClickIndex := 1
@@ -2068,9 +761,10 @@ Dev3NameClick:
     global ClickIndex := 3
     goto DoNameClick
 ; ; Example Expansion
-; Dev4NameClick:
-;     global ClickIndex := 4
-;     goto DoNameClick
+ ;Dev4NameClick:
+ ;    global ClickIndex := 4
+ ;    goto DoNameClick
+;end
 DoNameClick:
     DeveloperDetails.click_website(ClickIndex)
 return
@@ -2086,9 +780,10 @@ Dev3LinkClick:
     global ClickIndex := 3
     goto DoLinkClick
 ; ; Example Expansion
-; Dev4LinkClick:
-;     global ClickIndex := 4
-; goto DoLinkClick
+ ;Dev4LinkClick:
+ ;    global ClickIndex := 4
+ ;goto DoLinkClick
+;end
 DoLinkClick:
     DeveloperDetails.click_link(ClickIndex)
 return
@@ -2209,35 +904,71 @@ class CorePlugin extends Plugin
     {
         ; global
         ; local
-        this.Auras                  := this.RegisterPoint(52  , 538 , this.S_LEFT  , "Auras")           ;OLDNAME=>temp01
-        this.Slot1                  := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")           ;OLDNAME=>temp02
-        this.Unequip                := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")         ;OLDNAME=>temp03
-        this.CloseGui               := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")        ;OLDNAME=>temp04
-        this.CloseChat              := this.RegisterPoint(151 , 38  , this.S_LEFT  , "CloseChat")       ;OLDNAME=>temp05
-        this.AuraCollection         := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")  ;OLDNAME=>temp06
-        this.ExitCollection         := this.RegisterPoint(525 , 158 , this.S_CENTER, "ExitCollection")  ;OLDNAME=>temp07
-        this.MerchantTextBox        := this.RegisterPoint(1308, 1073, this.S_CENTER, "MerchantTextBox") ;OLDNAME=>temp08
-        this.SellFish               := this.RegisterPoint(1289, 1264, this.S_CENTER, "SellFish")        ;OLDNAME=>temp09
-        this.Slot1Fish              := this.RegisterPoint(1117, 550 , this.S_CENTER, "Slot1Fish")       ;OLDNAME=>temp10
-        this.SubMenuSell            := this.RegisterPoint(1002, 831 , this.S_CENTER, "SubMenuSell")     ;OLDNAME=>temp11
-        this.CloseFishSell          := this.RegisterPoint(1958, 361 , this.S_CENTER, "CloseFishSell")   ;OLDNAME=>temp12
-        ; this.temp13 := this.RegisterPoint(40, 541, this.S_CENTER, "temp13")                           ; Duplicate see <temp01>
-        this.AuraTabOne             := this.RegisterPoint(1262, 447 , this.S_CENTER, "AuraTabOne")      ;OLDNAME=>temp14
-        this.SearchBox              := this.RegisterPoint(1469, 489 , this.S_CENTER, "SearchBox")       ;OLDNAME=>temp15
-        ; this.temp16 := this.RegisterPoint(1883, 395, this.S_CENTER, "temp16")                         ; Duplicate see <temp04>
-        this.FishButton             := this.RegisterPoint(1161, 1124, this.S_CENTER, "FishButton")      ;OLDNAME=>temp17
-        this.SkipButton             := this.RegisterPoint(1280, 720 , this.S_CENTER, "SkipButton")      ;OLDNAME=>temp18
-        this.FS_p1                  := this.RegisterPoint(1690, 1224, this.S_CENTER, "FS_p1")           ;OLDNAME=>temp19
-        this.FS_p2                  := this.RegisterPoint(1523, 649 , this.S_CENTER, "FS_p2")           ;OLDNAME=>temp20
-        ; this.temp21 := this.RegisterPoint(1457, 491, this.S_CENTER, "temp21")                         ; Duplicate see <temp15>
-        this.SellAll                := this.RegisterPoint(904 , 1080, this.S_CENTER, "SellAll")
-        this.SellOne                := this.RegisterPoint(700 , 1078, this.S_CENTER, "SellOne")
-        this.AbysPatPixSearchClick  := this.RegisterPoint(830 , 845 , this.S_CENTER, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
-        this.MoveOutOfWay           := this.RegisterPoint(1263, 1177, this.S_CENTER, "MoveOutOfWay")
-        this.MainMenuStart          := this.RegisterPoint(347 , 1329, this.S_LEFT  , "MainMenuStart")
-        this.CloseFishCaught        := this.RegisterPoint(1457, 491 , this.S_CENTER, "CloseFishCaught")
+
+        ;FIXED X AND Y POSITION ON WINDOW
+        this.CloseChat               := this.RegisterPoint(151 , 38  , this.S_LEFT  , "CloseChat")       ;OLDNAME=>temp05
+
+
+        ;SCALES WITH WIDTH OF WINDOW
+        this.ExitCollection          := this.RegisterPoint(525 , 158 , this.S_LEFT, "ExitCollection")    ;OLDNAME=>temp07
+        this.MerchantTextBox         := this.RegisterPoint(1308, 1073, this.S_BOTTOM, "MerchantTextBox") ;OLDNAME=>temp08
+        this.SellFish                := this.RegisterPoint(1289, 1264, this.S_BOTTOM, "SellFish")        ;OLDNAME=>temp09
+
+        ;SCALES WITH WIDTH AND HEIGHT OF WINDOW
+        this.Slot1Fish               := this.RegisterPoint(1117, 550 , this.S_CENTER, "Slot1Fish")       ;OLDNAME=>temp10
+        this.SubMenuSell             := this.RegisterPoint(1002, 831 , this.S_CENTER, "SubMenuSell")     ;OLDNAME=>temp11
+        this.CloseFishSell           := this.RegisterPoint(1958, 361 , this.S_CENTER, "CloseFishSell")   ;OLDNAME=>temp12
+        this.SellAll                 := this.RegisterPoint(904 , 1080, this.S_CENTER, "SellAll")
+        this.SellOne                 := this.RegisterPoint(700 , 1078, this.S_CENTER, "SellOne")
+
+        ;FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
+        this.CloseGui                := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")        ;OLDNAME=>temp04
+        this.AuraTabOne              := this.RegisterPoint(1262, 447 , this.S_CENTER, "AuraTabOne")      ;OLDNAME=>temp14
+        this.AbysPatPixSearchClick   := this.RegisterPoint(830 , 845 , this.S_CENTER, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
+        this.SearchBox               := this.RegisterPoint(1469, 489 , this.S_CENTER, "SearchBox")       ;OLDNAME=>temp15
+        this.Slot1                   := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")           ;OLDNAME=>temp02
+
+        ;POSTIONS MAY DRIFT SLIGHTLY WITH SIZE? MIGHT NEED TO COMPENSATE
+        this.Auras                   := this.RegisterPoint(52  , 538 , this.S_LEFT  , "Auras")           ;OLDNAME=>temp01
+        this.Auras.UseOuter := false
+        this.Unequip                 := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")         ;OLDNAME=>temp03
+        this.AuraCollection          := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")  ;OLDNAME=>temp06
+        this.AuraCollection.UseOuter := false
+
+        ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
+        this.FishButton              := this.RegisterPoint(1161, 1124, this.S_CENTER, "FishButton")      ;OLDNAME=>temp17
+        this.MoveOutOfWay            := this.RegisterPoint(1263, 1177, this.S_CENTER, "MoveOutOfWay")
+
+        this.FS_p1                   := this.RegisterPoint(1690, 1224, this.S_CENTER, "FS_p1")           ;OLDNAME=>temp19
+        this.FS_p2                   := this.RegisterPoint(1523, 649 , this.S_CENTER, "FS_p2")           ;OLDNAME=>temp20
+        
+        this.CloseFishCaught         := this.RegisterPoint(1457, 491 , this.S_CENTER, "CloseFishCaught")
+
+        this.MainMenuStart           := this.RegisterPoint(347 , 1329, this.S_LEFT  , "MainMenuStart")
+        this.SkipButton              := this.RegisterPoint(1280, 720 , this.S_CENTER, "SkipButton")      ;OLDNAME=>temp18
+
+
+        
+        this.pixelsearch01a := this.RegisterSearchXY2(768 , 835 , 888 , 860 , this.S_BOTTOM, "pixelsearch01a")
+        ; this.pixelsearch01a.set_position(768 , 835)
+        this.pixelsearch02a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch02a")
+        ; this.pixelsearch02a.set_position(295 , 1364)
+        this.pixelsearch03a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch03a")
+        ; this.pixelsearch03a.set_position(295 , 1364)
+        this.pixelsearch04a := this.RegisterSearchXY2(1043, 1033, 1519, 1033, this.S_BOTTOM, "pixelsearch04a")
+        ; this.pixelsearch04a.set_position(1043, 1033)
+        this.pixelsearch05a := this.RegisterSearchXY2(1043, 1033, 1519, 1058, this.S_BOTTOM, "pixelsearch05a")
+        ; this.pixelsearch05a.set_position(1043, 1033)
+        
+
+        ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
+        this.PixelGetColor01 := this.RegisterPoint(1536, 1119, this.S_CENTER, "PixelGetColor01")
+        this.PixelGetColor02 := this.RegisterPoint(1261, 1033, this.S_CENTER, "PixelGetColor02")
+        this.PixelGetColor03 := this.RegisterPoint(1535, 1120, this.S_CENTER, "PixelGetColor03")
+        this.PixelGetColor04 := this.RegisterPoint(0,    1033, this.S_CENTER, "MovingPixelGetColor04")
     }
-    ;temp hiding
+
+    ;temp hiding in ide
         ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
         SetupTabList()
         {
@@ -2597,10 +1328,8 @@ class CorePlugin extends Plugin
                 ;end
 
                 ;[DEV COMMENT] Grab donor's txt from github?
-                url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
-
                 Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                Http.Open("GET", url, false)
+                Http.Open("GET", DonorURL, false)
                 Http.Send()
                 ;[DEV COMMENT] remove last \r\n from the response text if its there
                 ;                      just makes the Edit look a little cleaner
@@ -2630,15 +1359,12 @@ class CorePlugin extends Plugin
         IniRead()
         {
             global
-            ;[DEV COMMENT] a very very rough regex to exclude any unwanted keys from being assigned by the ini file in an attempt to bypas
-            ;                   the settings of the Hotkey gui
-            temp_regex_keybind_base := "Escape|Button|Wheel|Space|Alt|Control|Shift|Win|Tab|Left|Right|Up|Down|Enter|Backspace|\b[\w\/]\b"
             ;[DEV COMMENT] Keybinds
                 IniRead, temp_start_keybind, %iniFilePath%, "Keybinds", "StartScript"
                 if (temp_start_keybind != "ERROR")
                 {
                     ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Pause_hotkey . "|" . Stop_hotkey
+                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Pause_hotkey . "|" . Stop_hotkey
                     if temp_start_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_start_keybind) ~= REGEX_KEYS_CHECK 
                         Start_hotkey := "F1"
                     else
@@ -2652,7 +1378,7 @@ class CorePlugin extends Plugin
                 if (temp_pause_keybind != "ERROR")
                 {
                     ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Stop_hotkey
+                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Stop_hotkey
                     if temp_pause_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_pause_keybind) ~= REGEX_KEYS_CHECK 
                         Pause_hotkey := "F2"
                     else
@@ -2666,7 +1392,7 @@ class CorePlugin extends Plugin
                 if (temp_stop_keybind != "ERROR")
                 {
                     ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := temp_regex_keybind_base . "|" . Start_hotkey . "|" . Pause_hotkey
+                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Pause_hotkey
                     if temp_stop_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_stop_keybind) ~= REGEX_KEYS_CHECK 
                         Stop_hotkey := "F3"
                     else
@@ -2885,8 +1611,8 @@ class CorePlugin extends Plugin
 
     RunLoop(byref loopCount, byref restartPathing)
     {
-        global
-        local barColor, otherBarColor, startWhitePixelSearch, barWidth
+        global ;                                                       ;interrupt returns stuff
+        local barColor, otherBarColor, startWhitePixelSearch, barWidth, return_value
         if (loopCount > maxLoopCount || restartPathing) {
             restartPathing := false
 
@@ -2906,10 +1632,14 @@ class CorePlugin extends Plugin
 
             if (autoCloseChat) {
                 this.DoSleep()
-                this.SendKey("{/}")  ;[DEV COMMENT] might need to do and escape on this ie \/
-                this.DoSleep()
+                this.SendKeySleep("{/}")  ;[DEV COMMENT] might need to do and escape on this ie \/
                 this.CloseChat.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
             }
+            
+            return_value := this.CallForInterrupt("PreLoop", loopCount, restartPathing)
+            if not return_value = "" and not return_value = 0
+                return return_value
+
             ; reset position and rotation
                 ;reset position
                     this.QuickReset()
@@ -2917,10 +1647,12 @@ class CorePlugin extends Plugin
                 ;reset rotation
                     this.Auras.MouseMoveAndClickWithSleep("Left", 3, 220, 220)
                     this.ExitCollection.MouseMoveAndClickWithSleep("Left", 3, 220, 220)
-                    Click WheelUp 80
+                    if Debugger.DoMouseMove
+                        Click WheelUp 80
                     this.DoSleep(500)
-                    Click WheelDown 35
-                    this.DoSleep(300)
+                    if Debugger.DoMouseMove
+                        Click WheelDown 35
+                    this.DoSleep()
                 ;end
             ;end
 
@@ -2928,41 +1660,24 @@ class CorePlugin extends Plugin
             if (pathingMode = "Non Vip Pathing") {
                 ; Non VIP Pathing
                 ;keyboard movements
-                    this.SendKey("{" %keyW% " Down}")
-                    this.SendKey("{" %keyA% " Down}")
-                    this.DoSleep(5190)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep(800)
-                    this.SendKey("{" %keyA% " Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(550)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{d Down}")
-                    this.DoSleep(240)
-                    this.SendKey("{d Up}")
-                    this.DoSleep(150)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(1450)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{s Down}")
-                    this.DoSleep()
-                    this.SendKey("{s Up}")
-                    this.DoSleep()
-                    this.SendKey("{Space Down}")
-                    this.DoSleep(25)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(1100)
-                    this.SendKey("{Space Up}")
-                    this.DoSleep(520)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{e Down}")
-                    this.DoSleep()
-                    this.SendKey("{e Up}")
-                    this.DoSleep()
+                    this.SendKey("{" keyW " Down}")
+                    this.SendKeySleep("{" keyA " Down}",5190)
+                    this.SendKeySleep("{" keyW " Up}",800)
+                    this.SendKeySleep("{" keyA " Up}",200)
+                    this.SendKeySleep("{" keyW " Down}",550)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{d Down}", 240)
+                    this.SendKeySleep("{d Up}", 150)
+                    this.SendKeySleep("{" keyW " Down}", 1450)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{s Down}")
+                    this.SendKeySleep("{s Up}")
+                    this.SendKeySleep("{Space Down}", 25)
+                    this.SendKeySleep("{" keyW " Down}", 1100)
+                    this.SendKeySleep("{Space Up}", 520)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{e Down}")
+                    this.SendKeySleep("{e Up}")
                 ;end
                 this.MerchantTextBox.MouseMoveAndClickWithSleep("Left", 3, 50, 50)
                 this.MerchantTextBox.Click("Left") ;MouseClick
@@ -2978,52 +1693,38 @@ class CorePlugin extends Plugin
                 }
 
                 this.CloseFishSell.MouseMoveAndClickWithSleep("Left", 3, 200, 200)
-                this.SendKey("{" %keyA% " Down}")
-                this.DoSleep(1400)
-                this.SendKey("{" %keyA% " Up}")
-                this.DoSleep(75)
-                this.SendKey("{" %keyW% " Down}")
-                this.DoSleep(3300)
-                this.SendKey("{" %keyW% " Up}")
+                this.SendKeySleep("{" keyA " Down}", 1400)
+                this.SendKeySleep("{" keyA " Up}"  , 75)
+                this.SendKeySleep("{" keyW " Down}",3300)
+                this.SendKey("{" keyW " Up}")
                 loopCount := 0
+
+                ;PostMoveInteruptCall
+                 return_value := this.CallForInterrupt("PostMovementPreFish_NonVip", loopCount, restartPathing)
+                 if not return_value = "" and not return_value = 0
+                    return return_value
+                ;end
             } else if (pathingMode = "Vip Pathing") {
                 ; VIP Pathing
                 ;keyboard movements
-                    this.SendKey("{" %keyW% " Down}")
-                    this.SendKey("{" %keyA% " Down}")
-                    this.DoSleep(4150)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep(600)
-                    this.SendKey("{" %keyA% " Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(400)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{d Down}")
-                    this.DoSleep(180)
-                    this.SendKey("{d Up}")
-                    this.DoSleep(150)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(1100)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{s Down}")
-                    this.DoSleep()
-                    this.SendKey("{s Up}")
-                    this.DoSleep()
-                    this.SendKey("{Space Down}")
-                    this.DoSleep(25)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(1200)
-                    this.SendKey("{Space Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep()
-                    this.SendKey("{e Down}")
-                    this.DoSleep()
-                    this.SendKey("{e Up}")
-                    this.DoSleep()
+                    this.SendKey("{" keyW " Down}")
+                    this.SendKeySleep("{" keyA " Down}", 4150)
+                    this.SendKeySleep("{" keyW " Up}", 600)
+                    this.SendKeySleep("{" keyA " Up}", 200)
+                    this.SendKeySleep("{" keyW " Down}", 400)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{d Down}", 180)
+                    this.SendKeySleep("{d Up}", 150)
+                    this.SendKeySleep("{" keyW " Down}", 1100)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{s Down}")
+                    this.SendKeySleep("{s Up}")
+                    this.SendKeySleep("{Space Down}", 25)
+                    this.SendKeySleep("{" keyW " Down}",1200)
+                    this.SendKeySleep("{Space Up}", 200)
+                    this.SendKeySleep("{" keyW " Up}")
+                    this.SendKeySleep("{e Down}")
+                    this.SendKeySleep("{e Up}")
                 ;end
                 this.MerchantTextBox.MouseMoveAndClickWithSleep("Left", 3, 50, 50)
                 this.MerchantTextBox.Click("Left") ;MouseClick
@@ -3039,14 +1740,17 @@ class CorePlugin extends Plugin
                 }
 
                 this.CloseFishSell.MouseMoveAndClickWithSleep("Left", 3, 200, 200)
-                this.SendKey("{" %keyA% " Down}")
-                this.DoSleep(1400)
-                this.SendKey("{" %keyA% " Up}")
-                this.DoSleep(75)
-                this.SendKey("{" %keyW% " Down}")
-                this.DoSleep(2670)
-                this.SendKey("{" %keyW% " Up}")
+                this.SendKeySleep("{" keyA " Down}", 1400)
+                this.SendKeySleep("{" keyA " Up}", 75)
+                this.SendKeySleep("{" keyW " Down}", 2670)
+                this.SendKey("{" keyW " Up}")
                 loopCount := 0
+
+                ;PostMoveInteruptCall
+                 return_value := this.CallForInterrupt("PostMovementPreFish_Vip", loopCount, restartPathing)
+                 if not return_value = "" and not return_value = 0
+                    return return_value
+                ;end
             } else if (pathingMode = "Abyssal Pathing") {
                 ; Abyssal Pathing
                 this.Auras.MouseMoveAndClickWithSleep("Left", 3, 200, 200)
@@ -3054,19 +1758,21 @@ class CorePlugin extends Plugin
                 this.SearchBox.MouseMoveAndClickWithSleep("Left", 3, 100, 100)
                 ClipBoard := "Abyssal Hunter"
                 this.DoSleep(100)
-                this.SendKey("^v")
-                this.DoSleep(200)
+                this.SendKeySleep("^v", 200)
                 this.Slot1.MouseMove(3)
                 this.DoSleep(200)
-                Click WheelUp 100
+                if Debugger.DoMouseMove
+                    Click WheelUp 100
                 this.DoSleep(200)
-                this.Slot1.Click("Left")
+                
+                if Debugger.DoMouseMove
+                    this.Slot1.Click("Left")
                 this.DoSleep(200)
 
                 ErrorLevel := 0
-                
                 Log.Info("PixelSearch, " . 768 . ", " . 835 . ", " . 888 . ", " . 860 . ", " . "0xfc7f98")
-                PixelSearch, px, py, 768, 835, 888, 860, 0xfc7f98, 3, Fast RGB
+                this.pixelsearch01a.PixelSearch(px, py, 0xfc7f98, 3, "Fast RGB")
+                ;PixelSearch, px, py, 768, 835, 888, 860, 0xfc7f98, 3, Fast RGB
                 if (ErrorLevel != 0) {
                     this.AbysPatPixSearchClick.MouseMoveAndClickWithSleep("Left",3,200,0)
                 }
@@ -3074,50 +1780,28 @@ class CorePlugin extends Plugin
                 this.DoSleep(200)
                 this.CloseGui.MouseMoveAndClickWithSleep("Left", 3, 200, 200)
                 ;keymovements
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(500)
-                    this.SendKey("{" %keyA% " Down}")
-                    this.DoSleep(2650)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep(600)
-                    this.SendKey("{" %keyA% " Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(500)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{s Down}")
-                    this.DoSleep(120)
-                    this.SendKey("{s Up}")
-                    this.DoSleep(100)
-                    this.SendKey("{d Down}")
-                    this.DoSleep(280)
-                    this.SendKey("{d Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyA% " Down}")
-                    this.DoSleep(50)
-                    this.SendKey("{Space Down}")
-                    this.DoSleep(730)
-                    this.SendKey("{Space Up}")
-                    this.DoSleep(200)
-                    this.SendKey("{" %keyA% " Up}")
-                    this.DoSleep(100)
-                    this.SendKey("{" %keyW% " Down}")
-                    this.DoSleep(810)
-                    this.SendKey("{" %keyW% " Up}")
-                    this.DoSleep(150)
-                    this.SendKey("{space Down}")
-                    this.DoSleep(15)
-                    this.SendKey("{d Down}")
-                    this.DoSleep(150)
-                    this.SendKey("{space Up}")
-                    this.DoSleep(580)
-                    this.SendKey("{d Up}")
-                    this.DoSleep(100)
-                    this.SendKey("{e Down}")
-                    this.DoSleep()
-                    this.SendKey("{e Up}")
-                    this.DoSleep()
+                    this.SendKeySleep("{" keyW " Down}", 500)
+                    this.SendKeySleep("{" keyA " Down}", 2650)
+                    this.SendKeySleep("{" keyW " Up}", 600)
+                    this.SendKeySleep("{" keyA " Up}",200)
+                    this.SendKeySleep("{" keyW " Down}", 500)
+                    this.SendKeySleep("{" keyW " Up}", 200)
+                    this.SendKeySleep("{s Down}", 120)
+                    this.SendKeySleep("{s Up}", 100)
+                    this.SendKeySleep("{d Down}", 280)
+                    this.SendKeySleep("{d Up}", 200)
+                    this.SendKeySleep("{" keyA " Down}", 50)
+                    this.SendKeySleep("{Space Down}", 730)
+                    this.SendKeySleep("{Space Up}", 200)
+                    this.SendKeySleep("{" keyA " Up}", 100)
+                    this.SendKeySleep("{" keyW " Down}", 810)
+                    this.SendKeySleep("{" keyW " Up}", 150)
+                    this.SendKeySleep("{space Down}", 15)
+                    this.SendKeySleep("{d Down}", 150)
+                    this.SendKeySleep("{space Up}", 580)
+                    this.SendKeySleep("{d Up}", 100)
+                    this.SendKeySleep("{e Down}")
+                    this.SendKeySleep("{e Up}")
                 ;end
                 this.MerchantTextBox.MouseMoveAndClickWithSleep("Left", 3, 50, 50)
                 this.MerchantTextBox.Click("Left")
@@ -3133,16 +1817,23 @@ class CorePlugin extends Plugin
                 }
 
                 this.CloseFishSell.MouseMoveAndClickWithSleep("Left", 3, 200, 200)
-                this.SendKey("{" %keyA% " Down}")
-                this.DoSleep(800)
-                this.SendKey("{" %keyA% " Up}")
-                this.DoSleep(100)
-                this.SendKey("{" %keyW% " Down}")
-                this.DoSleep(1760)
-                this.SendKey("{" %keyW% " Up}")
+                this.SendKeySleep("{" keyA " Down}", 800)
+                this.SendKeySleep("{" keyA " Up}", 100)
+                this.SendKeySleep("{" keyW " Down}", 1760)
+                this.SendKey("{" keyW " Up}")
                 loopCount := 0
+                
+                ;PostMoveInteruptCall
+                 return_value := this.CallForInterrupt("PostMovementPreFish_Abys", loopCount, restartPathing)
+                 if not return_value = "" and not return_value = 0
+                    return return_value
+                ;end
             }
         }
+
+        return_value := this.CallForPostPathing(loopCount, restartPathing)
+        if not return_value = "" and not return_value = 0
+            return return_value
 
         ; Fishing Minigame
         this.FishButton.MouseMoveAndClickWithSleep("Left", 3, 30, 300)
@@ -3157,25 +1848,28 @@ class CorePlugin extends Plugin
         
         fishingFailsafeRan := false
         Loop {
-            PixelGetColor, color, 1536, 1119, RGB
-            Log.Info("PixelGetColor, color:=" . color . ", " . 1536 . ", " . 1119)
+            this.PixelGetColor01.PixelGetColor(color)
+            ;PixelGetColor, color, 1536, 1119, RGB
+            Log.Info("Pix_LGetColor, color:=" . color . ", " . 1536 . ", " . 1119)
 
             if (color = 0xFFFFFF) {
                 this.MoveOutOfWay.MouseMove(3)
                 ; Get randomized bar color
                 this.DoSleep(50)
-                PixelGetColor, barColor, 1261, 1033, RGB
-                Log.Info("PixelGetColor, barColor:=" . barColor . ", " . 1261 . ", " . 1033)
+                this.PixelGetColor02.PixelGetColor(barColor)
+                ; PixelGetColor, barColor, 1261, 1033, RGB
+                Log.Info("Pix_LGetColor, barColor:=" . barColor . ", " . 1261 . ", " . 1033)
 
                 SetTimer, DoMouseMove2, Off
                 globalFailsafeTimer := 0
                 break
             }
-
+            
             ; Auto Rejoin Failsafe
             if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-                PixelGetColor, checkColor, 1535, 1120, RGB
-                Log.Info("PixelGetColor, checkColor:=" . checkColor . ", " . 1535 . ", " . 1120)
+                this.PixelGetColor03.PixelGetColor(checkColor)
+                ; PixelGetColor, checkColor, 1535, 1120, RGB
+                Log.Info("Pix_LGetColor, checkColor:=" . checkColor . ", " . 1535 . ", " . 1120)
 
                 if (checkColor != 0xFFFFFF) {
                     Process, Close, RobloxPlayerBeta.exe
@@ -3194,7 +1888,8 @@ class CorePlugin extends Plugin
                     Loop {
                         ErrorLevel := 0
                         Log.Info("PixelSearch, " . 295 . ", " . 1364 . ", " . 445 . ", " . 1311 . ", " . "0x82ff95")
-                        PixelSearch, px, py, 295, 1364, 445, 1311, 0x82ff95, 5, Fast RGB
+                        this.pixelsearch02a.PixelSearch(px, py, 0x82ff95, 5, "Fast RGB")
+                        ; PixelSearch, px, py, 295, 1364, 445, 1311, 0x82ff95, 5, Fast RGB
                         if (ErrorLevel = 0) {
                             this.DoSleep(1000)
                             this.MainMenuStart.MouseMoveAndClickWithSleep("Left", 3, 350, 0)
@@ -3216,7 +1911,7 @@ class CorePlugin extends Plugin
                 this.FS_p1.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
                 this.FS_p2.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
                 this.SearchBox.MouseMoveAndClickWithSleep("Left", 3, 300, 300) ;[DEV COMMENT] unsure 1457, 491
-                this.FishButton.MouseMoveAndClickWithSleep("Left", 3, 300, 0)  ;[DEV COMMENT] unsure 1163, 1126
+                this.FishButton.MouseMoveAndClickWithSleep("Left", 3, 300, 0)  ;[DEV COMMENT] unsure 1163, 1126    Most likely the Fish Minigame Button
                 fishingFailsafeRan := true
                 if (failsafeWebhook)
                 {
@@ -3258,14 +1953,22 @@ class CorePlugin extends Plugin
             if (advancedFishingDetection) {
                 ErrorLevel := 0
                 Log.Info("PixelSearch, " . 1043 . ", " . 1033 . ", " . 1519 . ", " . 1033 . ", " . barColor)
-                PixelSearch, leftX, leftY, 1043, 1033, 1519, 1033, barColor, 5, Fast RGB
+                
+                this.pixelsearch03a.PixelSearch(leftX, leftY, barColor, 5, "Fast RGB")
+                ;PixelSearch, leftX, leftY, 1043, 1033, 1519, 1033, barColor, 5, Fast RGB
                 if (ErrorLevel = 0) {
                     rightX := leftX
                     Loop {
                         testX := rightX + 1
                         if (testX > 1519)
                             break
-                        PixelGetColor, testColor, %testX%, 1033, RGB
+                        ; move to testX:1033
+                        this.PixelGetColor04.set_position(testX, 1033)
+                        ; rescale it by its own anchor
+                        this.PixelGetColor04.MoveByAnchor(0,0,"")
+                        this.PixelGetColor04.PixelGetColor(testColor)
+                        ; PixelGetColor, testColor, %testX%, 1033, RGB
+                        ; [DEV NOTE] Look into this bit manipulation magic o3o
                         if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
                             rightX := testX
                         } else {
@@ -3285,7 +1988,8 @@ class CorePlugin extends Plugin
                 ; Normal detection
                 ErrorLevel := 0
                 Log.Info("PixelSearch, " . 1043 . ", " . 1033 . ", " . 1519 . ", " . 1058 . ", " . barColor)
-                PixelSearch, FoundX, FoundY, 1043, 1033, 1519, 1058, barColor, 5, Fast RGB
+                this.pixelsearch04a.PixelSearch(FoundX, FoundY, barColor, 5, "Fast RGB")
+                ;PixelSearch, FoundX, FoundY, 1043, 1033, 1519, 1058, barColor, 5, Fast RGB
                 if (ErrorLevel = 0) {
                 } else {
                     this.MoveOutOfWay.Click("left") ;MouseClick
@@ -3296,6 +2000,55 @@ class CorePlugin extends Plugin
         this.CloseFishCaught.MouseMoveAndClickWithSleep("Left", 3, 700, 300)
         cycleCount++
         return 0 ;[DEV COMMENT] success don't need to do anything :D
+    }
+
+    static PreLoop := "CorePlugin_PreLoop"
+    static PostMove := { NonVip : "CorePlugin_PostMovementPreFish_NonVip"
+                       , Vip :  "CorePlugin_PostMovementPreFish_Vip"
+                       , Abysl : "CorePlugin_PostMovementPreFish_Abys" } 
+
+    CallForInterrupt(name, byref loopCount, byref restartPathing)
+    {
+        pre_reset_inter := Interrupts.GetInterrupts("CorePlugin_" . name)
+        for _, regi in pre_reset_inter
+        {
+            regi_function := regi.FuncCall
+            theClass := regi.This_Class
+            func1 := theClass[regi_function]
+
+            if(regi.CanForceEnd)
+            {
+                try return_value := %func1%(loopCount, restartPathing)
+                if not return_value = "" and not return_value = 0
+                    return return_value
+            }
+            else
+            {
+                try return_value := theClass[regi_function](loopCount, restartPathing)
+            }
+        }
+    }
+    
+    CallForPostPathing(byref loopCount, byref restartPathing)
+    {
+        pre_reset_inter := Interrupts.GetInterrupts("CorePlugin_PostMovement")
+        for _, regi in pre_reset_inter
+        {
+            regi_function := regi.FuncCall
+            theClass := regi.This_Class
+            func1 := theClass[regi_function]
+
+            if(regi.CanForceEnd)
+            {
+                try return_value := %func1%(pathingMode, loopCount, restartPathing)
+                if not return_value = "" and not return_value = 0
+                    return return_value
+            }
+            else
+            {
+                try return_value := theClass[regi_function](pathingMode, loopCount, restartPathing)
+            }
+        }
     }
 }
 

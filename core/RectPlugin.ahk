@@ -89,7 +89,7 @@ class Plugin
 
     RegisterSearchXY2(X, Y, X2, Y2, Side, Name:="")
     {
-        return this.RegisterSearch( Min(X,X2), Min(Y,Y2), Abs(X-X2), Abs(Y-Y2), Side, Name)
+        return this.RegisterSearch( min(X,X2), min(Y,Y2), Abs(X2-X), Abs(Y2-Y), Side, Name)
     }
 
     RegisterSearch(X, Y, W, H, Side, Name:="")
@@ -169,13 +169,28 @@ class Plugin
     DoSleep(ms:=300)
     {
         Log.Low_Info("Sleep " . ms)
-        Sleep %ms%
+        if Debugger.DoSleep
+            Sleep %ms%
     }
 
     SendKey(key_press)
     {
         Log.Low_Info("Send " . key_press)
-        Send %key_press%
+        if Debugger.DoSendKeystrokes
+            Send %key_press%
+    }
+
+    SendKeySleep(key_press, ms:=300)
+    {
+        this.SendKey(key_press)
+        this.DoSleep(ms)
+    }
+    
+    QuickReset()
+    {
+        this.SendKeySleep("{Esc}",650)
+        this.SendKeySleep("R",650)
+        this.SendKeySleep("{Enter}",2000)
     }
 }
 
@@ -228,14 +243,51 @@ class Tester extends Plugin
     {
         Return true
     }
-    
-    QuickReset()
+}
+
+class Interrupts
+{
+    static registry := []
+
+    RegisterInterupt(callname, this_class, function, CanForceEnd:=false)
     {
-        Send , {Esc}
-        Sleep, 650
-        Send , R
-        Sleep, 650
-        Send , {Enter}
-        Sleep, 2000
+        if not Interrupts.registry.hasKey(callname)
+        {
+            Interrupts.registry[callname] := []
+        }
+        Interrupts.registry[callname].Push({This_Class : this_class
+        , FuncCall : function,      CheckForceEnd : CanForceEnd})
+    }
+
+    ; Self contained Interrupt call, if inturrupt would return or modify values with byrefs please use GetInterrupts and make your own Caller
+    CallForInterrupt(callname, params*)
+    {
+        for index, value in Interrupts.registry
+        {
+            function := value.FuncCall
+            TheClass := value.This_Class
+            if(value.CanForceEnd)
+            {
+                try ret := TheClass[%function%](params)
+                if not ret = "" and not ret = 0 ; if something says to stop running we stop running
+                    return ret
+            }
+            else
+                try ret := TheClass[%function%](params)
+        }
+        return 0
+    }
+
+    GetInterrupts(CallName)
+    {
+        return Interrupts.registry[callname]
     }
 }
+
+
+
+; For _, interrupt in GetInterrup("PostWalkToFishingSpot")
+; {
+;     function := interrupt.Function
+;     interrupt.ClassName.%function%(var1, var2, var3)
+; } 

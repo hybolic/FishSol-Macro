@@ -1,8 +1,30 @@
 ; Preloader for Plugins
 
 global _PluginFolder_     := A_ScriptDir "\plugins"
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NOTES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; eventually show a ui that has the current plugins in .\plugins
+; to allow the user to select which one to add or remove
+;
+; also allow this to be embeded into the main script
+; aswell as be standalone so it can be accessed inside fishsols
+; or outside if it goes wrong and .\plugins\PluginsManager.ahk
+; needs to be rebuilt
+;
+; expand meta data function to include an optional about section
+; logo, title, link to the project, if it has resources and other stuff
+; 
+; probably have the application run a basic MD5 to just make
+; sure the plugin is even the supplied file if not warn the user
+;    where this basic integrety check will be placed i do not know
+;    possibly inside the metadata at the top of the class?
+;    seperate file? maybe as a comment next to its name in 
+;    .\plugins\PluginMananger.ahk or on a github page?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 PluginLoader.LoadPlugins()
 ExitApp
+
 class PluginLoader
 {
     ; Not a replacement for simple human safety but will work for now
@@ -109,8 +131,6 @@ class PluginLoader
 
         REGEX .= "O)" needle
         
-
-
         Match := 1
         lastPos := 1
         if not RegExMatch(haystack, REGEX, VarOut)

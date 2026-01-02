@@ -26,12 +26,9 @@ class AutoCrafterPlugin extends Plugin
         Return true
     }
 
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
     PluginSetup()
     {}
 
-    
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
     IniRead()
     {
         global
@@ -55,13 +52,12 @@ class AutoCrafterPlugin extends Plugin
             autoCrafterDetection := (tempAutoCrafterDetection = "true" || tempAutoCrafterDetection = "1")
         }
     }
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    
     SetupTabList()
     {
         return "|Crafter"
     }
 
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
     SetupGui()
     {
         global
@@ -91,7 +87,6 @@ class AutoCrafterPlugin extends Plugin
         Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
     }
     
-    ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
     GuiControlChecks()
     {
         global
@@ -387,38 +382,37 @@ class AutoCrafterPlugin extends Plugin
 }
 
 goto AutoCrafter_EOF
-ToggleAutoCrafter:
-    autoCrafter := !autoCrafter
-    Toggle_GuiControl("AutoCrafterStatus", autoCrafter, "autoCrafter")
-return
 
-
-ToggleCrafter:
-    crafterToggle := !crafterToggle
-    Toggle_GuiControl("CrafterStatus", crafterToggle, "crafterToggle")
-    if (crafterToggle) {
-        autoCrafterDetection := true
-        autoCrafterLastCheck := A_TickCount
-        IniWrite, true, %iniFilePath%, "Macro", "autoCrafterDetection"
-    } else {
-        IniWrite, false, %iniFilePath%, "Macro", "autoCrafterDetection"
-    }
-return
-
-UpdateAutoCrafterInterval:
-    Gui, Submit, NoHide
-    newInterval := AutoCrafterInterval * 60000
-    if (newInterval > 0) {
-        autoCrafterInterval := newInterval
-        IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
-    }
-return
-
-ToggleAutoCrafterWebhook:
-    autoCrafterWebhook := !autoCrafterWebhook
-    Toggle_GuiControl("AutoCrafterWebhookStatus", autoCrafterWebhook, "autoCrafterWebhook")
-return
-
+ ToggleAutoCrafter:
+     autoCrafter := !autoCrafter
+     Toggle_GuiControl("AutoCrafterStatus", autoCrafter, "autoCrafter")
+ return
+ 
+ ToggleCrafter:
+     crafterToggle := !crafterToggle
+     Toggle_GuiControl("CrafterStatus", crafterToggle, "crafterToggle")
+     if (crafterToggle) {
+         autoCrafterDetection := true
+         autoCrafterLastCheck := A_TickCount
+         IniWrite, true, %iniFilePath%, "Macro", "autoCrafterDetection"
+     } else {
+         IniWrite, false, %iniFilePath%, "Macro", "autoCrafterDetection"
+     }
+ return
+ 
+ UpdateAutoCrafterInterval:
+     Gui, Submit, NoHide
+     newInterval := AutoCrafterInterval * 60000
+     if (newInterval > 0) {
+         autoCrafterInterval := newInterval
+         IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
+     }
+ return
+ 
+ ToggleAutoCrafterWebhook:
+     autoCrafterWebhook := !autoCrafterWebhook
+     Toggle_GuiControl("AutoCrafterWebhookStatus", autoCrafterWebhook, "autoCrafterWebhook")
+ return
 
 AutoCrafter_EOF:
 

@@ -12,7 +12,7 @@ class SnowmanPathingPlugin extends Plugin
     PluginRun(byref restartPathing)
     {
         global
-        return
+        Return true
         if (snowmanPathing) {
             elapsed := A_TickCount - startTick
             if ((snowmanPathingLastRun = 0 and elapsed >= snowmanPathingTime) or (snowmanPathingLastRun > 0 and (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {

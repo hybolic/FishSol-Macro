@@ -11,7 +11,7 @@ class BiomesPlugin extends Plugin
     PluginRun(byref restartPathing)
     {
         global
-        return
+        Return true
         ;[DEV COMMENT] re-enable the timer if already disabled and <webhookURL> is true - Nadir
         if (not BiomesPlugin_can_run and InStr(webhookURL, "discord")) {
             BiomesPlugin_can_run := true
