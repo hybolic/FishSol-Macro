@@ -118,6 +118,7 @@ class Plugin
             
     }
 
+    ; part of the visualiser
     ShowAll(force:=false)
     {
         for k, rect in this.LocalThings
@@ -127,6 +128,7 @@ class Plugin
         }
     }
 
+    ; part of the visualiser
     getRandomColor()
     {
         HEX := "0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|"
@@ -135,7 +137,7 @@ class Plugin
         return "0x" . HEX
     }
 
-
+    ;will probably pull this out and into its own thing
     SendWebhook(title, color := "0") {
         global
         local time, timestamp, json, http
@@ -164,9 +166,16 @@ class Plugin
         http.Send(json)
     }
 
-    Sleep(ms:=300)
+    DoSleep(ms:=300)
     {
-        Sleep, %ms%
+        Log.Low_Info("Sleep " . ms)
+        Sleep %ms%
+    }
+
+    SendKey(key_press)
+    {
+        Log.Low_Info("Send " . key_press)
+        Send %key_press%
     }
 }
 

@@ -2213,7 +2213,7 @@ class CorePlugin extends Plugin
         this.Slot1                  := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")           ;OLDNAME=>temp02
         this.Unequip                := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")         ;OLDNAME=>temp03
         this.CloseGui               := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")        ;OLDNAME=>temp04
-        this.CloseChat              := this.RegisterPoint(151 , 38  , this.S_CENTER, "CloseChat")       ;OLDNAME=>temp05
+        this.CloseChat              := this.RegisterPoint(151 , 38  , this.S_LEFT  , "CloseChat")       ;OLDNAME=>temp05
         this.AuraCollection         := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")  ;OLDNAME=>temp06
         this.ExitCollection         := this.RegisterPoint(525 , 158 , this.S_CENTER, "ExitCollection")  ;OLDNAME=>temp07
         this.MerchantTextBox        := this.RegisterPoint(1308, 1073, this.S_CENTER, "MerchantTextBox") ;OLDNAME=>temp08
@@ -2235,6 +2235,7 @@ class CorePlugin extends Plugin
         this.AbysPatPixSearchClick  := this.RegisterPoint(830 , 845 , this.S_CENTER, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
         this.MoveOutOfWay           := this.RegisterPoint(1263, 1177, this.S_CENTER, "MoveOutOfWay")
         this.MainMenuStart          := this.RegisterPoint(347 , 1329, this.S_LEFT  , "MainMenuStart")
+        this.CloseFishCaught        := this.RegisterPoint(1457, 491 , this.S_CENTER, "CloseFishCaught")
     }
     ;temp hiding
         ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
@@ -3184,7 +3185,7 @@ class CorePlugin extends Plugin
                     WinActivate, ahk_exe RobloxPlayerBeta.exe
                     this.DoSleep(6000)
 
-                    ; Skip button
+                    ; Skip Load button
                     this.DoSleep(1000)
                     this.SkipButton.MouseMoveAndClickWithSleep("Left", 3, 200, 6000)
 
@@ -3214,8 +3215,8 @@ class CorePlugin extends Plugin
             {
                 this.FS_p1.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
                 this.FS_p2.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
-                this.SearchBox.MouseMoveAndClickWithSleep("Left", 3, 300, 300)
-                this.FishButton.MouseMoveAndClickWithSleep("Left", 3, 300, 0)
+                this.SearchBox.MouseMoveAndClickWithSleep("Left", 3, 300, 300) ;[DEV COMMENT] unsure 1457, 491
+                this.FishButton.MouseMoveAndClickWithSleep("Left", 3, 300, 0)  ;[DEV COMMENT] unsure 1163, 1126
                 fishingFailsafeRan := true
                 if (failsafeWebhook)
                 {
@@ -3245,7 +3246,7 @@ class CorePlugin extends Plugin
 
         ; PixelSearch loop
         startTime := A_TickCount
-        this.MoveOutOfWay.MouseMove(3)[DEV COMMENT]
+        this.MoveOutOfWay.MouseMove(3) ; [DEV COMMENT] second move out of way just incase
         this.DoSleep(300)
         Loop {
             if (!toggle)
@@ -3292,37 +3293,9 @@ class CorePlugin extends Plugin
             }
         }
         this.DoSleep(300)
-        MouseMove, 1457, 491, 3 ;[DEV COMMENT] closes point is SearchBox so might replace with this.SearchBox.MoveMouse(3)
-        this.DoSleep(700)
-        /*
-            Loop {
-                PixelGetColor, color, 1455, 492, RGB
-                Log.Info("PixelGetColor, " . color . ", " . 1455 . ", " . 492)
-
-                if (color = 0xFFFFFF) {
-                    break
-                }
-                if (!toggle) {
-                    Return 2
-                }
-            }
-        */
-        this.SearchBox.Click("Left") ;MouseClick
-        this.DoSleep(300)
+        this.CloseFishCaught.MouseMoveAndClickWithSleep("Left", 3, 700, 300)
         cycleCount++
         return 0 ;[DEV COMMENT] success don't need to do anything :D
-    }
-
-    DoSleep(ms:=300)
-    {
-        Log.Info("Sleep " . ms)
-        Sleep %ms%
-    }
-
-    SendKey(key_press)
-    {
-        Log.Info("Send " . key_press)
-        Send %key_press%
     }
 }
 
