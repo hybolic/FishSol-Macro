@@ -5,22 +5,24 @@ class Debugger
     static LogToFile            := true
     static Log_More_Info        := true
     static Log_Basic_Info       := true
-    static DoMouseClick         := true
+    static DoMouseClick         := false
     static DoMouseMove          := true
     static DoSendKeystrokes     := true
 
-    static ForceHideLabels      := true
-    static ForceHideViews       := true
+    static ForceHideLabels      := false
+    static Visual_ShowObjectKey := false
+    static ForceHideViews       := false
     static Internal_FPS         := 60
     static Internal_States_FTU  := 1
     static Internal_Window_FTU  := 1
-    static _Internal_Logs_FTU   := Debugger.Internal_FPS * 5
-    Internal_Logs_FTU    {
-        get {
-            return _Internal_Logs_FTU
-        } set {
-            return _Internal_Logs_FTU := min(max(value, Debugger.Internal_FPS * 1), Debugger.Internal_FPS * 30)
-        } }
+    static _Internal_Logs_FTU   := 60 * 5
+    Internal_Logs_FTU(val:=-1)
+    {
+        if val = -1
+            return Debugger._Internal_Logs_FTU
+        else
+            return Debugger._Internal_Logs_FTU := min(max(value, Debugger.Internal_FPS * 1), Debugger.Internal_FPS * 30)
+    } 
 
 
 }
@@ -176,6 +178,7 @@ class Log
         if Debugger.Log_More_Info
             Log.message("LOWINFO", value, false, false, startNewLine)
     }
+
     ;[DEV COMMENT] two part messaeg first containing the info message and the second the extra details that won't get logged
     ExtraInfo(message, message2, startNewLine:=true)
     {
@@ -213,9 +216,12 @@ class Log
         Debugger.LogToFile := False
         return this
     }
+
     ;[DEV COMMENT] brains of the Logger
     message(prefix, value, openConsoleWindow:=false, pushToFile:=false, newLineStarter := true)
     {
+        temp_speed := A_BatchLines
+        SetBatchLines, %MAX_SPEED%
         message_string :=  ""
         spacer := ""
         newLine := ""
@@ -243,8 +249,8 @@ class Log
 
         StoredLogLength := StrLen(RegExReplace(Log.StoredConsoleLog, "[^\n]*"))
         MaxSizeOfStoredLog := min(StoredLogLength, Log.__TB_MAX - 1)
-        if (StoredLogLength > MaxSizeOfStoredLog)
-            Log.StoredConsoleLog := RegExReplace(Log.StoredConsoleLog, ".+?[\n\r]{1,2}",r,o, StoredLogLength - MaxSizeOfStoredLog)
+        ; if (StoredLogLength > MaxSizeOfStoredLog)
+        ;     Log.StoredConsoleLog := RegExReplace(Log.StoredConsoleLog, ".+?[\n\r]{1,2}",r,o, StoredLogLength - MaxSizeOfStoredLog)
         
         if (Log.ConsoleLogHandle)
         {
@@ -261,6 +267,8 @@ class Log
             Debugger.LogToFile := Temp_Disable_Log2File_switch
             Temp_Disable_Log2File_switch := -1
         }
+
+        SetBatchLines, %temp_speed%
     }
     
     ;[DEV COMMENT] gets current directory for the log files to go into
@@ -351,6 +359,17 @@ class Log
         consoleMade := true
         Log.message("", " Done!",false,true,true)
         Log.CleanUpLogs()
+
+        ;[DEV COMMENT] check the Tray icon on the bottom right, 
+        ;       right click and at the top of the menu we have the console window opener
+        Menu, Tray, NoStandard
+        Menu, Tray, Add, % "&Open Logs", ToggleConsole
+        Menu, Tray, Add, % "&Toggle Lables", HideLabels
+        Menu, Tray, Add, % "&Toggle Rects", HideViews
+        Menu, Tray, Add, % "&Toggle Debug", ToggleDebug
+        Menu, Tray, Add, % ""
+        Menu, Tray, Standard
+
     }
     
     static WM_SYSCOMMAND := 0x112, SC_CLOSE := 0xF060
@@ -571,10 +590,3 @@ Log.message("LogStartup", "Logging Started at " . Log.getTimeDate("HH:mm:ss"),Fa
 
 ;[DEV COMMENT] MAKE THAT CONSOLE WINDOW
 Log.MakeConsole()
-
-;[DEV COMMENT] check the Tray icon on the bottom right, 
-;       right click and at the top of the menu we have the console window opener
-Menu, Tray, NoStandard
-Menu, Tray, Add, % "&Open Logs", ToggleConsole
-Menu, Tray, Add, % ""
-Menu, Tray, Standard

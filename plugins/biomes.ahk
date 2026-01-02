@@ -8,9 +8,10 @@ class BiomesPlugin extends Plugin
 {
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
     ;               added to the list when the loader is called
-    PluginRun()
+    PluginRun(byref restartPathing)
     {
         global
+        return
         ;[DEV COMMENT] re-enable the timer if already disabled and <webhookURL> is true - Nadir
         if (not BiomesPlugin_can_run and InStr(webhookURL, "discord")) {
             BiomesPlugin_can_run := true
@@ -21,6 +22,7 @@ class BiomesPlugin extends Plugin
         {
             BiomesPlugin_can_run := false
         }
+        Return true
     }
 
     PluginSetup()
@@ -30,7 +32,7 @@ class BiomesPlugin extends Plugin
         if (not InStr(webhookURL, "discord")) {
             BiomesPlugin_can_run := false
         }
-        SetTimer, CheckBiome, 1000
+        ;SetTimer, CheckBiome, 1000
     }
 
     SetupTabList()
@@ -178,6 +180,7 @@ ProcessExist(Name) {
 
 CheckBiomeFunction()
 {
+    SetBatchLines, %MAX_SPEED%
     if (!ProcessExist("RobloxPlayerBeta.exe")) {
         return
     }
@@ -301,6 +304,7 @@ CheckBiomeFunction()
         ;[DEV COMMENT] if you have the name of the aura why not use it to un-equip it during the un-equip phase? - Nadir
         prevState := state
     }
+    SetBatchLines, %STANDARD_SPEED%
 }
 ;[DEV COMMENT]  unchanged
 LoadBiomeToggles() {

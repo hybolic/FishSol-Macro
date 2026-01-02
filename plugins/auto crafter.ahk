@@ -1,8 +1,8 @@
 /*
 {
 ClassName: AutoCrafterPlugin,
-Width: 123,
-Height: 123
+Width: 2560,
+Height: 1440
 }
 */
 class AutoCrafterPlugin extends Plugin
@@ -10,9 +10,21 @@ class AutoCrafterPlugin extends Plugin
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
     ;               added to the list when the loader is called
 
-    ;OVERRIDE THIS FUNCTION AND CALL |PLUGIN_NAME|.RUN()
-    PluginRun()
-    {}
+    PluginRun(byref restartPathing)
+    {
+        ; Auto Crafter Detection
+        if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
+            currentTime := A_TickCount
+            if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
+                autoCrafterLastCheck := currentTime
+                PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
+                if (!ErrorLevel) {
+                    this.RunAutoCrafter()
+                }
+            }
+        }
+        Return true
+    }
 
     ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
     PluginSetup()
@@ -91,6 +103,287 @@ class AutoCrafterPlugin extends Plugin
             autoCrafterDetection := false
         }
     }
+
+    RunAutoCrafter() {
+        global
+        return
+        MouseGetPos, originalX, originalY
+
+        if (res = "1080p") {
+            this.RunAutoCrafter1080p()
+        } else if (res = "1440p") {
+            this.RunAutoCrafter1440p()
+        } else if (res = "1366x768") {
+            this.RunAutoCrafter768p()
+        }
+        
+        MouseMove, %originalX%, %originalY%, 0
+    }
+
+    ; 1080p Auto Crafter
+    RunAutoCrafter1080p() {
+        Send, {Esc}
+        Sleep, 300
+        Send, R
+        Sleep, 500
+        Send, {Enter}
+        Sleep, 2000
+
+        MouseMove, 100, 400, 3
+        Sleep, 200
+        Click, Left
+        Sleep, 200
+
+        MouseMove, 500, 300, 3
+        Sleep, 200
+        Click, Left
+        Sleep, 500
+
+        Click, WheelUp 80
+        Sleep, 500
+        Click, WheelDown 35
+        Sleep, 300
+
+        Send, {s Down}
+        Send, {a Down}
+        Sleep, 2000
+        Send, {a Up}
+        Sleep, 1500
+        Send, {d Down}
+        Sleep, 1000
+        Send, {d Up}
+        Sleep, 500
+
+        Send, {a Down}
+        Send, {w Down}
+        Sleep, 500
+        Send, {a Up}
+        Send, {w Up}
+        Sleep, 100
+        Send, {Space Down}
+        Send, {s Down}
+        Sleep, 100
+        Send, {Space Up}
+        Sleep, 500
+        Send, {s Up}
+        Sleep, 100
+    }
+
+    ; 1440p Auto Crafter
+    RunAutoCrafter1440p() {
+        Send, {w up}
+        Send, {a up}
+        Send, {s up}
+        Send, {d up}
+        Send, {space up}
+        Send, {e up}
+        reset := false
+        Sleep 300
+
+        Send, {Esc}
+        Sleep, 650
+        Send, R
+        Sleep, 650
+        Send, {Enter}
+        sleep 2600
+        MouseMove, 52, 621, 3
+        sleep 300
+        Click, Left
+        sleep 300
+        MouseMove, 525, 158, 3
+        sleep 300
+        Click, Left
+        sleep 300
+        Click, WheelUp 80
+        sleep 500
+        Click, WheelDown 90
+        sleep 300
+
+        ; start pathing to stella
+        Send, {s down}
+        Send, {a down}
+        sleep 2660
+        Send, {a up}
+        Sleep, 2500
+        Send, {d down}
+        Sleep, 1100
+        Send, {d up}
+        Send, {s up}
+        sleep 10
+        Send, {a down}
+        Send, {w down}
+        Sleep, 300
+        Send, {a up}
+        Send, {w up}
+        sleep 100
+        Send, {Space down}
+        Send, {s down}
+        Sleep, 100
+        Send, {Space up}
+        Sleep, 500
+        Send, {s up}
+        sleep 10
+        Send, {a down}
+        Send, {s down}
+        Sleep, 400
+        Send, {a up}
+        Sleep, 6000
+        Send, {s up}
+        Send, {a down}
+        Sleep, 1500
+        Send, {a up}
+        Send, {s down}
+        Sleep, 1250
+        Send, {a down}
+        Sleep, 200
+        Send, {a up}
+        Sleep, 1000
+        Send, {a down}
+        Send, {Space down}
+        Sleep, 100
+        Send, {Space up}
+        Sleep, 750
+        Send, {Space down}
+        Sleep, 100
+        Send, {Space up}
+        Sleep, 700
+        Send, {s up}
+        Sleep, 2500
+        Send, {a up}
+        Send, {s down}
+        Sleep, 1300
+        Send, {s up}
+        sleep 500
+
+        ; portal detection
+        screenColor := 0
+        success := false
+        loopCount := 0
+        Loop {
+            sleep 100
+            if (loopCount > 40) {
+                break
+            }
+            PixelGetColor, screenColor, 2509, 1389, RGB
+            if (screenColor = 0x000000) {
+                success := true
+            }
+                loopCount++
+        }
+        if (success) {
+            sleep, 500
+        } else {
+            reset := true
+        }
+
+        ; potion crafting
+        sleep 750
+        Send, {a down}
+        Sleep, 1000
+        Send, {a up}
+        Sleep, 300
+        Send, {f down}
+        Sleep, 300
+        Send, {f up}
+        Sleep, 125
+        Clipboard := "Heavenly Potion"
+        sleep 125
+        MouseMove, 1271, 448, 3
+        Sleep, 250
+        MouseClick, Left
+        Sleep, 250
+        Send, ^v
+        Sleep, 250
+        MouseMove, 1530, 552, 3
+        Sleep, 250
+        Click, WheelUp 80
+        sleep 250
+        MouseClick, Left
+        Sleep, 250
+        MouseMove, 769, 769, 3
+        Sleep, 250
+        MouseClick, Left
+        Sleep, 300
+        MouseMove, 954, 840, 3
+        Sleep, 250
+        MouseClick, Left
+        Sleep, 200
+        MouseClick, Left
+        sleep 125
+        Clipboard := "250"
+        sleep 125
+        Send, ^v
+        Sleep, 250
+        MouseMove, 1064, 839, 3
+        Sleep, 250
+        MouseClick, Left
+        Sleep, 200
+        MouseClick, Left
+        Sleep, 250
+        MouseMove, 1064, 910, 3
+        sleep 250
+        Mouseclick, Left
+        sleep 250
+        Mouseclick, Left
+        sleep 250
+        MouseMove, 1064, 984, 3
+        sleep 250
+        MouseClick, Left
+        sleep 250
+        MouseMove, 1885, 396, 3
+        Sleep, 250
+        MouseClick, Left
+        Sleep, 300
+    }
+
+    ; 768p Auto Crafter
+    RunAutoCrafter768p() {
+        Send, {Esc}
+        Sleep, 300
+        Send, R
+        Sleep, 500
+        Send, {Enter}
+        Sleep, 2000
+
+        MouseMove, 80, 300, 3
+        Sleep, 200
+        Click, Left
+        Sleep, 200
+
+        MouseMove, 400, 250, 3
+        Sleep, 200
+        Click, Left
+        Sleep, 500
+
+        Click, WheelUp 80
+        Sleep, 500
+        Click, WheelDown 20
+        Sleep, 300
+
+        Send, {s Down}
+        Send, {a Down}
+        Sleep, 1800
+        Send, {a Up}
+        Sleep, 2000
+        Send, {d Down}
+        Sleep, 800
+        Send, {d Up}
+        Sleep, 400
+
+        Send, {a Down}
+        Send, {w Down}
+        Sleep, 200
+        Send, {a Up}
+        Send, {w Up}
+        Sleep, 100
+        Send, {Space Down}
+        Send, {s Down}
+        Sleep, 100
+        Send, {Space Up}
+        Sleep, 400
+        Send, {s Up}
+        Sleep, 100
+    }
 }
 
 goto AutoCrafter_EOF
@@ -125,286 +418,6 @@ ToggleAutoCrafterWebhook:
     autoCrafterWebhook := !autoCrafterWebhook
     Toggle_GuiControl("AutoCrafterWebhookStatus", autoCrafterWebhook, "autoCrafterWebhook")
 return
-
-RunAutoCrafter() {
-    MouseGetPos, originalX, originalY
-    global res
-
-    if (res = "1080p") {
-        RunAutoCrafter1080p()
-    } else if (res = "1440p") {
-        RunAutoCrafter1440p()
-    } else if (res = "1366x768") {
-        RunAutoCrafter768p()
-    }
-
-    MouseMove, %originalX%, %originalY%, 0
-}
-
-; 1080p Auto Crafter
-RunAutoCrafter1080p() {
-    Send, {Esc}
-    Sleep, 300
-    Send, R
-    Sleep, 500
-    Send, {Enter}
-    Sleep, 2000
-
-    MouseMove, 100, 400, 3
-    Sleep, 200
-    Click, Left
-    Sleep, 200
-
-    MouseMove, 500, 300, 3
-    Sleep, 200
-    Click, Left
-    Sleep, 500
-
-    Click, WheelUp 80
-    Sleep, 500
-    Click, WheelDown 35
-    Sleep, 300
-
-    Send, {s Down}
-    Send, {a Down}
-    Sleep, 2000
-    Send, {a Up}
-    Sleep, 1500
-    Send, {d Down}
-    Sleep, 1000
-    Send, {d Up}
-    Sleep, 500
-
-    Send, {a Down}
-    Send, {w Down}
-    Sleep, 500
-    Send, {a Up}
-    Send, {w Up}
-    Sleep, 100
-    Send, {Space Down}
-    Send, {s Down}
-    Sleep, 100
-    Send, {Space Up}
-    Sleep, 500
-    Send, {s Up}
-    Sleep, 100
-}
-
-; 1440p Auto Crafter
-RunAutoCrafter1440p() {
-    Send, {w up}
-    Send, {a up}
-    Send, {s up}
-    Send, {d up}
-    Send, {space up}
-    Send, {e up}
-    reset := false
-    Sleep 300
-
-    Send, {Esc}
-    Sleep, 650
-    Send, R
-    Sleep, 650
-    Send, {Enter}
-    sleep 2600
-    MouseMove, 52, 621, 3
-    sleep 300
-    Click, Left
-    sleep 300
-    MouseMove, 525, 158, 3
-    sleep 300
-    Click, Left
-    sleep 300
-    Click, WheelUp 80
-    sleep 500
-    Click, WheelDown 90
-    sleep 300
-
-    ; start pathing to stella
-    Send, {s down}
-    Send, {a down}
-    sleep 2660
-    Send, {a up}
-    Sleep, 2500
-    Send, {d down}
-    Sleep, 1100
-    Send, {d up}
-    Send, {s up}
-    sleep 10
-    Send, {a down}
-    Send, {w down}
-    Sleep, 300
-    Send, {a up}
-    Send, {w up}
-    sleep 100
-    Send, {Space down}
-    Send, {s down}
-    Sleep, 100
-    Send, {Space up}
-    Sleep, 500
-    Send, {s up}
-    sleep 10
-    Send, {a down}
-    Send, {s down}
-    Sleep, 400
-    Send, {a up}
-    Sleep, 6000
-    Send, {s up}
-    Send, {a down}
-    Sleep, 1500
-    Send, {a up}
-    Send, {s down}
-    Sleep, 1250
-    Send, {a down}
-    Sleep, 200
-    Send, {a up}
-    Sleep, 1000
-    Send, {a down}
-    Send, {Space down}
-    Sleep, 100
-    Send, {Space up}
-    Sleep, 750
-    Send, {Space down}
-    Sleep, 100
-    Send, {Space up}
-    Sleep, 700
-    Send, {s up}
-    Sleep, 2500
-    Send, {a up}
-    Send, {s down}
-    Sleep, 1300
-    Send, {s up}
-    sleep 500
-
-    ; portal detection
-    screenColor := 0
-    success := false
-    loopCount := 0
-    Loop {
-    sleep 100
-    if (loopCount > 40) {
-    break
-    }
-    PixelGetColor, screenColor, 2509, 1389, RGB
-    if (screenColor = 0x000000) {
-    success := true
-    }
-    loopCount++
-    }
-    if (success) {
-    sleep, 500
-    } else {
-    reset := true
-    }
-
-    ; potion crafting
-    sleep 750
-    Send, {a down}
-    Sleep, 1000
-    Send, {a up}
-    Sleep, 300
-    Send, {f down}
-    Sleep, 300
-    Send, {f up}
-    Sleep, 125
-    Clipboard := "Heavenly Potion"
-    sleep 125
-    MouseMove, 1271, 448, 3
-    Sleep, 250
-    MouseClick, Left
-    Sleep, 250
-    Send, ^v
-    Sleep, 250
-    MouseMove, 1530, 552, 3
-    Sleep, 250
-    Click, WheelUp 80
-    sleep 250
-    MouseClick, Left
-    Sleep, 250
-    MouseMove, 769, 769, 3
-    Sleep, 250
-    MouseClick, Left
-    Sleep, 300
-    MouseMove, 954, 840, 3
-    Sleep, 250
-    MouseClick, Left
-    Sleep, 200
-    MouseClick, Left
-    sleep 125
-    Clipboard := "250"
-    sleep 125
-    Send, ^v
-    Sleep, 250
-    MouseMove, 1064, 839, 3
-    Sleep, 250
-    MouseClick, Left
-    Sleep, 200
-    MouseClick, Left
-    Sleep, 250
-    MouseMove, 1064, 910, 3
-    sleep 250
-    Mouseclick, Left
-    sleep 250
-    Mouseclick, Left
-    sleep 250
-    MouseMove, 1064, 984, 3
-    sleep 250
-    MouseClick, Left
-    sleep 250
-    MouseMove, 1885, 396, 3
-    Sleep, 250
-    MouseClick, Left
-    Sleep, 300
-}
-
-; 768p Auto Crafter
-RunAutoCrafter768p() {
-    Send, {Esc}
-    Sleep, 300
-    Send, R
-    Sleep, 500
-    Send, {Enter}
-    Sleep, 2000
-
-    MouseMove, 80, 300, 3
-    Sleep, 200
-    Click, Left
-    Sleep, 200
-
-    MouseMove, 400, 250, 3
-    Sleep, 200
-    Click, Left
-    Sleep, 500
-
-    Click, WheelUp 80
-    Sleep, 500
-    Click, WheelDown 20
-    Sleep, 300
-
-    Send, {s Down}
-    Send, {a Down}
-    Sleep, 1800
-    Send, {a Up}
-    Sleep, 2000
-    Send, {d Down}
-    Sleep, 800
-    Send, {d Up}
-    Sleep, 400
-
-    Send, {a Down}
-    Send, {w Down}
-    Sleep, 200
-    Send, {a Up}
-    Send, {w Up}
-    Sleep, 100
-    Send, {Space Down}
-    Send, {s Down}
-    Sleep, 100
-    Send, {Space Up}
-    Sleep, 400
-    Send, {s Up}
-    Sleep, 100
-}
 
 
 AutoCrafter_EOF:

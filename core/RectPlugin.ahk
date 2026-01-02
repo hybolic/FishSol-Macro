@@ -6,7 +6,7 @@ class Plugin
     static S_TOP         := 2
     static S_RIGHT       := 3
     static S_BOTTOM      := 4
-    static S_CENTER      := 5 ;ALSO WRITEN AS NONE
+    static S_CENTER      := 5 ;ALSO WRITEN AS NONE but leaving as center
 
     Width := 1920
     Height := 1080
@@ -21,13 +21,14 @@ class Plugin
 
     Run()
     {
-        Log.Info("[PLUGIN=>" . this.__Class . "] is Running!")
-        this.PluginRun()
+        ; Log.Info("[PLUGIN=>" . this.__Class . "] is Running!")
+        ; this.PluginRun()
     }
 
-    ;OVERRIDE THIS FUNCTION AND CALL |PLUGIN_NAME|.RUN()
-    PluginRun()
-    {}
+    PluginRun(byref restartPathing)
+    {
+        Return true
+    }
 
     ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
     PluginSetup()
@@ -71,9 +72,29 @@ class Plugin
         return PointObject
     }
 
-    RegisterRect(X, Y, Side, Name:="")
+    RegisterRect(X, Y, W, H, Side, Name:="")
     {
-        RectID := RectangleBuilder.DrawRect(X, Y, 10, 10, 2, 0xFFFFFF)
+        RectID := RectangleBuilder.DrawRect(X, Y, W, H, 2, 0xFFFFFF)
+        RectObject := RectangleBuilder.get_Window(RectID)
+        if Name != ""
+            RectObject.set_Name(Name)
+        RectObject.SetVisibility(true,true)
+        RectObject.set_Anchor(Side, false)
+        RectObject.SnapToSides()
+        RectObject.SnapAdjustToResolution(this.Width,this.Height)
+        RectObject.set_Color(this.getRandoomColor())
+        this.LocalThings.Push(RectObject)
+        return RectObject
+    }
+
+    RegisterSearchXY2(X, Y, X2, Y2, Side, Name:="")
+    {
+        return this.RegisterSearch( Min(X,X2), Min(Y,Y2), Abs(X-X2), Abs(Y-Y2), Side, Name)
+    }
+
+    RegisterSearch(X, Y, W, H, Side, Name:="")
+    {
+        RectID := RectangleBuilder.DrawSearch(X, Y, W, H, 2, 0xFFFFFF)
         RectObject := RectangleBuilder.get_Window(RectID)
         if Name != ""
             RectObject.set_Name(Name)
@@ -111,35 +132,57 @@ class Plugin
         HEX := "0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|"
         Sort, HEX, Random D|
         HEX := SubStr(StrReplace(HEX, "|"), 1, 6)
-        Log.Info(HEX)
         return "0x" . HEX
     }
 
-    SendWebhook(title, color := "16777215") {
-        ; if (!InStr(webhookURL, "discord")) {
-        ;     return
-        ; }
 
-        ; time := A_NowUTC
-        ; timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+    SendWebhook(title, color := "0") {
+        global
+        local time, timestamp, json, http
+        
+        if (!InStr(webhookURL, "discord")) {
+            return
+        }
+        time := A_NowUTC
+        timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
 
-        ; json := "{"
-        ; . """embeds"": ["
-        ; . "{"
-        ; . "    ""title"": """ title ""","
-        ; . "    ""color"": " color ","
-        ; . "    ""footer"": {""text"": ""fishSol v1.9.3"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
-        ; . "    ""timestamp"": """ timestamp """"
-        ; . "  }"
-        ; . "],"
-        ; . """content"": """""
-        ; . "}"
+        json := "{"
+        . """embeds"": ["
+        . "{"
+        . "    ""title"": """ title ""","
+        . "    ""color"": " color ","
+        . "    ""footer"": {""text"": """ version """, ""icon_url"": """ . icon_url . " ""},"
+        . "    ""timestamp"": """ timestamp """"
+        . "  }"
+        . "],"
+        . """content"": """""
+        . "}"
 
-        ; http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-        ; http.Open("POST", webhookURL, false)
-        ; http.SetRequestHeader("Content-Type", "application/json")
-        ; http.Send(json)
+        http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        http.Open("POST", webhookURL, false)
+        http.SetRequestHeader("Content-Type", "application/json")
+        http.Send(json)
     }
+
+    Sleep(ms:=300)
+    {
+        Sleep, %ms%
+    }
+}
+
+
+LoadPlugins()
+{
+    Log.Info("Loading Plugins!")
+    pt2  := new StopWatch
+    for _, plugin_class in PLUGINS_LIST
+    {
+        Log.message("BENCHMARK", "[" . plugin_class.__Class . "] has started to load", false, true)
+        pt2.Start()
+        plugin_class.PluginSetup()
+        Log.message("BENCHMARK", "PLUGIN SETUP=>" . plugin_class.__Class . " took " . pt2.Stop().getTimeData().get_ms() . "ms to load!", false, true)
+    }
+    pt2 := ""
 }
 
 ;Tester := new Tester(2560,1440)
@@ -148,6 +191,7 @@ class Tester extends Plugin
 {
     PluginSetup()
     {
+        MSGBOX, % "THE TEST PLUGIN HAS BEEN LOADED"
         this.VisualWidth := 100
 
         this.Left_Tester           := this.RegisterRect(0, 0, this.S_LEFT, "Left")
@@ -171,6 +215,18 @@ class Tester extends Plugin
         this.Center_Tester.set_position(0, 0)
     }
 
-    PluginRun()
-    {}
+    PluginRun(byref restartPathing)
+    {
+        Return true
+    }
+    
+    QuickReset()
+    {
+        Send , {Esc}
+        Sleep, 650
+        Send , R
+        Sleep, 650
+        Send , {Enter}
+        Sleep, 2000
+    }
 }

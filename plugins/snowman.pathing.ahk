@@ -9,16 +9,30 @@ class SnowmanPathingPlugin extends Plugin
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
     ;               added to the list when the loader is called
 
-    ;OVERRIDE THIS FUNCTION AND CALL |PLUGIN_NAME|.RUN()
-    PluginRun()
+    PluginRun(byref restartPathing)
     {
-        sleep 500
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 2600
+        global
+        return
+        if (snowmanPathing) {
+            elapsed := A_TickCount - startTick
+            if ((snowmanPathingLastRun = 0 and elapsed >= snowmanPathingTime) or (snowmanPathingLastRun > 0 and (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                this.QuickReset()
+                if (snowmanPathingWebhook) {
+                    try this.SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                }
+                this.RunSnowmanPathing()
+                snowmanPathingLastRun := elapsed
+                restartPathing := true
+                Return false
+            }
+        }
+        Return true
+    }
+
+    RunSnowmanPathing()
+    {
+        return
+        this.QuickReset()
 
         Send, {a Down}
         sleep 1500
@@ -67,7 +81,7 @@ class SnowmanPathingPlugin extends Plugin
     ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
     PluginSetup()
     {
-
+        ;
     }
 
     ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
@@ -569,49 +583,49 @@ RunSnowmanPathingAbyssal() {
     MouseMove, %originalX%, %originalY%, 0
 }
 
-RunSnowmanPathingNow:
-    global toggle, restartPathing, firstLoop, snowmanPathingLastRun, snowmanPathingInterval, snowmanPathingWebhook, res, pathingMode
+; RunSnowmanPathingNow:
+;     global toggle, restartPathing, firstLoop, snowmanPathingLastRun, snowmanPathingInterval, snowmanPathingWebhook, res, pathingMode
 
-    Send, {Esc}
-    sleep 500
-    Send, r
-    sleep 1000
-    Send, {Enter}
-    sleep 2000
+;     Send, {Esc}
+;     sleep 500
+;     Send, r
+;     sleep 1000
+;     Send, {Enter}
+;     sleep 2000
 
-    Send, {w up}
-    Send, {a up}
-    Send, {s up}
-    Send, {d up}
-    Send, {space up}
-    Send, {e up}
+;     Send, {w up}
+;     Send, {a up}
+;     Send, {s up}
+;     Send, {d up}
+;     Send, {space up}
+;     Send, {e up}
 
-    Suspend, Off
+;     Suspend, Off
 
-    if (snowmanPathingWebhook) {
-        try SendWebhook(":snowman: Starting snowman pathing (" . pathingMode . " at " . res . ")", "16636040")
-    }
+;     if (snowmanPathingWebhook) {
+;         try SendWebhook(":snowman: Starting snowman pathing (" . pathingMode . " at " . res . ")", "16636040")
+;     }
 
-    RunSnowmanPathing()
+;     RunSnowmanPathing()
 
-    snowmanPathingLastRun := A_TickCount - snowmanPathingInterval + 60000
+;     snowmanPathingLastRun := A_TickCount - snowmanPathingInterval + 60000
 
-    toggle := true
-    restartPathing := true
-    firstLoop := true
+;     toggle := true
+;     restartPathing := true
+;     firstLoop := true
 
-    if (res = "1080p") {
-        Gosub, DoMouseMove
-    } else if (res = "1440p") {
-        Gosub, DoMouseMove2
-    } else if (res = "1366x768") {
-        Gosub, DoMouseMove3
-    }
+;     if (res = "1080p") {
+;         Gosub, DoMouseMove
+;     } else if (res = "1440p") {
+;         Gosub, DoMouseMove2
+;     } else if (res = "1366x768") {
+;         Gosub, DoMouseMove3
+;     }
 
-    if (savedPathingState) {
-        Suspend, On
-    }
-return
+;     if (savedPathingState) {
+;         Suspend, On
+;     }
+; return
 
 SnowmanPathing_EOF:
 Log.Info("[PLUGIN=>""snowman.pathing.ahk""]" . " Finished Loading!")

@@ -12,7 +12,7 @@ class WatchData
 
     get_uSeconds()
     {
-        return RTrim(((this.last_time / this.freq) * 1000000) . "0","0")
+        return RTrim(((this.last_time / this.freq) * 1000000),"0")
     }
 
     get_ms()
@@ -56,18 +56,24 @@ class StopWatch
 
     Start()
     {
+        temp_speed := A_BatchLines
+        SetBatchLines, %MAX_SPEED%
         DllCall("QueryPerformanceFrequency", "Int64*", f)
         DllCall("QueryPerformanceCounter", "Int64*", s)
         this.Data.freq := f
         this.Data.start_time := s
+        SetBatchLines, %temp_speed%
         return this
     }
 
     Stop()
     {
+        temp_speed := A_BatchLines
+        SetBatchLines, %MAX_SPEED%
         DllCall("QueryPerformanceCounter", "Int64*", st)
         this.Data.stop_time := st
         this.Data.last_time := (this.Data.stop_time - this.Data.start_time)
+        SetBatchLines, %temp_speed%
         return this
     }
 
