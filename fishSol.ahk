@@ -87,7 +87,7 @@ CoordMode, Pixel, Screen
     global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
 ;end
 
-global version  := "fishSol v1.9.4 2601-AltC"
+global version  := "fishSol v1.9.4 2601-AltE"
 
 ;WEB RESOURCES
     global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
@@ -891,7 +891,16 @@ return
         GuiControl, , AllowStopRebind_CHECKBOX, 0
     return
 ;end
-
+F9::
+MouseGetPos, pos_this_x, pos_this_y
+PWidth  := RobloxWindow.State.Screen.Width
+PHeight := RobloxWindow.State.Screen.Height
+PX := RobloxWindow.State.Screen.X
+PY := RobloxWindow.State.Screen.Y
+Clipboard := (PX - pos_this_x) . " " . (PY - pos_this_y) . " : " . PWidth . " " . PHeight
+msgbox % "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
+Clipboard := "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
+return
 class CorePlugin extends Plugin
 {
 
@@ -905,47 +914,94 @@ class CorePlugin extends Plugin
         ; global
         ; local
 
-        ;FIXED X AND Y POSITION ON WINDOW
-        this.CloseChat               := this.RegisterPoint(151 , 38  , this.S_LEFT  , "CloseChat")       ;OLDNAME=>temp05
-
+        ;FIXED X AND Y POSITION ON WINDOW. Roblox ingame ui is a fixed size and position anchored to the top left or 0,0 of the windo
+        ;[DONE]                                                ;140   32
+        this.CloseChat               := this.RegisterFixedPoint(151 , 38  , this.S_LEFT  , "CloseChat")
 
         ;SCALES WITH WIDTH OF WINDOW
-        this.ExitCollection          := this.RegisterPoint(525 , 158 , this.S_LEFT, "ExitCollection")    ;OLDNAME=>temp07
-        this.MerchantTextBox         := this.RegisterPoint(1308, 1073, this.S_BOTTOM, "MerchantTextBox") ;OLDNAME=>temp08
-        this.SellFish                := this.RegisterPoint(1289, 1264, this.S_BOTTOM, "SellFish")        ;OLDNAME=>temp09
+        ;[DONE]                                                            ;0x1+0x2 flag tells Scaled to do both H and V Scaling
+        this.ExitCollection          := this.RegisterScaledPoint(525 , 158, 0x3, "ExitCollection")
+        this.ExitCollection.HighOffset(0.2 ,0.103) ;do not compensate for horizontal offset
+        this.ExitCollection .LowOffset(0.2 ,0.163) ;just vertical, thanks game o7
+        
+        ;Is the Anchor for top of fish mechant window          ;1308, 1073 
+        this.TempMerchantBoxTop      := this.RegisterScaledPoint(0.5,0.625, 0x3, "AnchorMerchant")
+        ; this.ExitCollection.HighOffset(0 ,0.625)
+        ; this.ExitCollection .LowOffset(0 ,0.625)
+        this.TempMerchantBoxTop.FWidth  := 1200    ;width doesn't matter
+        this.TempMerchantBoxTop.FHeight := 400     ;but height does
+        this.TempMerchantBoxTop._isAnchor := true  ;makes visualiser smaller, basically dev only setting, not actually anchor
 
+        ;[DONE]                                                         ;0x4 tells Scaled to use the alternative scaling (ie not largest)
+        this.MerchantTextBox         := this.RegisterScaledPoint(0  ,0.5, 0x7, "MerchantTextBox")
+        ; this.MerchantTextBox.HighOffset(0 ,0.5)
+        ; this.MerchantTextBox .LowOffset(0 ,0.5)
+        this.MerchantTextBox._isAnchor := true
+        this.TempMerchantBoxTop.addChild(this.MerchantTextBox)
+
+        ;[DONE]                                                 ;1289, 1264
+        this.SellFish                := this.RegisterScaledPoint(0  ,0.95, 0x7, "MerchantSellFish")
+        ; this.SellFish.HighOffset(0 ,0.95)
+        ; this.SellFish .LowOffset(0 ,0.95)
+        this.SellFish._isAnchor := true
+        this.TempMerchantBoxTop.addChild(this.SellFish)
+
+        ;[    ]
         ;SCALES WITH WIDTH AND HEIGHT OF WINDOW
-        this.Slot1Fish               := this.RegisterPoint(1117, 550 , this.S_CENTER, "Slot1Fish")       ;OLDNAME=>temp10
-        this.SubMenuSell             := this.RegisterPoint(1002, 831 , this.S_CENTER, "SubMenuSell")     ;OLDNAME=>temp11
-        this.CloseFishSell           := this.RegisterPoint(1958, 361 , this.S_CENTER, "CloseFishSell")   ;OLDNAME=>temp12
+        this.Slot1Fish               := this.RegisterPoint(1117, 550 , this.S_CENTER, "Slot1Fish")
+
+        ;[    ]
+        this.SubMenuSell             := this.RegisterPoint(1002, 831 , this.S_CENTER, "SubMenuSell")
+
+        ;[    ]
+        this.CloseFishSell           := this.RegisterPoint(1958, 361 , this.S_CENTER, "CloseFishSell")
+
+        ;[    ]
         this.SellAll                 := this.RegisterPoint(904 , 1080, this.S_CENTER, "SellAll")
+
+        ;[    ]
         this.SellOne                 := this.RegisterPoint(700 , 1078, this.S_CENTER, "SellOne")
 
         ;FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
-        this.CloseGui                := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")        ;OLDNAME=>temp04
-        this.AuraTabOne              := this.RegisterPoint(1262, 447 , this.S_CENTER, "AuraTabOne")      ;OLDNAME=>temp14
+        this.CloseGui                := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")
+        this.AuraTabOne              := this.RegisterPoint(1262, 447 , this.S_CENTER, "AuraTabOne")
         this.AbysPatPixSearchClick   := this.RegisterPoint(830 , 845 , this.S_CENTER, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
-        this.SearchBox               := this.RegisterPoint(1469, 489 , this.S_CENTER, "SearchBox")       ;OLDNAME=>temp15
-        this.Slot1                   := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")           ;OLDNAME=>temp02
+        this.SearchBox               := this.RegisterPoint(1469, 489 , this.S_CENTER, "SearchBox")
+        this.Slot1                   := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")
 
         ;POSTIONS MAY DRIFT SLIGHTLY WITH SIZE? MIGHT NEED TO COMPENSATE
-        this.Auras                   := this.RegisterPoint(52  , 538 , this.S_LEFT  , "Auras")           ;OLDNAME=>temp01
+        ;[    ]
+        this.Auras                   := this.RegisterPoint(52  , 538 , this.S_LEFT  , "Auras")
         this.Auras.UseOuter := false
-        this.Unequip                 := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")         ;OLDNAME=>temp03
-        this.AuraCollection          := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")  ;OLDNAME=>temp06
+
+        ;[    ]
+        this.AuraCollection          := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")
         this.AuraCollection.UseOuter := false
 
+        ;[    ]
+        this.Unequip                 := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")
+
         ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
-        this.FishButton              := this.RegisterPoint(1161, 1124, this.S_CENTER, "FishButton")      ;OLDNAME=>temp17
+        ;[    ]                                                 ;78.05%
+        this.FishButton              := this.RegisterPoint(1161, 1124, this.S_CENTER, "FishButton")
+
+        ;[    ]                                                 ;81.73%
         this.MoveOutOfWay            := this.RegisterPoint(1263, 1177, this.S_CENTER, "MoveOutOfWay")
 
-        this.FS_p1                   := this.RegisterPoint(1690, 1224, this.S_CENTER, "FS_p1")           ;OLDNAME=>temp19
-        this.FS_p2                   := this.RegisterPoint(1523, 649 , this.S_CENTER, "FS_p2")           ;OLDNAME=>temp20
+        ;needs to be checked
+        this.FS_p1                   := this.RegisterPoint(1690, 1224, this.S_CENTER, "FS_p1")
         
+        ;needs to be checked
+        this.FS_p2                   := this.RegisterPoint(1523, 649 , this.S_CENTER, "FS_p2")
+        
+        ;needs to be checked
         this.CloseFishCaught         := this.RegisterPoint(1457, 491 , this.S_CENTER, "CloseFishCaught")
 
+        ;needs to be checked
         this.MainMenuStart           := this.RegisterPoint(347 , 1329, this.S_LEFT  , "MainMenuStart")
-        this.SkipButton              := this.RegisterPoint(1280, 720 , this.S_CENTER, "SkipButton")      ;OLDNAME=>temp18
+        
+        ;needs to be checked
+        this.SkipButton              := this.RegisterPoint(1280, 720 , this.S_CENTER, "SkipButton")
 
 
         

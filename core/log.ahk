@@ -13,10 +13,10 @@ class Debugger
     static ForceHideLabels      := false
     static Visual_ShowObjectKey := false
     static ForceHideViews       := false
-    static Internal_FPS         := 1
+    static Internal_FPS         := 10
     static Internal_States_FTU  := 1
     static Internal_Window_FTU  := 1
-    static _Internal_Logs_FTU   := 1 * 5
+    static _Internal_Logs_FTU   := Debugger.Internal_FPS * 5
     Internal_Logs_FTU(val:=-1)
     {
         if val = -1

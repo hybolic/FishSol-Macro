@@ -72,6 +72,35 @@ class Plugin
         return PointObject
     }
 
+    RegisterFixedPoint(X, Y, Side, Name:="")
+    {
+        PointID := RectangleBuilder.DrawFixedPoint(X, Y, 15, 15)
+        PointObject := RectangleBuilder.get_Window(PointID)
+        if Name != ""
+            PointObject.set_Name(Name)
+        PointObject.SetVisibility(true,true)
+        PointObject.set_Anchor(Side, false)
+        PointObject.SnapAdjustToResolution(this.Width, this.Height)
+        PointObject.set_Color(this.getRandomColor())
+        this.LocalThings.Push(PointObject)
+        return PointObject
+    }
+
+    ; Side: 0 no scaled, 0x1 scaled witdth, 0x2 scaled height, 0x3 both
+    RegisterScaledPoint(X, Y, Side, Name:="")
+    {
+        tempSide := Side ; & 0x3
+        PointID := RectangleBuilder.DrawScaledPoint(X, Y, 15, 15)
+        PointObject := RectangleBuilder.get_Window(PointID)
+        if Name != ""
+            PointObject.set_Name(Name)
+        PointObject.SetVisibility(true,true)
+        PointObject.set_Anchor(tempSide, true)
+        PointObject.set_Color(this.getRandomColor())
+        this.LocalThings.Push(PointObject)
+        return PointObject
+    }
+
     RegisterRect(X, Y, W, H, Side, Name:="")
     {
         RectID := RectangleBuilder.DrawRect(X, Y, W, H, 2, 0xFFFFFF)
@@ -208,6 +237,7 @@ LoadPlugins()
     }
     pt2 := ""
 }
+
 
 ;Tester := new Tester(2560,1440)
 
