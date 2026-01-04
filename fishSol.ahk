@@ -87,7 +87,7 @@ CoordMode, Pixel, Screen
     global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
 ;end
 
-global version  := "fishSol v1.9.4 2601-AltE"
+global version  := "fishSol v1.9.4 2601-AltE.1"
 
 ;WEB RESOURCES
     global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"

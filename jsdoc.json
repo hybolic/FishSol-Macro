@@ -1,0 +1,19 @@
+{
+  "recurseDepth": 10,
+  "plugins": ["jsDocPlugin.js"],
+    "source": {
+        "includePattern": ".+\\.ahk?$"
+    },
+    "sourceType": "script",
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc","closure"]
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "default":{
+            "outputSourceFiles":false
+        }
+    }
+}
