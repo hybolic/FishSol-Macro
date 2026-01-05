@@ -9,13 +9,11 @@ FullAppTimer  := new StopWatch
 FullAppTimer.Start()
 #Include core\Rectangle.ahk    ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
 #include core\RectPlugin.ahk 
-#include core\RobloxWindow.ahk ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
+#include core\Roblox.ahk ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
 
 global MAX_SPEED := -1
 global STANDARD_SPEED := A_BatchLines
 SetBatchLines, %MAX_SPEED%
-
-global RobloxWindow := new _RobloxWindow
 
 Loading_Times := new StopWatch
 
@@ -45,17 +43,6 @@ stopBench(message,micro:=false)
 }
 
 ; [DEV COMMENT] Brought in to test loading times and disabled after
-
-; Loading_Times.Start()
-; SolsRng.Load_Auras()
-; ms := Loading_Times.Stop().getTimeData().get_ms()
-; Log.Temp_Disable_Log2File().message("LOADING", "SolsRng.Load_Auras() took " . ms . "ms to load!", false, true, true)
-
-; Loading_Times.Start()
-; RobloxLogs.UpdateFromLogs()
-; ms := Loading_Times.Stop().getTimeData().get_ms()
-; Log.Temp_Disable_Log2File().message("LOADING", "RobloxLogs.UpdateFromLogs() took " . ms . "ms to load!", false, true, true)
-; Loading_Times.__Delete()
 
 ; [DEV COMMENT] Reset any changes made to Gui, by the #Includes
 Gui, Default
