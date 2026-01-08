@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: Vector2D</title>
+    <title>JSDoc: Class: SortedArray_Func</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: Vector2D</h1>
+    <h1 class="page-title">Class: SortedArray_Func</h1>
 
     
 
@@ -28,9 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>Vector2D<span class="signature">(X<span class="signature-attributes">opt</span>, Y<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>SortedArray_Func</h2>
         
-            <div class="class-description">Basic Vector2D holder</div>
+            <div class="class-description">Global Sorted Array Functions</div>
         
     
 </header>
@@ -40,21 +40,6 @@
     
         
 
-    
-    <h2>Constructor</h2>
-    
-
-    
-    <h4 class="name" id="Vector2D"><span class="type-signature"></span>new Vector2D<span class="signature">(X<span class="signature-attributes">opt</span>, Y<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Basic Vector2D holder
-</div>
 
 
 
@@ -63,99 +48,6 @@
 
 
 
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>X</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>Y</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -232,136 +124,6 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="X"><span class="type-signature"></span>X<span class="type-signature"> :Number</span></h4>
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Y"><span class="type-signature"></span>Y<span class="type-signature"> :Number</span></h4>
-
-
-
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -372,7 +134,7 @@
     
 
     
-    <h4 class="name" id="Add"><span class="type-signature"></span>Add<span class="signature">(X, Y)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".Push"><span class="type-signature">(static) </span>Push<span class="signature">(array, key, value)</span><span class="type-signature"> &rarr; {SortedArray}</span></h4>
     
 
     
@@ -380,7 +142,7 @@
 
 
 <div class="description">
-    Adds to Vector2D's X and Y position then returns itself
+    pushes a new item to the sorted array!<br/>it does cause it to become messy but its here just in case its needed
 </div>
 
 
@@ -416,13 +178,36 @@
 
         <tr>
             
-                <td class="name"><code>X</code></td>
+                <td class="name"><code>array</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">SortedArray</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">byref Sorted Array</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>key</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
 
 
             
@@ -439,13 +224,13 @@
 
         <tr>
             
-                <td class="name"><code>Y</code></td>
+                <td class="name"><code>value</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Object</span>
 
 
             
@@ -516,6 +301,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">SortedArray</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -527,7 +330,7 @@
     
 
     
-    <h4 class="name" id="Multiply"><span class="type-signature"></span>Multiply<span class="signature">(X, Y)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".RemoveAt"><span class="type-signature">(static) </span>RemoveAt<span class="signature">(array, index)</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
 
     
@@ -535,7 +338,7 @@
 
 
 <div class="description">
-    multiplies the Vector2D's X and Y position then returns itself
+    remove element from array using its known sorted index<br/> returning the removed object
 </div>
 
 
@@ -571,13 +374,13 @@
 
         <tr>
             
-                <td class="name"><code>X</code></td>
+                <td class="name"><code>array</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">SortedArray</span>
 
 
             
@@ -587,20 +390,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">byref Sorted Array</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>Y</code></td>
+                <td class="name"><code>index</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Integer</span>
 
 
             
@@ -671,6 +474,28 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the removed object
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -682,7 +507,7 @@
     
 
     
-    <h4 class="name" id="Set"><span class="type-signature"></span>Set<span class="signature">(X, Y)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".SortedArrayMake"><span class="type-signature">(static) </span>SortedArrayMake<span class="signature">(&hellip;array)</span><span class="type-signature"> &rarr; {SortedArray}</span></h4>
     
 
     
@@ -690,7 +515,173 @@
 
 
 <div class="description">
-    sets the Vector2D's X and Y position then returns itself
+    looks for and removes item from sorted array<br/>pairs of key value in long aaa list give to be turned into an array <b>SortedArrayMake(key, value, key2, value2)</b>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>array</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">pairs of String and Objects</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Sorted Array
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">SortedArray</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".SortedArrayRemove"><span class="type-signature">(static) </span>SortedArrayRemove<span class="signature">(array, item_name)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    looks for and removes item from sorted array
 </div>
 
 
@@ -726,13 +717,13 @@
 
         <tr>
             
-                <td class="name"><code>X</code></td>
+                <td class="name"><code>array</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">SortedArray</span>
 
 
             
@@ -749,13 +740,13 @@
 
         <tr>
             
-                <td class="name"><code>Y</code></td>
+                <td class="name"><code>item_name</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -826,26 +817,44 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
 
 
         
-            
-
     
 
     
-    <h4 class="name" id="Subtract"><span class="type-signature"></span>Subtract<span class="signature">(X, Y)</span><span class="type-signature"></span></h4>
-    
+        <h3 class="subsection-title">Type Definitions</h3>
 
-    
+        
+                
+<h4 class="name" id=".SortedArray">SortedArray</h4>
+
 
 
 
 <div class="description">
-    subtracts from Vector2D's X and Y position then returns itself
+    an array of string keys and value objects, yes this is a keypair list, but if definied as such is not entirely true
 </div>
 
 
@@ -854,12 +863,11 @@
 
 
 
+    <h5 class="subsection-title">Properties:</h5>
 
-
-    <h5>Parameters:</h5>
     
 
-<table class="params">
+<table class="props">
     <thead>
     <tr>
         
@@ -881,13 +889,13 @@
 
         <tr>
             
-                <td class="name"><code>X</code></td>
+                <td class="name"><code>Key</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -897,20 +905,20 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">name of the object</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>Y</code></td>
+                <td class="name"><code>Value</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Object</span>
 
 
             
@@ -926,8 +934,6 @@
     
     </tbody>
 </table>
-
-
 
 
 
@@ -972,23 +978,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
+            
     
 
     

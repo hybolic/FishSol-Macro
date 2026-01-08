@@ -27,7 +27,9 @@ class AutoCrafterPlugin extends Plugin
     }
 
     PluginSetup()
-    {}
+    {
+        
+    }
 
     IniRead()
     {

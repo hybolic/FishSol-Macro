@@ -3,20 +3,28 @@
 #SingleInstance Force
 
 
+
+
+
+
+
+
+
+
 #include core\log.ahk
-#Include core\Timer.ahk
+#include core\timer.ahk
 FullAppTimer  := new StopWatch
 FullAppTimer.Start()
-#Include core\Rectangle.ahk    ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
+#include core\Rectangle.ahk    ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
 #include core\RectPlugin.ahk 
 #include core\Roblox.ahk ;[DEV COMMENT] not yet implmented this is just the plugin compatibilty test - Nadir
 
 global MAX_SPEED := -1
 global STANDARD_SPEED := A_BatchLines
+
 SetBatchLines, %MAX_SPEED%
 
 Loading_Times := new StopWatch
-
 ;RobloxLogs.RegisterOtherLogType(SolsRng)
 startBench()
 RectangleBuilder.MakeOverlayGui()
@@ -60,11 +68,13 @@ CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
 
 ;SYSTEM RESOURCES
-    iniFilePath := A_ScriptDir "\settings.ini"
-    iconFilePath := A_ScriptDir "\img\icon.ico"
+    iniFilePath := A_ScriptDir . "\settings.ini"
+    iconFilePath := A_ScriptDir . "\img\icon.ico"
+
     if (FileExist(iconFilePath)) {
         Menu, Tray, Icon, %iconFilePath%
     }
+
     global DiscordPNG        := A_ScriptDir . "\img\Discord.png"
     global RobloxPNG         := A_ScriptDir . "\img\Robux.png"
     global Gui_Main_Png      := A_ScriptDir . "\gui\Main.png"
@@ -74,7 +84,7 @@ CoordMode, Pixel, Screen
     global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
 ;end
 
-global version  := "fishSol v1.9.4 2601-AltE.1"
+global version  := "fishSol v1.9.4 2601-AltF.1"
 
 ;WEB RESOURCES
     global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
@@ -374,6 +384,12 @@ return
 ;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
 
+
+
+
+
+
+
 ;;;;;;;;;;;;;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
  
  HideLabels:
@@ -397,15 +413,17 @@ return
 TabChange:
 return
 
+
 getTimeNow()
 {
     time := A_NowUTC
-    timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+    timestamp := SubStr(time,1,4) . "-" . SubStr(time,5,2) . "-" . SubStr(time,7,2) . "T" . SubStr(time,9,2) . ":" . SubStr(time,11,2) . ":" . SubStr(time,13,2) . ".000Z"
     return timestamp
 }
 
 ; webhooks!
 SendWebhook(title, color := "16777215") {
+
     global ;just assume global
     local json, timestamp, http
     if (!InStr(webhookURL, "discord")) {
@@ -429,6 +447,7 @@ SendWebhook(title, color := "16777215") {
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
     http.Send(json)
+
 }
 
 UpdateGUI:
@@ -453,6 +472,7 @@ UpdateGUI:
     }
 return
 
+
 ManualGUIUpdate() {
     if (toggle) {
         GuiControl,, StatusText, Running
@@ -476,6 +496,7 @@ ManualGUIUpdate() {
         GuiControl,, ResStatusText, Ready
     }
 }
+
 
 ;[DEV COMMENT] Renamed to allow hotkeys to be bound to the functions directly
 ;HOTKEYS SCRIPT
@@ -879,15 +900,19 @@ return
     return
 ;end
 F9::
-MouseGetPos, pos_this_x, pos_this_y
-PWidth  := RobloxWindow.State.Screen.Width
-PHeight := RobloxWindow.State.Screen.Height
-PX := RobloxWindow.State.Screen.X
-PY := RobloxWindow.State.Screen.Y
-Clipboard := (PX - pos_this_x) . " " . (PY - pos_this_y) . " : " . PWidth . " " . PHeight
-msgbox % "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
-Clipboard := "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
+    MouseGetPos, pos_this_x, pos_this_y
+    PWidth  := RobloxWindow.State.Screen.Width
+    PHeight := RobloxWindow.State.Screen.Height
+    PX := RobloxWindow.State.Screen.X
+    PY := RobloxWindow.State.Screen.Y
+    Clipboard := (PX - pos_this_x) . " " . (PY - pos_this_y) . " : " . PWidth . " " . PHeight
+    msgbox % "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
+    Clipboard := "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
 return
+
+#include core/Math.ahk
+#include core/adaptive_control.ahk
+
 class CorePlugin extends Plugin
 {
 
@@ -895,13 +920,18 @@ class CorePlugin extends Plugin
     {
         Return true
     }
-
+    /*
+    * JUST DISCOVERED SOLS RNG USES A ASPECT RATION OF 2:1
+    */
     PluginSetup()
     {
         ; global
         ; local
 
-        ;FIXED X AND Y POSITION ON WINDOW. Roblox ingame ui is a fixed size and position anchored to the top left or 0,0 of the windo
+        ;RegisterPoint\((\d+) *, +(\d+) *, +this\.\w+ *, +("\w+")\)
+        ;RegisterScaledPoint(($1/2560), ($2/1440) , 0x7, $3)
+
+        ;FIXED X AND Y POSITION ON WINDOW. Roblox ingame ui is a fixed size and position anchored to the top left or 0,0 of the window
         ;[DONE]                                                ;140   32
         this.CloseChat               := this.RegisterFixedPoint(151 , 38  , this.S_LEFT  , "CloseChat")
 
@@ -933,82 +963,103 @@ class CorePlugin extends Plugin
         this.SellFish._isAnchor := true
         this.TempMerchantBoxTop.addChild(this.SellFish)
 
-        ;[    ]
-        ;SCALES WITH WIDTH AND HEIGHT OF WINDOW
-        this.Slot1Fish               := this.RegisterPoint(1117, 550 , this.S_CENTER, "Slot1Fish")
+        ; [DONE]
+        ; SCALES WITH WIDTH AND HEIGHT OF WINDOW
+        this.Slot1Fish               := this.RegisterScaledPoint((1117/2560), (550/1440) , 0x7, "Slot1Fish")
+        this.Slot1Fish .HighOffset(0 ,0.335)
+        this.Slot1Fish .LowOffset(0 ,0.41)
 
-        ;[    ]
-        this.SubMenuSell             := this.RegisterPoint(1002, 831 , this.S_CENTER, "SubMenuSell")
+        ; [DONE]
+        this.SubMenuSell             := this.RegisterScaledPoint((1002/2560), (831/1440) , 0x7, "SubMenuSell")
 
-        ;[    ]
-        this.CloseFishSell           := this.RegisterPoint(1958, 361 , this.S_CENTER, "CloseFishSell")
+        ; [QUESTIONABLE]
+        this.CloseFishSell           := this.RegisterScaledPoint((1958/2560), (361/1440) , 0x7, "CloseFishSell")
 
-        ;[    ]
-        this.SellAll                 := this.RegisterPoint(904 , 1080, this.S_CENTER, "SellAll")
+        ; [DONE]
+        this.SellAll                 := this.RegisterScaledPoint((904/2560), (1080/1440) , 0x7, "SellAll")
 
-        ;[    ]
-        this.SellOne                 := this.RegisterPoint(700 , 1078, this.S_CENTER, "SellOne")
+        ; [DONE]
+        this.SellOne                 := this.RegisterScaledPoint((700/2560), (1078/1440) , 0x7, "SellOne")
 
-        ;FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
-        this.CloseGui                := this.RegisterPoint(1882, 395 , this.S_CENTER, "CloseGui")
-        this.AuraTabOne              := this.RegisterPoint(1262, 447 , this.S_CENTER, "AuraTabOne")
-        this.AbysPatPixSearchClick   := this.RegisterPoint(830 , 845 , this.S_CENTER, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
-        this.SearchBox               := this.RegisterPoint(1469, 489 , this.S_CENTER, "SearchBox")
-        this.Slot1                   := this.RegisterPoint(1089, 575 , this.S_CENTER, "Slot1")
+        ; [QUESTIONABLE]
+        ; FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
+        this.AuraStorageBox            := this.RegisterScaledPoint(0.5, 0.5, 0x7, "AuraStorageBox")
+        this.AuraStorageBox.FWidth     := 1282
+        this.AuraStorageBox.FHeight    := 700
+        this.CloseGui                 := this.RegisterScaledPoint(0.49, -0.472 , 0x7, "CloseGui")
+        this.AuraTabOne               := this.RegisterScaledPoint(-0.1,  -0.42, 0x7, "AuraTabOne")
+        ;[NOTE] change to area search
+        this.AbysPatPixSearchClick    := this.RegisterScaledPoint(-0.35, 0.20, 0x7, "Equip **change to zone for pixel search and click on pixel**") ;[DEV COMMENT] Possible duplicate but keeping it just in case
+        this.SearchBox                := this.RegisterScaledPoint(0, -0.35 , 0x7, "SearchBox")
+        this.Slot1                    := this.RegisterScaledPoint(-0.15, -0.2, 0x7, "Slot1")
+
+        this.AuraStorageBox.addChild(this.CloseGui)
+        this.AuraStorageBox.addChild(this.AuraTabOne)
+        this.AuraStorageBox.addChild(this.AbysPatPixSearchClick)
+        this.AuraStorageBox.addChild(this.SearchBox)
+        this.AuraStorageBox.addChild(this.Slot1)
+
+        ; ; ; ; ; ; ; ; ; ; this.CloseGui                := this.RegisterScaledPoint((1882/2560), (395/1440) , 0x7, "CloseGui")
+        ; ; ; ; ; ; ; ; ; ; this.AuraTabOne              := this.RegisterScaledPoint((1262/2560), (447/1440) , 0x7, "AuraTabOne")
+        ; ; ; ; ; ; ; ; ; ; this.AbysPatPixSearchClick   := this.RegisterScaledPoint((830 /2560), (845/1440) , 0x7, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
+        ; ; ; ; ; ; ; ; ; ; this.SearchBox               := this.RegisterScaledPoint((1469/2560), (489/1440) , 0x7, "SearchBox")
+        ; ; ; ; ; ; ; ; ; ; this.Slot1                   := this.RegisterScaledPoint((1089/2560), (575/1440) , 0x7, "Slot1")
 
         ;POSTIONS MAY DRIFT SLIGHTLY WITH SIZE? MIGHT NEED TO COMPENSATE
-        ;[    ]
-        this.Auras                   := this.RegisterPoint(52  , 538 , this.S_LEFT  , "Auras")
-        this.Auras.UseOuter := false
+        ;[DONE]
+        this.Auras                   := this.RegisterScaledPoint((52/2560), (538/1440) , 0x1 + (0x1 << 1)+(0x1 << 2)+(0x1 << 5), "Auras")
+        this.Auras.HighOffset(0, 0.3736)
+        this.Auras .LowOffset(0, 0.36)
 
-        ;[    ]
-        this.AuraCollection          := this.RegisterPoint(52  , 621 , this.S_LEFT  , "AuraCollection")
-        this.AuraCollection.UseOuter := false
+        ; ;[DONE]
+        this.AuraCollection          := this.RegisterScaledPoint((52/2560), (621/1440) , 0x7, "AuraCollection")
+        this.AuraCollection.HighOffset(0, 0.4312)
+        this.AuraCollection .LowOffset(0, 0.4176)
 
-        ;[    ]
-        this.Unequip                 := this.RegisterPoint(835 , 845 , this.S_CENTER, "Unequip")
+        ; ;[    ]
+        ; this.Unequip                 := this.RegisterScaledPoint((835/2560), (845/1440) , 0x7, "Unequip")
 
-        ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
-        ;[    ]                                                 ;78.05%
-        this.FishButton              := this.RegisterPoint(1161, 1124, this.S_CENTER, "FishButton")
+        ; ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
+        ; ;[    ]                                                 ;78.05%
+        ; this.FishButton              := this.RegisterScaledPoint((1161/2560), (1124/1440) , 0x7, "FishButton")
 
-        ;[    ]                                                 ;81.73%
-        this.MoveOutOfWay            := this.RegisterPoint(1263, 1177, this.S_CENTER, "MoveOutOfWay")
+        ; ;[    ]                                                 ;81.73%
+        ; this.MoveOutOfWay            := this.RegisterScaledPoint((1263/2560), (1177/1440) , 0x7, "MoveOutOfWay")
 
-        ;needs to be checked
-        this.FS_p1                   := this.RegisterPoint(1690, 1224, this.S_CENTER, "FS_p1")
+        ; ;needs to be checked
+        ; this.FS_p1                   := this.RegisterScaledPoint((1690/2560), (1224/1440) , 0x7, "FS_p1")
         
-        ;needs to be checked
-        this.FS_p2                   := this.RegisterPoint(1523, 649 , this.S_CENTER, "FS_p2")
+        ; ;needs to be checked
+        ; this.FS_p2                   := this.RegisterScaledPoint((1523/2560), (649/1440) , 0x7, "FS_p2")
         
-        ;needs to be checked
-        this.CloseFishCaught         := this.RegisterPoint(1457, 491 , this.S_CENTER, "CloseFishCaught")
+        ; ;needs to be checked
+        ; this.CloseFishCaught         := this.RegisterScaledPoint((1457/2560), (491/1440) , 0x7, "CloseFishCaught")
 
-        ;needs to be checked
-        this.MainMenuStart           := this.RegisterPoint(347 , 1329, this.S_LEFT  , "MainMenuStart")
+        ; ;needs to be checked
+        ; this.MainMenuStart           := this.RegisterScaledPoint((347/2560), (1329/1440) , 0x7, "MainMenuStart")
         
-        ;needs to be checked
-        this.SkipButton              := this.RegisterPoint(1280, 720 , this.S_CENTER, "SkipButton")
+        ; ;needs to be checked
+        ; this.SkipButton              := this.RegisterScaledPoint((1280/2560), (720/1440) , 0x7, "SkipButton")
 
 
         
-        this.pixelsearch01a := this.RegisterSearchXY2(768 , 835 , 888 , 860 , this.S_BOTTOM, "pixelsearch01a")
-        ; this.pixelsearch01a.set_position(768 , 835)
-        this.pixelsearch02a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch02a")
-        ; this.pixelsearch02a.set_position(295 , 1364)
-        this.pixelsearch03a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch03a")
-        ; this.pixelsearch03a.set_position(295 , 1364)
-        this.pixelsearch04a := this.RegisterSearchXY2(1043, 1033, 1519, 1033, this.S_BOTTOM, "pixelsearch04a")
-        ; this.pixelsearch04a.set_position(1043, 1033)
-        this.pixelsearch05a := this.RegisterSearchXY2(1043, 1033, 1519, 1058, this.S_BOTTOM, "pixelsearch05a")
-        ; this.pixelsearch05a.set_position(1043, 1033)
+        ; this.pixelsearch01a := this.RegisterSearchXY2(768 , 835 , 888 , 860 , this.S_BOTTOM, "pixelsearch01a")
+        ; ; this.pixelsearch01a.set_position(768 , 835)
+        ; this.pixelsearch02a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch02a")
+        ; ; this.pixelsearch02a.set_position(295 , 1364)
+        ; this.pixelsearch03a := this.RegisterSearchXY2(295 , 1364, 445 , 1311, this.S_BOTTOM, "pixelsearch03a")
+        ; ; this.pixelsearch03a.set_position(295 , 1364)
+        ; this.pixelsearch04a := this.RegisterSearchXY2(1043, 1033, 1519, 1033, this.S_BOTTOM, "pixelsearch04a")
+        ; ; this.pixelsearch04a.set_position(1043, 1033)
+        ; this.pixelsearch05a := this.RegisterSearchXY2(1043, 1033, 1519, 1058, this.S_BOTTOM, "pixelsearch05a")
+        ; ; this.pixelsearch05a.set_position(1043, 1033)
         
 
-        ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
-        this.PixelGetColor01 := this.RegisterPoint(1536, 1119, this.S_CENTER, "PixelGetColor01")
-        this.PixelGetColor02 := this.RegisterPoint(1261, 1033, this.S_CENTER, "PixelGetColor02")
-        this.PixelGetColor03 := this.RegisterPoint(1535, 1120, this.S_CENTER, "PixelGetColor03")
-        this.PixelGetColor04 := this.RegisterPoint(0,    1033, this.S_CENTER, "MovingPixelGetColor04")
+        ; ;SIZE FIXED, Y POSTION SCALES WITH WINDOW
+        ; this.PixelGetColor01 := this.RegisterScaledPoint((1536/2560), (1119/1440) , 0x7, "PixelGetColor01")
+        ; this.PixelGetColor02 := this.RegisterScaledPoint((1261/2560), (1033/1440) , 0x7, "PixelGetColor02")
+        ; this.PixelGetColor03 := this.RegisterScaledPoint((1535/2560), (1120/1440) , 0x7, "PixelGetColor03")
+        ; this.PixelGetColor04 := this.RegisterScaledPoint((0/2560), (1033/1440) , 0x7, "MovingPixelGetColor04")
     }
 
     ;temp hiding in ide
@@ -1656,6 +1707,7 @@ class CorePlugin extends Plugin
     {
         global ;                                                       ;interrupt returns stuff
         local barColor, otherBarColor, startWhitePixelSearch, barWidth, return_value
+
         if (loopCount > maxLoopCount || restartPathing) {
             restartPathing := false
 
@@ -2095,6 +2147,7 @@ class CorePlugin extends Plugin
     }
 }
 
+
 class CoreProto extends Plugin
 {
     OldClipboard := ""
@@ -2123,7 +2176,7 @@ class CoreProto extends Plugin
             return
         }
         time := A_NowUTC
-        timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+        timestamp := SubStr(time,1,4) . "-" . SubStr(time,5,2) . "-" . SubStr(time,7,2) . "T" . SubStr(time,9,2) . ":" . SubStr(time,11,2) . ":" . SubStr(time,13,2) . ".000Z"
 
         json := "{"
         . """embeds"": ["

@@ -1,5 +1,6 @@
+;@cleanupregex "/\[\]/g" "new Array"
 global PLUGINS_LIST := []
-
+;@cleanupend
 class Plugin
 {
     static S_LEFT        := 1
@@ -11,6 +12,14 @@ class Plugin
     Width := 1920
     Height := 1080
 
+    /**
+     * @description makes a new plugin to be loaded and pushes it to the stack
+     * @class Plugin
+     * @classdesc Plugin definition and exectution
+     * @param {Number} width  window width used when making the plugin, default 2560
+     * @param {Number} height window height used when making the plugin, default 1440
+     * @constructor
+     */
     __New(width, height)
     {
         Log.Info("[PLUGIN=>" . this.__Class . "] I've been Created! W: " . width . " H: " . height)
@@ -25,31 +34,103 @@ class Plugin
         ; this.PluginRun()
     }
 
+    /**
+     * @description what is run during the main loop
+     * @param {"byref boolean"} restartPathing the restartPathing variable given from the main script, we can set this if we need to restart the pathing
+     * @returns {Boolean} if false we end the loop of the current run
+     */
     PluginRun(byref restartPathing)
     {
         Return true
     }
 
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    /**
+     * @description function called when plugin is setup at the start
+     * @example <caption>good to use the following template</caption>
+     * PluginSetup()
+     * {
+     *     global ; X, Y <== example global variables
+     *     local  ; var1, var2, var3 := "something" <== example local variables
+     *     ;;initialise code bellow here;;
+     * }
+     * @example <caption>Webhook Example</caption>
+     * PluginSetup()
+     * {
+     *     global
+     *     if (not inStr(webhookURL, "code"))
+     *          this.plugin_can_post := false
+     * ....more code
+     * }
+     */
     PluginSetup()
     {
         ; global
         ; local
     }
 
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    /**
+     * @description adds new tabs to tab list
+     * @example <caption>if a tab is required setting a return to a string like so is required</caption>
+     * SetupTabList()
+     * {
+     *     return "|tab_name"
+     * }
+     * @return {String|Null}
+     */
     SetupTabList()
     {}
 
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
+    /**
+     * @description Gui Setup done in here {@link Plugin#SetupTabList}
+     * @example <caption>to hook a tab created with {@link Plugin#SetupTabList|SetupTabList()}</caption>
+     * SetupGui()
+     * {
+     *     global
+     *     Gui, Tab, tab_name //this should be the same as the string
+     *                    //used in {@link Plugin#SetupTabList|SetupTabList()}
+     * ....more code
+     * }
+     */
     SetupGui()
     {}
-    
-    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+
+    /**
+     * @description used to read variables from the ini file at startup {@link Plugin#QuickLoad:QuickLoad("variable", default)}
+     * @example
+     * IniRead()
+     * {
+     *     global
+     *     local temp_variable
+     *     IniRead, temp_variable, %iniFilePath%, "Category", "variable_save_name"
+     *     if (temp_variable != "ERROR")
+     *         variable := tempPSLink //We have a variable so we can set it here!
+     *      
+     *     Else //Write the default variable to the ini if it doesn't already exist
+     *         IniWrite, % "", %iniFilePath%, "Category", "variable_save_name"
+     * ....more code
+     * }
+     */
     IniRead()
     {}
     
-    ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
+
+    /**
+     * @description because the order of iniread and setupgui are the way they are
+     * <br/>we also have a second function called after both to update control states
+     * @example
+     * GuiControlChecks()
+     * {
+     *     global
+     *     local color, state, name_fix, catagory_fix
+     * 
+     *     GuiControl,, the_control, (the_control_active ? "ON" : "OFF")
+     *     GuiControl, (the_control_active ? "+c0x00DD00" : "+c0xFF4444"), the_control
+     * 
+     *     //sometimes that change needs to be savesd to file
+     *     IniWrite, % (the_control_active ? "true" : "false"), %iniFilePath%, "Category", "variable_save_name"
+     * ....more code
+     * }
+     */
     GuiControlChecks()
     {}
 

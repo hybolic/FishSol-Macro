@@ -1,10 +1,12 @@
 {
-  "recurseDepth": 10,
-  "plugins": ["jsDocPlugin.js"],
+    "recurseDepth": 10,
+    "plugins": ["jsDocPlugin.js","plugins/underscore.js"],
     "source": {
-        "includePattern": ".+\\.ahk?$"
+        "includePattern": ".+\\.ahk?$",
+        "include": ["./core", "./plugins", "./"],
+        "excludePattern": "(.+1\\.9\\.[234])|(.+\\-v0\\.[0-9])|(Example)|Copy|docs|JSON.ahk"
     },
-    "sourceType": "script",
+    "sourceType": "module",
     "tags": {
         "allowUnknownTags": true,
         "dictionaries": ["jsdoc","closure"]
@@ -13,7 +15,14 @@
         "cleverLinks": false,
         "monospaceLinks": false,
         "default":{
-            "outputSourceFiles":false
+            "outputSourceFiles":false,
+            "includeDate": false
         }
+    },
+    "opts": {
+        "destination": ".\\docs\\",
+        "readme": "README.md",
+        "verbose": true,
+        "debug": true
     }
 }

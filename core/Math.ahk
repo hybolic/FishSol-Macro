@@ -1,45 +1,38 @@
 ;@region Vector2D
-
 class Vector2D
 {
     /**
-     * Basic Vector2D holder
+     * @description Basic Vector2D holder
      * @module Vector2D
-     * @param {String} [X] optional
-     * @param {String} [Y] optional
+     * @param {Number} [X]
+     * @param {Number} [Y]
      * @class Vector2D
      * @classdesc Basic Vector2D holder
      * @constructor
      */
-    __New(X:="",Y:="")
+
+    __New(X:=0, Y:=0)
     {
-        this.X := MathStuffs.NumOrDefault(X,0)
-        this.Y := MathStuffs.NumOrDefault(Y,0)
+        this.X := X
+        this.Y := Y
     }
 
+
     /**
-     * @name X
-     * @memberof Vector2D
-     * @instance
-     * @var {Number} X Position
-     */
+    * @member {Number} 
+    */
     X := 0
     
-    /**
-     * @name Y
-     * @memberof Vector2D
-     * @instance
-     * @var {Number} Y Position
-     */
+    /** @member {Number} 
+    */
     Y := 0
 
     /**
-     * Adds to Vector2D's X and Y position then returns itself
-     * @name Add
-     * @memberof Vector2D
-     * @instance
+     * @description Adds to Vector2D's X and Y position then returns itself
+     * @param {Number} X
+     * @param {Number} Y
      * @function
-    */
+     */
     Add(X,Y)
     {
         this.X += X
@@ -48,12 +41,11 @@ class Vector2D
     }
 
     /**
-    subtracts from Vector2D's X and Y position then returns itself
-     * @name Subtract
-     * @memberof Vector2D
-     * @instance
+     * @description subtracts from Vector2D's X and Y position then returns itself
+     * @param {Number} X
+     * @param {Number} Y
      * @function
-    */
+     */
     Subtract(X,Y)
     {
         this.X -= X
@@ -62,12 +54,11 @@ class Vector2D
     }
 
     /**
-    multiplies the Vector2D's X and Y position then returns itself
-     * @name Multiply
-     * @memberof Vector2D
-     * @instance
+     * @description multiplies the Vector2D's X and Y position then returns itself
+     * @param {Number} X
+     * @param {Number} Y
      * @function
-    */
+     */
     Multiply(X,Y)
     {
         this.X *= X
@@ -76,12 +67,11 @@ class Vector2D
     }
 
     /**
-    sets the Vector2D's X and Y position then returns itself
-     * @name Set
-     * @memberof Vector2D
-     * @instance
+     * @description sets the Vector2D's X and Y position then returns itself
+     * @param {Number} X
+     * @param {Number} Y
      * @function
-    */
+     */
     Set(X,Y)
     {
         this.X := X
@@ -89,6 +79,8 @@ class Vector2D
         return this
     }
     
+    /** @ignore 
+    */
     isVector2D()
     {
         return true
@@ -97,44 +89,14 @@ class Vector2D
 }
 
 ;@endregion Vector2D
-;@region Rectangle
+;@region Rectangle2
 
-class Rectangle
+class Rectangle2
 {
 
     /**
-     * @memberof Rectangle
-     * @instance
-     * @var {Vector2D} Position
-     */
-    Position := ""
-    /**
-     * @memberof Rectangle
-     * @instance
-     * @var {Number} Width
-     */
-    Width    := 0
-    /**
-     * @memberof Rectangle
-     * @instance
-     * @var {Number} Height
-     */
-    Height   := 0
-
-    /**
-     * @ignore
-     */
-    isRectangle()
-    {
-        return true
-    }
-
-
-
-    /**
-     * @class Rectangle
-     * @classdesc Basic Rectangle holder
-     * @description 
+     * @class Rectangle2
+     * @classdesc Basic Rectangle2 holder
      * @param {Vector2D} [Pos]
      * @param {Number} [Wid]
      * @param {Number} [Hei]
@@ -147,23 +109,37 @@ class Rectangle
         this.Height   := Hei
     }
 
+
     ;@todo combine both __New
-    ; __New(X, Y, Wid, Hei)
-    ; {
-    ;     this.Position := new Vector2D(X,Y)
-    ;     this.Width    := Wid
-    ;     this.Height   := Hei
+     ; __New(X, Y, Wid, Hei)
+     ; {
+     ;     this.Position := new Vector2D(X,Y)
+     ;     this.Width    := Wid
+     ;     this.Height   := Hei
     ; }
+
+    /** @member {Vector2D} 
+    */
+    Position := ""
+    /** @member {Number} 
+    */
+    Width    := 0
+    /** @member {Number} 
+    */
+    Height   := 0
+
+    /** @ignore 
+    */
+    isRectangle2()
+    {
+        return true
+    }
     
     /**
-     * @Description
-     * @name SetPosition
-     * @instance
-     * @function
-     * @memberof Rectangle
+     * @description set the X/Y Position of the Rectangle2
      * @param {Number} X
      * @param {Number} Y
-     * @returns {Rectangle}
+     * @returns {Rectangle2}
      */
     SetPosition(X,Y)
     {
@@ -172,20 +148,16 @@ class Rectangle
     }
 
     /**
-     * @Description
-     * @name Offset
-     * @instance
-     * @function
-     * @memberof Rectangle
-     * @param {(Number|Rectangle|Vector2D)} X
+     * @description Offsets the X/Y Position of the Rectangle2
+     * @param {(Number|Rectangle2|Vector2D)} X Number or Vector2D/Rectangle2
      * @param {?Number} Y
-     * @returns {Rectangle}
+     * @returns {Rectangle2}
      */
     Offset(X,Y:="")
     {
         if parent.isVector2D()
             this.Position.Add(parent.X, parent.Y)
-        else if parent.isRectangle()
+        else if parent.isRectangle2()
             this.Position.Add(parent.Position.X, parent.Position.Y)
         else
             this.Position.Add(X, Y)
@@ -193,15 +165,11 @@ class Rectangle
     }
 
     /**
-     * @Description
-     * @name Scale
-     * @instance
-     * @function
-     * @memberof Rectangle
+     * @description Scales the Rectangle2
      * @param {...Number} scale either overall scale or W/H
-     * @returns {Rectangle}
+     * @returns {Rectangle2}
      */
-    Scale(scale...)
+    Scale(scale*)
     {
         scale_1 := MathStuff.NumOrDefault(scale[1], 1)
         this.Width  *= scale_1
@@ -209,122 +177,97 @@ class Rectangle
         return this
     }
 
-    ;@region Rectangle.FLAGS
+    ;@region Rectangle2.FLAGS
     /**
      * @description Byte location index
-     * @memberof Rectangle
-     * @var {Number} ByteLoc_FLAG_VERTICLE_SCALING
-     * @default
+     * @fixed {Number}
     */
     static ByteLoc_FLAG_VERTICLE_SCALING    := 1
 
     /**
-     * @var {Number} FLAG_VERTICLE_SCALING {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x01
+     * @fixed {Flag}
     */
-    static FLAG_VERTICLE_SCALING            := 0x1 << (Rectangle.ByteLoc_FLAG_VERTICLE_SCALING - 1)
+    static FLAG_VERTICLE_SCALING            := 0x1 << (Rectangle2.ByteLoc_FLAG_VERTICLE_SCALING - 1)
 
     
     /**
      * @description Byte location index
-     * @var {Number} ByteLoc_FLAG_HORIZONTAL_SCALING
-     * @memberof Rectangle
-     * @default 2
+     * @fixed {Number}
     */
     static ByteLoc_FLAG_HORIZONTAL_SCALING  := 2
 
     /**
-     * @var {Number} FLAG_HORIZONTAL_SCALING {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x02
+     * @fixed {Flag}
     */
-    static FLAG_HORIZONTAL_SCALING          := 0x1 << (Rectangle.ByteLoc_FLAG_HORIZONTAL_SCALING - 1)
+    static FLAG_HORIZONTAL_SCALING          := 0x1 << (Rectangle2.ByteLoc_FLAG_HORIZONTAL_SCALING - 1)
 
     /**
-     * @description at the moment corners are just assigning it as the two bits from {@link Rectangle.FLAG_VERTICLE_SCALING|FLAG_VERTICLE_SCALING} and {@link Rectangle.FLAG_HORIZONTAL_SCALING|FLAG_HORIZONTAL_SCALING}
-     * @var {Number} FLAG_CORNERS {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x03
+     * @type {Flag}
+     * @description at the moment corners are just assigning it as the two bits from {@link Rectangle2.FLAG_VERTICLE_SCALING|FLAG_VERTICLE_SCALING} and {@link Rectangle2.FLAG_HORIZONTAL_SCALING|FLAG_HORIZONTAL_SCALING}
+     * @fixed {Flag}
     */
-    static FLAG_CORNERS                     := Rectangle.FLAG_VERTICLE_SCALING & Rectangle.FLAG_HORIZONTAL_SCALING
+    static FLAG_CORNERS                     := Rectangle2.FLAG_VERTICLE_SCALING + Rectangle2.FLAG_HORIZONTAL_SCALING
 
     /**
      * @description Byte location index
-     * @var {Number} ByteLoc_FLAG_CENTERING_VERT
-     * @memberof Rectangle
-     * @default 3
+     * @fixed {Number}
     */
     static ByteLoc_FLAG_CENTERING_VERT      := 3
 
     /**
-     * @var {Number} FLAG_CENTERING_VERT {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x04
+     * @fixed {Flag}
     */
-    static FLAG_CENTERING_VERT         := 0x1 << (Rectangle.ByteLoc_FLAG_CENTERING_VERT - 1)
+    static FLAG_CENTERING_VERT         := 0x1 << (Rectangle2.ByteLoc_FLAG_CENTERING_VERT - 1)
 
     /**
      * @description Byte location index
-     * @var {Number} ByteLoc_FLAG_Use_MIN_OR_MAX
-     * @memberof Rectangle
-     * @default 4
+     * @fixed {Number}
     */
     static ByteLoc_FLAG_Use_MIN_OR_MAX      := 4
 
     /**
-     * @var {Number} FLAG_Use_MIN_OR_MAX {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x08
+     * @fixed {Flag}
     */
-    static FLAG_Use_MIN_OR_MAX              := 0x1 << (Rectangle.ByteLoc_FLAG_Use_MIN_OR_MAX - 1)
+    static FLAG_Use_MIN_OR_MAX              := 0x1 << (Rectangle2.ByteLoc_FLAG_Use_MIN_OR_MAX - 1)
 
     /**
      * @description Byte location index
-     * @var {Number} ByteLoc_FLAG_IGNORE_SCALING
-     * @memberof Rectangle
-     * @default 8
+     * @fixed {Number}
     */
     static ByteLoc_FLAG_IGNORE_SCALING      := 8
 
     /**
-     * @var {Number} FLAG_IGNORE_SCALING {@link Flags|Other Flags}
-     * @memberof Rectangle
-     * @default 0x80
+     * @fixed {Flag}
     */
-    static FLAG_IGNORE_SCALING              := 0x1 << (Rectangle.ByteLoc_FLAG_IGNORE_SCALING - 1)
+    static FLAG_IGNORE_SCALING              := 0x1 << (Rectangle2.ByteLoc_FLAG_IGNORE_SCALING - 1)
     
     /** @typedef Flags
-     * @see {@link Rectangle.FLAG_VERTICLE_SCALING}
-     * @see {@link Rectangle.FLAG_HORIZONTAL_SCALING}
-     * @see {@link Rectangle.FLAG_CORNERS}
-     * @see {@link Rectangle.FLAG_Use_MIN_OR_MAX}
-     * @see {@link Rectangle.FLAG_IGNORE_SCALING}
+     * @see {@link Rectangle2.FLAG_VERTICLE_SCALING}
+     * @see {@link Rectangle2.FLAG_HORIZONTAL_SCALING}
+     * @see {@link Rectangle2.FLAG_CORNERS}
+     * @see {@link Rectangle2.FLAG_Use_MIN_OR_MAX}
+     * @see {@link Rectangle2.FLAG_IGNORE_SCALING}
      */
-    ;@endregion Rectangle.FLAGS
+    ;@endregion Rectangle2.FLAGS
 
     /**
-     * @Description NO_DESCRIPTION
-     * @name RescaleAndOffset
-     * @instance
-     * @function
-     * @memberof Rectangle
-     * @param {Rectangle} parent the parent of the scale
-     * @param {(Rectangle|Vector2D|Number[])} bounds bounds to constrain scale to
-     * @param {Number} flags {@link Flags|Valid Flags}
-     * @returns {Rectangle}
+     * @description NO_DESCRIPTION
+     * @param {Rectangle2} parent the parent of the scale
+     * @param {(Rectangle2|Vector2D|Number[])} bounds bounds to constrain scale to
+     * @param {Flag} flags {@link Flags|Valid Flags}
+     * @returns {Rectangle2}
      */
-    RescaleAndOffset(parent, bounds, flags)
+    RescaleAndOffset(parent, bounds, flags=0)
     {
         ;scale to Width or Height
-        VerticleScaling      := MathStuffs.getByte(flags,Rectangle.ByteLoc_FLAG_VERTICLE_SCALING)
-        HorizontalScaling    := MathStuffs.getByte(flags,Rectangle.ByteLoc_FLAG_HORIZONTAL_SCALING)
+        VerticleScaling      := MathStuffs.getByte(flags,Rectangle2.ByteLoc_FLAG_VERTICLE_SCALING)
+        HorizontalScaling    := MathStuffs.getByte(flags,Rectangle2.ByteLoc_FLAG_HORIZONTAL_SCALING)
         
         ;if top two aren't set use this variable to switch between either Min or Max
-        ScaleUses_MinORMax := MathStuffs.getByte(flags,Rectangle.ByteLoc_FLAG_Use_MIN_OR_MAX)
+        ScaleUses_MinORMax := MathStuffs.getByte(flags,Rectangle2.ByteLoc_FLAG_Use_MIN_OR_MAX)
         
         ;Forces the scaling to be 1x
-        ignoreScale     := MathStuffs.getByte(flags,Rectangle.ByteLoc_FLAG_IGNORE_SCALING)
+        ignoreScale     := MathStuffs.getByte(flags,Rectangle2.ByteLoc_FLAG_IGNORE_SCALING)
 
         ;defautls
         bounds_PosY := 0
@@ -332,7 +275,7 @@ class Rectangle
         Scale := 1
         
         ;this checks what type of variable <bounds> is and does something accordingly
-        if bounds.isRectangle() ;if it was a rectangle use all variables
+        if bounds.isRectangle2() ;if it was a Rectangle2 use all variables
         {
             bounds_PosX := bounds.Position.X
             bounds_PosY := bounds.Position.Y
@@ -344,7 +287,7 @@ class Rectangle
             bounds_Width := bounds.X
             bounds_Height := bounds.Y
         }
-        Else if bounds.Length() = 4 ; same as Rectangle just we do Pop to grab the elements in reverse order incase its not indexed correctly
+        Else if bounds.Length() = 4 ; same as Rectangle2 just we do Pop to grab the elements in reverse order incase its not indexed correctly
         {                           ; [3:num1, 8:num2, 33:num3, 192:num4] we just grab the numbers backwards instead of indexing for this reason
             bounds_Height := bounds.Pop()
             bounds_Width := bounds.Pop()
@@ -363,7 +306,7 @@ class Rectangle
         }
         Else ;else something has gone terribly wrong
         {
-            throw { What: 1, File: A_LineFile, Line: A_LineNumber, Message:"bounds variable is Malformed, it needs to either be a number, vector or rectangle!" }
+            throw { What: 1, File: A_LineFile, Line: A_LineNumber, Message:"bounds variable is Malformed, it needs to either be a number, vector or Rectangle2!" }
         }
 
         if not ignoreScale
@@ -397,7 +340,7 @@ class Rectangle
             THIS_PosY := this.Position.Y * Scale
         }
 
-        Corner := flags & Rectangle.FLAG_CORNERS
+        Corner := flags & Rectangle2.FLAG_CORNERS
         
         switch %Corner%
         {
@@ -414,11 +357,7 @@ class Rectangle
     
 
     /**
-     * @Description Returns True if instance of this class has {@link OffsetCompensation} attatched
-     * @name HasCompensation
-     * @instance
-     * @function
-     * @memberof Rectangle
+     * @description Returns True if instance of this class has {@link OffsetCompensation} attatched
      * @returns {Boolean}
      */
     HasCompensation()
@@ -427,31 +366,26 @@ class Rectangle
     }
 
     /**
+     * @description Sets the {@link OffsetCompensation|compensation}
      * @param {(number|OffsetCompensation)} lowX
      * @param {?number} lowY
      * @param {?number} highX
      * @param {?number} highY
-     * @returns {Rectangle}
-     * @Description Sets the {@link OffsetCompensation|compensation}
-     * @name SetOffsetCompensation
-     * @instance
-     * @function
-     * @memberof Rectangle
+     * @returns {Rectangle2}
      */
     SetOffsetCompensation(lowX, lowY:="", highX:="", highY:="")
     {
         if lowX.isOffsetCompensation()
             this._OffsetCompensation := lowX
-        this._OffsetCompensation = new OffsetCompensation(lowX, MathStuffs.NumOrDefault(lowY, lowX), MathStuffs.NumOrDefault(highX, lowX), MathStuffs.NumOrDefault(highY, lowX))
+        ly := MathStuffs.NumOrDefault(lowY, lowX)
+        hx := MathStuffs.NumOrDefault(highX, lowX)
+        hy := MathStuffs.NumOrDefault(highY, lowX)
+        this._OffsetCompensation := new OffsetCompensation(lowX, ly, hx, hy)
         return this
     }
 
     /**
-     * @Description returns a compensated offset between High and Low by amount
-     * @name getCompensation
-     * @instance
-     * @function
-     * @memberof Rectangle
+     * @description returns a compensated offset between High and Low by amount
      * @param {Float} Amount
      * @param {Number} byrefX
      * @param {Number} byrefY
@@ -470,17 +404,18 @@ class Rectangle
     }
 }
 
-;@endregion Rectangle
+;@endregion Rectangle2
 ;@region OffsetCompensation
 
 class OffsetCompensation
 {
+    /** @ignore */
     Low  := ""
+    /** @ignore */
     High := ""
-    ;@private
+    /** @ignore */
     StoredReturnVector := ""
-
-    ;@ignore
+    /** @ignore */
     isOffsetCompensation()
     {
         return true
@@ -491,13 +426,13 @@ class OffsetCompensation
      * @class OffsetCompensation
      * @classdesc Basic OffsetCompensation holder
      * @description makes a new instance of OffsetCompensation<br/><pre>         - </pre>please either use 4 numbers or 2 Vectors
-     * @type {OffsetCompensation} {{Low:Vector2D, High:Vector2D}}
      * @param {(Number|Vector2D)} var1 - both var1 and var2 must be of same TYPE
      * @param {(Number|Vector2D)} var2 - both var1 and var2 must be of same TYPE
-     * @param {Number} [highX]
-     * @param {Number} [highY]
+     * @param {?Number} highX
+     * @param {?Number} highY
      * @constructor
      */
+
     __New(var1, var2, highX := "", highY := "")
     {
         if var1.isVector2D() and var2.isVector2D()
@@ -513,13 +448,10 @@ class OffsetCompensation
         this.StoredReturnVector := new Vector2D(0,0)
     }
 
+
     ;returns a compensated offset between High and Low by amount
     /**
-     * @Description returns a compensated offset {@link Vector2D|Vector} between High and Low by amount of this offset
-     * @name getCompensation
-     * @memberof OffsetCompensation
-     * @instance
-     * @function
+     * @description returns a compensated offset {@link Vector2D|Vector} between High and Low by amount of this offset
      * @param {Number} Amount
      * @param {Number} [scaleX]
      * @param {Number} [scaleY]
@@ -533,11 +465,7 @@ class OffsetCompensation
     }
     
     /**
-     * @Description Swaps the X values between both High and Low offsets
-     * @name SwapX
-     * @instance
-     * @function
-     * @memberof OffsetCompensation
+     * @description Swaps the X values between both High and Low offsets
      * @returns {OffsetCompensation}
      */
     SwapX()
@@ -549,11 +477,7 @@ class OffsetCompensation
     }
     
     /**
-     * @Description Swaps the Y values between both High and Low offsets
-     * @name SwapY
-     * @instance
-     * @function
-     * @memberof OffsetCompensation
+     * @description Swaps the Y values between both High and Low offsets
      * @returns {OffsetCompensation}
      */
     SwapY()
@@ -565,11 +489,7 @@ class OffsetCompensation
     }
     
     /**
-     * @Description Swaps the X<>Y values in both High and Low offsets
-     * @name SwapXY
-     * @instance
-     * @function
-     * @memberof OffsetCompensation
+     * @description Swaps the X<>Y values in both High and Low offsets
      * @returns {OffsetCompensation}
      */
     SwapXY()
@@ -586,11 +506,7 @@ class OffsetCompensation
     }
 
     /**
-     * @Description Swaps the High and Low offsets 
-     * @name SwapHighLow
-     * @instance
-     * @function
-     * @memberof OffsetCompensation
+     * @description Swaps the High and Low offsets
      * @returns {OffsetCompensation}
      */
     SwapHighLow()
@@ -617,11 +533,8 @@ class MathStuffs
     ; Linearly interpolates between two points given the <amount>
     ;
     /**
-     * @Description Linearly interpolates between two {@link Number} given the amount returning a new point as the offset
-     * @name Lerp
-     * @instance
-     * @function
-     * @memberof MathStuffs
+     * @description Linearly interpolates between two {@link Number} given the amount returning a new point as the offset
+     * @static
      * @param {Vector2D} Vector_One
      * @param {Vector2D} Vector_Two
      * @param {(Number)} Amount
@@ -634,10 +547,7 @@ class MathStuffs
     
     /**
      * @description Linearly interpolates between two {@link Vector2D|Points}  given the amount returns a {@link Vector2D|new vector} or referenced vector with the offset
-     * @name Lerp2D
-     * @instance
-     * @function
-     * @memberof MathStuffs
+     * @static
      * @param {Vector2D} Vector_One 
      * @param {Vector2D} Vector_Two
      * @param {Number} Amount
@@ -645,9 +555,10 @@ class MathStuffs
      * @param {...Number} [options] - eg. scaleX scaleY offsetX offsetY
      * @return {Vector2D} [Byref ret]
      */
-    Lerp2D(Vector_One, Vector_Two, Amount, &ret:="", params*) ;replace & with byref for export only because syntax during documentation
+    Lerp2D(Vector_One, Vector_Two, Amount, byref ret:="", params*) ;replace & with byref for export only because syntax during documentation
     {
-        if ret := ""
+
+        if (ret := "")
             ret := new Vector2D()
 
         scaleX := MathStuffs.NumOrDefault(params[1])    ;scaleX set to first param, else set to 1
@@ -661,13 +572,10 @@ class MathStuffs
 
     /**
      * returns the number or default if one is not given
+     * @static
      * @param {Number} [Varible=""] - Input Varible 
      * @param {Number} [Default=1] - return if Varible is invalid
      * @returns {Number}
-     * @name NumOrDefault
-     * @instance
-     * @function
-     * @memberof MathStuffs
      */
     NumOrDefault(Var, Default := 1)
     {
@@ -682,13 +590,10 @@ class MathStuffs
     ;returns the bit (true or false) at the <index> in variable <Var>
     /**
      * Get the indexed {@link Bit|Bit} from an {@link Number}
+     * @static
      * @param {Number} Var
      * @param {Integer} index
      * @returns {Boolean}
-     * @name GetByte
-     * @instance
-     * @function
-     * @memberof MathStuffs
      */
     GetByte(Var, index)
     {
@@ -701,18 +606,16 @@ class MathStuffs
     }
     /**
      * @description lookup reference array for later use incase we overuse the getBytes or GetByte function
+     * @static
      * @private
      */
     static stored_getBytes := []
 
     /**
      * gets the {@link Bit|bits} associated with {@link Number} variable given
+     * @static
      * @param {Number} Var
      * @returns {Bit[]}
-     * @name GetBytes
-     * @instance
-     * @function
-     * @memberof MathStuffs
      */
     GetBytes(Var)
     {
@@ -739,12 +642,9 @@ class MathStuffs
     ;Returns a Random Hex string of <Length>
     /**
      * Returns a Random {@link https://en.wikipedia.org/wiki/Hexadecimal|Hexdecimal} string of a given length
+     * @static
      * @param {Number} length
      * @returns {String} a string representation of a hex value of length
-     * @name RandomHexdecimal
-     * @instance
-     * @function
-     * @memberof MathStuffs
      */
     RandomHexdecimal(length)
     {
@@ -758,21 +658,19 @@ class MathStuffs
 
     /**
      * quick {@link https://en.wikipedia.org/wiki/Pi|pi}, for when its needed
+     * @static
      * @returns {Number} 3.141592653589793
      */
-    static Pi()
+    Pi()
     {
         return 3.141592653589793
     }
     
     /**
      * quickly {@link https://www.autohotkey.com/docs/v1/Variables.htm#bitwise|Bitwise} Or's all values given
+     * @static
      * @param {Number} values...
      * @returns {Number}
-     * @name LinearOr
-     * @instance
-     * @function
-     * @memberof MathStuffs
      */
     LinearOr(values*)
     {

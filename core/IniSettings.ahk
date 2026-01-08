@@ -1,4 +1,4 @@
-
+;@cleanupnuke
 UpdateLoopCount:
     Gui, Submit, nohide
     if (MaxLoopInput > 0) {

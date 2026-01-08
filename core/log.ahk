@@ -28,6 +28,10 @@ class Debugger
 
 }
 ;[DEV COMMENT] the log class
+/**
+ * @class Log
+ * @hideconstructor
+ */
 class Log
 {
     
@@ -41,6 +45,10 @@ class Log
     static ConsoleGuiHandle := ""
     static ConsoleOpenLogDirButton := ""
     ;[DEV COMMENT] disabled for now
+    /**
+     * @decription Temporarily disabled to prevent zip file compression spam
+     * @static
+     */
     CleanUpLogs()
     {
         ; CLEANUP DISABLED DUE TO FILE LOGGING BEING DISABLED ON UPLOAD
@@ -151,12 +159,25 @@ class Log
     }
 
     ;[DEV COMMENT] log the current error given
+    /**
+     * @description sends Error to log
+     * @static
+     * @param {String} message
+     * @param {Boolean} [startNewLine=true]
+     */
     Error(message, startNewLine:=true)
     {
         Log.message("ERROR", message, true, true, startNewLine)
     }
 
     ;[DEV COMMENT] log the current exception given
+    /**
+     * @description sends Exception to log
+     * @static
+     * @param {String} message
+     * @param {Exception} exc
+     * @param {Boolean} [startNewLine=true]
+     */
     Exception(message, exc, startNewLine:=true)
     {
         Log.message("EXCEPTION-", message, true, true, startNewLine)
@@ -167,20 +188,35 @@ class Log
     }
 
     ;[DEV COMMENT] log an info message
+    /**
+     * @description sends Info to log
+     * @static
+     * @param {String} message
+     * @param {Boolean} [startNewLine=true]
+     */
     Info(message, startNewLine:=true)
     {
         if Debugger.Log_Basic_Info
             Log.message("INFO", message, false, true, startNewLine)
     }
 
-    ;[DEV COMMENT] log a low info message, usually these don't even get pushed to file
+    ;[DEV COMMENT] log a low info message, usually these dont even get pushed to file
+    /**
+     * @description sends Low Priority Info to log<br/>usually something that doesnt need to be saved to file
+     * @static
+     * @param {String} message
+     * @param {Boolean} [startNewLine=true]
+     */
     Low_Info(value, startNewLine:=true)
     {
         if Debugger.Log_More_Info
             Log.message("LOWINFO", value, false, false, startNewLine)
     }
 
-    ;[DEV COMMENT] two part messaeg first containing the info message and the second the extra details that won't get logged
+    ;[DEV COMMENT] two part messaeg first containing the info message and the second the extra details that wont get logged
+    /**
+     * @ignore
+     */
     ExtraInfo(message, message2, startNewLine:=true)
     {
         throw Exception("WHY ARE YOU STILL USING THIS!!!")
@@ -191,6 +227,15 @@ class Log
     }
 
     ;[DEV COMMENT]  better version of the one above
+    /**
+     * @description combination of {@link Log#Info|Info()} and {@link Log#Low_Info|Low_Info()} in one call
+     * <br/>similar use case as Low_Info but you optionally keep the info if push is set to true
+     * @static
+     * @param {String} message
+     * @param {String} message2
+     * @param {Boolean} [pushToFile=true]
+     * @param {Boolean} [startNewLine=true]
+     */
     Info_With_Extra(message, message2, pushToFile:=false, startNewLine:=true)
     {
         if Debugger.Log_Basic_Info
@@ -198,6 +243,9 @@ class Log
     }
 
     ;[DEV COMMENT] worst option but here anyway
+    /**
+     * @ignore
+     */
     ExtraInfo2(message, message2, pushToFile:=false, startNewLine:=true)
     {
         throw Exception("WHY ARE YOU STILL USING THIS!!!")
@@ -210,6 +258,10 @@ class Log
     static Temp_Disable_Log2File_switch := -1
     ;[DEV COMMENT] temporarily disables the log to file function to allow the dev to
     ;                 dump large amounts of stuff to the console but not to file
+    /**
+     * @description if we are logging to file we temporarily switch that off
+     * @static
+     */
     Temp_Disable_Log2File()
     {
         if(Debugger.LogToFile) and (not Temp_Disable_Log2File_switch)
@@ -219,6 +271,15 @@ class Log
     }
 
     ;[DEV COMMENT] brains of the Logger
+    /**
+     * @description brains of the Logger, logs messages to the console aswell as to file if enabled
+     * @static
+     * @param {String} prefix the prefix of the message ie [INFO] or [DEBUG]
+     * @param {String} Message 
+     * @param {Boolean} [OpenConsoleWindow:=false]
+     * @param {Boolean} [PushToFile:=false]
+     * @param {Boolean} [StartNewLine:=true]
+     */
     message(prefix, value, openConsoleWindow:=false, pushToFile:=false, newLineStarter := true)
     {
         temp_speed := A_BatchLines
@@ -373,7 +434,8 @@ class Log
 
     }
     
-    static WM_SYSCOMMAND := 0x112, SC_CLOSE := 0xF060
+    static WM_SYSCOMMAND := 0x112
+    static SC_CLOSE := 0xF060
     ;[DEV COMMENT] stops the gui from being deleted when closed but instead hides it
     GuiClose(gui_, wp, lp, msg, hwnd) {
         if (gui_ = hwnd && wp = Log.SC_CLOSE){
@@ -390,10 +452,19 @@ class Log
     }
 }
 
-
+/**
+ * @description stringify an object using a crude JsonStringify {@link Global.print_loop|loop}
+ * @name JSONStringify
+ * @param {Object} object the object to be dumped into a string
+ * @param {Character} [space_char=empty] the character used to give the json string spaces, if supplied new lines will also be added
+ * @param {Boolean} [cleanup=false] cleans up the string removing anything that was used to keep the arrays in a logical order
+ * @returns {String}
+ * @function
+ * @memberof Global
+ */
 JSONStringify(object, space_char:="", cleanup:=false)
 {
-    indent := ""
+    new_line := ""
     gap := ""
     single_gap := ""
     
@@ -404,23 +475,35 @@ JSONStringify(object, space_char:="", cleanup:=false)
         {
             single_gap := " "
             gap .= " "
-            indent := "`n"
+            new_line := "`n"
         }
         else
         {
             single_gap := SubStr(space_char, 1, 1)
             gap .= space_char
-            indent := "`n"
+            new_line := "`n"
         }
     }
 
-    __c := "{" . indent
-    __c .= print_loop(object, single_gap, gap, indent, cleanup)
-    __c .= indent . "}"
+    __c := "{" . new_line
+    __c .= print_loop(object, single_gap, gap, new_line, cleanup)
+    __c .= new_line . "}"
     return __c
 }
 
-print_loop(item, single_gap, gap, indent, cleanup:=false)
+/**
+ * loop "function" of {@link Global.JSONStringify|Json} Stringify
+ * @name print_loop
+ * @param {Object} item
+ * @param {Character} single_gap
+ * @param {String} gap
+ * @param {Character} new_line
+ * @param {Boolean} [cleanup=false] cleans up the string removing anything that was used to keep the arrays in a logical order
+ * @returns {String}
+ * @function
+ * @memberof Global
+ */
+print_loop(item, single_gap, gap, new_line, cleanup:=false)
 {
     curstr := ""
  
@@ -432,7 +515,7 @@ print_loop(item, single_gap, gap, indent, cleanup:=false)
 
             if IsArray(_value)
             {
-                curstr .= gap . """" . key . """" . single_gap . ":" . single_gap . "[" . indent
+                curstr .= gap . """" . key . """" . single_gap . ":" . single_gap . "[" . new_line
 
                 print_UnIndexed_Array_index := 0
                 Loop % _value.Count()
@@ -440,8 +523,8 @@ print_loop(item, single_gap, gap, indent, cleanup:=false)
                     print_UnIndexed_Array_index++
                     if IsArray(_value[print_UnIndexed_Array_index])
                     {
-                        curstr .= gap . single_gap . single_gap . "{" . indent
-                        curstr .= print_loop(_value[print_UnIndexed_Array_index], single_gap, (single_gap . single_gap . single_gap . gap), indent) . indent
+                        curstr .= gap . single_gap . single_gap . "{" . new_line
+                        curstr .= print_loop(_value[print_UnIndexed_Array_index], single_gap, (single_gap . single_gap . single_gap . gap), new_line) . new_line
                         curstr .= gap . single_gap . single_gap . "}"
                     }
                     else
@@ -452,22 +535,22 @@ print_loop(item, single_gap, gap, indent, cleanup:=false)
                     if print_UnIndexed_Array_index < % (_value.Count())
                         curstr .= ","
 
-                    curstr .= indent
+                    curstr .= new_line
                 }
                 curstr .= gap . "]"
                 if A_Index < (item.Count())
                     curstr .= ","
-                curstr .= indent
+                curstr .= new_line
             }
             else if IsObject(_value) and _value.Count() > 0
             {
-                curstr .= gap .  """" . key . """" . single_gap . ":" . indent
-                curstr .= gap . single_gap . "{" . indent
-                curstr .= print_loop(_value, single_gap, (single_gap . single_gap . gap), indent)
+                curstr .= gap .  """" . key . """" . single_gap . ":" . new_line
+                curstr .= gap . single_gap . "{" . new_line
+                curstr .= print_loop(_value, single_gap, (single_gap . single_gap . gap), new_line)
                 curstr .= gap . single_gap .  "}"
                 if ______temp_index < (item.Count())
-                    curstr .= "," . indent
-                curstr .= indent
+                    curstr .= "," . new_line
+                curstr .= new_line
             }
             else
             {
@@ -476,7 +559,7 @@ print_loop(item, single_gap, gap, indent, cleanup:=false)
                 else
                     curstr .= gap . """" . key . """" . single_gap . ":" . single_gap . """" . _value . """"
                 if ______temp_index <(item.Count())
-                    curstr .= "," . indent
+                    curstr .= "," . new_line
             }
         }
     
@@ -486,6 +569,19 @@ print_loop(item, single_gap, gap, indent, cleanup:=false)
         return curstr
 }
 
+/**
+ * @description sanatizes the string of strings and returns a clean string<pre>
+ * <b>(?i)(sorted_)[\d]{4}_</b>        // Remove "Sorted_####_" from the string
+ * <b>(?i)(""FALSE"")</b>   ==>  <b>false</b> // makes false lowercase
+ * <b>(?i)(""TRUE"")</b>    ==>  <b>true</b>  // makes true lowercase
+ * <b>(?i)(CLASSTYPE)</b>   ==>  <b>class</b> // replaces "CLASSTYPE" with "class"
+ * <b>(?:\.\d*?[1-9])\K0+</b>          // removes trailing zeros of float</pre>
+ * @name sanitize_string
+ * @param {String} string byref
+ * @returns {String}
+ * @function
+ * @memberof Global
+ */
 sanitize_string(byref __string)
 {
     repalced_string := RegExReplace(__string, "(?i)(sorted_)[\d]{4}_")
@@ -498,6 +594,37 @@ sanitize_string(byref __string)
 }
 
 
+/**
+ * @class SortedArray_Func
+ * @classdesc Global Sorted Array Functions
+ * @hideconstructor
+ */
+
+
+/**
+ * @class Global
+ * @classdesc Global Functions
+ * @hideconstructor
+ */
+
+/**
+ * @typedef  SortedArray
+ * @memberof SortedArray_Func
+ * @name SortedArray
+ * @description an array of string keys and value objects, yes this is a keypair list, but if definied as such is not entirely true
+ * @property {String} Key    name of the object
+ * @property {Object} Value
+ */
+
+/**
+ * looks for and removes item from sorted array
+ * @name SortedArrayRemove
+ * @param {SortedArray} array
+ * @param {String} item_name
+ * @returns {Boolean}
+ * @function
+ * @memberof SortedArray_Func
+ */
 SortedArrayRemove(array, name)
 {
     for key, _UNUSED_ in array
@@ -512,6 +639,14 @@ SortedArrayRemove(array, name)
     return false
 }
 
+/**
+ * looks for and removes item from sorted array<br/>pairs of key value in long aaa list give to be turned into an array <b>SortedArrayMake(key, value, key2, value2)</b>
+ * @name SortedArrayMake
+ * @param {...Object} array pairs of String and Objects
+ * @returns {SortedArray} Sorted Array
+ * @function
+ * @memberof SortedArray_Func
+ */
 SortedArrayMake(params*)
 {
     Sorted_Array := Object()
@@ -528,12 +663,80 @@ SortedArrayMake(params*)
     return Sorted_Array
 }
 
+/**
+ * pushes a new item to the sorted array!<br/>it does cause it to become messy but its here just in case its needed
+ * @name Push
+ * @param {SortedArray} array byref Sorted Array
+ * @param {String} key
+ * @param {Object} value
+ * @returns {SortedArray}
+ * @function
+ * @memberof SortedArray_Func
+ */
+Push(byref array, key, value)
+{
+    highest := -1
+    used_numbers := []
+    for key, _ in array
+    {
+        the_index := SubStr(key, 7, 4) + 0
+        if (the_index) > %highest%
+            highest := (the_index + 1)
+        used_numbers.Push(the_index)
+    }
+    i := 1
+    loop
+        i++
+    until  not the_index[highest+i]
+
+    new_key_name := "Sorted_" Format("{:04}", highest + i) "_" key
+    array[new_key_name] := value
+    return array
+}
+
+
+/**
+ * remove element from array using its known sorted index
+ * <br/> returning the removed object
+ * @name RemoveAt
+ * @param {SortedArray} array byref Sorted Array
+ * @param {Integer} index
+ * @returns {Object} the removed object
+ * @function
+ * @memberof SortedArray_Func
+ */
+RemoveAt(byref array, index)
+{
+    
+    for key, value in array
+    {
+        the_index := SubStr(key, 7, 4) + 0
+        if the_index = %index%
+        {
+            saved_value := value
+            array.Delete(key)
+            return saved_value
+        }
+    }
+    return ""
+}
+
+/**
+ * @global 
+ */
 ;simple math lerp function
 lerp(A,B,T)
 {
     return A + ((B - A) * T)
 }
 
+/**
+ * @name isString
+ * @param {Object} object
+ * @returns {Boolean}
+ * @function
+ * @memberof Global
+ */
 isString(object)
 {
     if object is Alpha
@@ -546,7 +749,13 @@ isString(object)
     return false
 }
 
-;simple is this a number check
+/**
+ * @name isNumber
+ * @param {Object} object
+ * @returns {Boolean}
+ * @function
+ * @memberof Global
+ */
 isNumber(object)
 {
     if object is Number
@@ -554,7 +763,13 @@ isNumber(object)
     return false
 }
 
-;Not the best way to detect an array but good enough
+/**
+ * @name IsArray
+ * @param {Object} object
+ * @returns {Boolean}
+ * @function
+ * @memberof Global
+ */
 IsArray(object) {
     if not IsObjectFixed(object)
         Return false
@@ -568,6 +783,14 @@ IsArray(object) {
    Return True
 }
 
+/**
+ * @name IsObjectFixed
+ * @description stops the whole IsObject() "function" from making the variable an object after checking if it is one
+ * @param {Object} object
+ * @returns {Boolean}
+ * @function
+ * @memberof Global
+ */
 IsObjectFixed(byref object)
 {
     checking := object

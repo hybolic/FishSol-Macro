@@ -1,9 +1,10 @@
 /*
-{ClassName: BiomesPlugin,
-Width: 2560,
-Height: 1440
-}
-*/
+ *
+ * // {ClassName: BiomesPlugin,
+ * // Width: 2560,
+ * // Height: 1440
+ * // }
+ */
 class BiomesPlugin extends Plugin
 {
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be
@@ -13,7 +14,8 @@ class BiomesPlugin extends Plugin
         global
         Return true
         ;[DEV COMMENT] re-enable the timer if already disabled and <webhookURL> is true - Nadir
-        if (not BiomesPlugin_can_run and InStr(webhookURL, "discord")) {
+        if (not BiomesPlugin_can_run and InStr(webhookURL, "discord")) 
+        {
             BiomesPlugin_can_run := true
             SetTimer, CheckBiome, 1000
         }
@@ -29,7 +31,8 @@ class BiomesPlugin extends Plugin
     {
         global
         ;[DEV COMMENT] disable the timer if webhook is unavaible  - Nadir
-        if (not InStr(webhookURL, "discord")) {
+        if (not InStr(webhookURL, "discord"))
+        {
             BiomesPlugin_can_run := false
         }
         ;SetTimer, CheckBiome, 1000
@@ -92,13 +95,14 @@ class BiomesPlugin extends Plugin
         
     }
     
-    IniRead()
+    IniRead() 
     {
+ ;
         global 
         local tempPSLink
         LoadBiomeToggles()
         IniRead, tempPSLink, %iniFilePath%, "Biomes", "privateServerLink"
-
+ ;
         if (webhookURL != "ERROR" and tempPSLink != "ERROR")
         {
             ;[DEV COMMENT] I'm keeping this in but its declared twice? should this be a seperate variable or just removed entirely? - Nadir
@@ -107,11 +111,17 @@ class BiomesPlugin extends Plugin
         }
         Else
             IniWrite, % "", %iniFilePath%, "Biomes", "privateServerLink"
+ ;
     }
     
+    
     GuiControlChecks()
-    {}
+    {
+        
+    }
+    
 }
+
 
 global biomesPrivateServerLink := ""
 
@@ -119,11 +129,14 @@ global biomeDetectionRunning := false
 global hasBiomesPlugin := true
 global prevBiome := "None"
 global prevState := "None"
+
+
+
 global biomeColors := { "NORMAL":16777215, "SAND STORM":16040572, "HELL":6033945, "STARFALL":6784224, "CORRUPTION":9454335, "NULL":0, "GLITCHED":6684517, "WINDY":9566207, "SNOWY":12908022, "RAINY":4425215, "DREAMSPACE":16743935, "PUMPKIN MOON":13983497, "GRAVEYARD":16777215, "BLOOD RAIN":16711680, "CYBERSPACE":2904999 }
 
 global BiomesPlugin_read_log_regex := """state"":""((?:\\.|[^""])*)"".*?""largeImage"":\{""hoverText"":""((?:\\.|[^""])*)"""
 
-global BiomesPlugin_can_run := True
+global BiomesPlugin_can_run := true
 
 ;internal and external resource locations
  global maxstellar_biome_thumbnail := "https://maxstellar.github.io/biome_thumb/"
@@ -131,6 +144,7 @@ global BiomesPlugin_can_run := True
  EnvGet, LocalAppData, LOCALAPPDATA
  global logDir := LocalAppData "\Roblox\logs"
 ;
+
 
 goto Biome_EOF
 
@@ -169,8 +183,10 @@ SaveBiomeToggles:
     IniWrite, %BiomeNull%, %iniFilePath%, "Biomes", BiomeNull
 return
 
+
 ;[DEV COMMENT] check below comment
-ProcessExist(Name) {
+ProcessExist(Name)
+{
     ;[DEV COMMENT] would <if WinExist("ahk_exe " . Name)> be faster? - Nadir
     for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process")
         if (process.Name = Name)
@@ -181,7 +197,8 @@ ProcessExist(Name) {
 CheckBiomeFunction()
 {
     SetBatchLines, %MAX_SPEED%
-    if (!ProcessExist("RobloxPlayerBeta.exe")) {
+    if (!ProcessExist("RobloxPlayerBeta.exe"))
+    {
         return
     }
     newestTime := 0
@@ -190,7 +207,8 @@ CheckBiomeFunction()
     ; Find latest log file
     Loop, Files, %logDir%\*.log, F
     {
-        if (A_LoopFileTimeModified > newestTime) {
+        if (A_LoopFileTimeModified > newestTime)
+        {
             newestTime := A_LoopFileTimeModified
             newestFile := A_LoopFileFullPath
         }
@@ -220,7 +238,8 @@ CheckBiomeFunction()
         line := lines_array[lines_array.MaxIndex() - A_Index + 1]
         if InStr(line, "[BloxstrapRPC]")
         {        ;[DEV COMMENT] Moved to global so it doesn't need to be reassigned every call
-            if RegExMatch(line, BiomesPlugin_read_log_regex, m) {
+            if RegExMatch(line, BiomesPlugin_read_log_regex, m)
+            {
                 state := m1
                 biome := m2
                 break
@@ -240,7 +259,8 @@ CheckBiomeFunction()
         else
             isSpecial := false
 
-        if (isBiomeEnabled = 1 or isSpecial) {
+        if (isBiomeEnabled = 1 or isSpecial)
+        {
             prevBiome := biome
             ; biome_url := StrReplace(biome, " ", "_")
             thumbnail_url := maxstellar_biome_thumbnail . StrReplace(biome, " ", "_") ".png"
@@ -250,7 +270,8 @@ CheckBiomeFunction()
             time := A_NowUTC
             timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
 
-            if (isSpecial) {
+            if (isSpecial)
+            {
                 content := "@everyone"
             } else {
                 content := ""
@@ -278,7 +299,8 @@ CheckBiomeFunction()
     }
     if (state && state != "In Main Menu" && state != "Equipped _None_" && state != "" && state != prevState)
     {
-        if (prevState != "None") {
+        if (prevState != "None")
+        {
             needle := Chr(92) Chr(34), pos1 := InStr(state, needle), auraName := (pos1 ? (pos2 := InStr(state, needle, false, pos1 + StrLen(needle))) && pos2>pos1 ? SubStr(state, pos1 + StrLen(needle), pos2 - (pos1 + StrLen(needle))) : state : state)
 
             time := A_NowUTC
@@ -307,7 +329,8 @@ CheckBiomeFunction()
     SetBatchLines, %STANDARD_SPEED%
 }
 ;[DEV COMMENT]  unchanged
-LoadBiomeToggles() {
+LoadBiomeToggles()
+{
     global
     IniRead, BiomeNormal, %iniFilePath%, "Biomes", BiomeNormal, 1
     IniRead, BiomeSandStorm, %iniFilePath%, "Biomes", BiomeSandStorm, 1
@@ -340,5 +363,9 @@ LoadBiomeToggles() {
     GuiControl,, BiomeNull, %BiomeNull%
 }
 
+
 Biome_EOF:
 Log.Info("[PLUGIN=>""biomes.ahk""]" . " Finished Loading!")
+/**
+* @ignore
+*/
