@@ -1,4 +1,4 @@
-;asd
+;attempting to unify everything found in Rectangle.ahk here
 ;#Include "\core\Math.ahk"
 class Point2
 {
