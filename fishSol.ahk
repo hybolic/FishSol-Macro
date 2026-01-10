@@ -92,17 +92,17 @@ ReadSetting(byref var, catagory, name, isBoolOrMin:=false, max:="")
 
 if (FileExist(iniFilePath)) {
     ReadSetting(res, "Macro", "resolution")
-    ReadSetting(maxLoopCount, "Macro", "maxLoopCount")
-    ReadSetting(fishingLoopCount, "Macro", "fishingLoopCount", 0, 1000) ; adjust if needed
+    ReadSetting(maxLoopCount, "Macro", "maxLoopCount", 1, 10000) ; adjust if needed
+    ReadSetting(fishingLoopCount, "Macro", "fishingLoopCount", 1, 10000) ; adjust if needed
     ReadSetting(sellAllToggle, "Macro", "sellAllToggle", true)
     ReadSetting(pathingMode, "Macro", "pathingMode")
     ; [REDFINED=azertyPathing]
     ReadSetting(azertyPathing, "Macro", "azertyPathing", true)
     ReadSetting(privateServerLink, "Macro", "privateServerLink")
     ReadSetting(advancedFishingDetection, "Macro", "advancedFishingDetection", true)
-    ReadSetting(fishingFailsafeTime, "Macro", "fishingFailsafeTime", 0, 36000000) ; adjust if needed
-    ReadSetting(pathingFailsafeTime, "Macro", "pathingFailsafeTime", 0, 36000000) ; adjust if needed
-    ReadSetting(autoRejoinFailsafeTime, "Macro", "autoRejoinFailsafeTime", 0, 36000000) ; adjust if needed
+    ReadSetting(fishingFailsafeTime, "Macro", "fishingFailsafeTime", 1, 3600000000) ; adjust if needed
+    ReadSetting(pathingFailsafeTime, "Macro", "pathingFailsafeTime", 1, 3600000000) ; adjust if needed
+    ReadSetting(autoRejoinFailsafeTime, "Macro", "autoRejoinFailsafeTime", 1, 3600000000) ; adjust if needed
     ReadSetting(autoUnequip, "Macro", "autoUnequip", true)
     ; on here twice check [REDFINED=azertyPathing]
     ; IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
@@ -198,32 +198,45 @@ loop % Devs.Length()
     dev%A_Index%_link       := Devs[Randomised_DevOrder[A_INDEX]].dev_link
     dev%A_Index%_website    := Devs[Randomised_DevOrder[A_INDEX]].dev_website
 }
+
 ;define colors so they can be adjusted quickly on mass
-global GuiColorDefault      := "c0xCCCCCC" ; default font text color
-global GuiColorText         := "cWhite"    ; text color
-global GuiColorRed          := "c0xFF4444" ; warning status, OFF and limits
-global GuiColorLBlue        := "c0x00D4FF" ; fishsol version, need help text and "recommended for..." text
-global GuiColorLGreen       := "c0x00DD00" ; used for runtime, status text and ON text
-global GuiColorGreen        := "c0x00FF00" ; used for donate text
-global GuiColorLGrey        := "0xD3aD3D3" ; background color (ommit "c")
-global GuiColorLLGreen      := "c0x00AA00" ; start button color
-global GuiColorYellowOrange := "c0xFFAA00" ; pause button color
-global GuiColorOrange       := "c0xFF2C00" ; stop  button color
-global GuiColorDonatorBG    := "0x2D2D2D"  ; background color for donator text box (ommit "c")
-global GuiDefaultColor      := "0x1E1E1E"  ; default gui color (ommit "c")
-global GuiLinkColor         := "c0x0088FF" ; used for dev name and links
-global GuiSCBRColor         := "0x696868"  ; used for border box aroun "Strange Controller" and "Biome Randomizer" (ommit "c")
-global GuiColorGlitch       := "c0x65FF65" ; Glitched text
-global GuiColorDreamscape   := "c0xFF7DFF" ; Dreamspace text
-global GuiColorCyberspace   := "c0x00ddff" ; Cyberspace text
+global GuiColorDefault      := "c" . "0x" . "CCCCCC" ; default font text color
+global GuiColorText         := "c" . "0x" . "FFFFFF" ; text color
+global GuiColorRed          := "c" . "0x" . "FF4444" ; warning status, OFF and limits
+global GuiColorLBlue        := "c" . "0x" . "00D4FF" ; fishsol version, need help text and "recommended for..." text
+global GuiColorLGreen       := "c" . "0x" . "00DD00" ; used for runtime, status text and ON text
+global GuiColorGreen        := "c" . "0x" . "00FF00" ; used for donate text
+global GuiColorLGrey        :=       "0x" . "D3D3D3" ; background color (ommit "c")
+global GuiColorLLGreen      := "c" . "0x" . "00AA00" ; start button color
+global GuiColorYellowOrange := "c" . "0x" . "FFAA00" ; pause button color
+global GuiColorOrange       := "c" . "0x" . "FF2C00" ; stop  button color
+global GuiColorDonatorBG    :=       "0x" . "2D2D2D" ; background color for donator text box (ommit "c")
+global GuiDefaultColor      :=       "0x" . "1E1E1E" ; default gui color (ommit "c")
+global GuiLinkColor         := "c" . "0x" . "0088FF" ; used for dev name and links
+global GuiSCBRColor         :=       "0x" . "696868" ; used for border box aroun "Strange Controller" and "Biome Randomizer" (ommit "c")
+global GuiColorGlitch       := "c" . "0x" . "65FF65" ; Glitched text
+global GuiColorDreamscape   := "c" . "0x" . "FF7DFF" ; Dreamspace text
+global GuiColorCyberspace   := "c" . "0x" . "00ddff" ; Cyberspace text
+
+;image resources
+global PNG_MAIN_TAB := A_ScriptDir "\gui\Main.png"
+global PNG_MISC_TAB := A_ScriptDir "\gui\Misc.png"
+global PNG_FAIL_TAB := A_ScriptDir "\gui\Failsafes.png"
+global PNG_BIOM_TAB := A_ScriptDir "\gui\Biomes.png"
+global PNG_CRAF_TAB := A_ScriptDir "\gui\Crafter.png"
+global PNG_WEBH_TAB := A_ScriptDir "\gui\Webhook.png"
+global PNG_SNOW_TAB := A_ScriptDir "\gui\Snowman.png"
+global PNG_CRED_TAB := A_ScriptDir "\gui\Credits.png"
+global PNG_DISCORD_ := A_ScriptDir "\img\Discord.png"
+global PNG_ROBLOX__ := A_ScriptDir "\img\Robux.png"
 
 Gui, Color, %GuiDefaultColor%
 Gui, Font, s17 %GuiColorText% Bold, Segoe UI
 Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %GuiColorLBlue%, fishSol v%version%
 
 Gui, Font, s9 %GuiColorText% Normal, Segoe UI
-; define DrawHelpDonate() function to reuse same code elsewhere
-DrawHelpDonate(X:=0)
+
+DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsewhere
 {
     global
     local xOFF1, xOFF2, xOFF3, xOFF4
@@ -233,9 +246,9 @@ DrawHelpDonate(X:=0)
     Gui, Color, %GuiDefaultColor%
     
     xOFF1 := 445 + X
-    Gui, Add, Picture, x%xOFF1% y600 w27 h19, %A_ScriptDir%\img\Discord.png
+    Gui, Add, Picture, x%xOFF1% y600 w27 h19, %PNG_DISCORD_%
     xOFF2 := 538 + X
-    Gui, Add, Picture, x%xOFF2% y601 w18 h19, %A_ScriptDir%\img\Robux.png
+    Gui, Add, Picture, x%xOFF2% y601 w18 h19, %PNG_ROBLOX__%
 
     Gui, Font, s11 %GuiColorText% Bold Underline, Segoe UI
     
@@ -263,7 +276,7 @@ Gui, Add, Tab3, x15 y55 w570 h600 vMainTabs gTabChange cWhite, %tabList%
 
 Gui, Tab, Main
 
-Gui, Add, Picture, x14 y60 w574 h590, %A_ScriptDir%\gui\Main.png
+Gui, Add, Picture, x14 y60 w574 h590, %PNG_MAIN_TAB%
 
 DrawHelpDonate(-5)
 
@@ -355,7 +368,7 @@ Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure y
 
 Gui, Tab, Misc
 
-Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Misc.png
+Gui, Add, Picture, x14 y80 w574 h590, %PNG_MISC_TAB%
 
 Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 Gui, Font, s9 %GuiColorText% Normal
@@ -408,7 +421,7 @@ DrawHelpDonate()
 
 Gui, Tab, Failsafes
 
-Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Failsafes.png
+Gui, Add, Picture, x14 y80 w574 h590, %PNG_FAIL_TAB%
 
 Gui, Font, s10 %GuiColorText% Normal
 Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans %GuiColorDefault%, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
@@ -450,7 +463,7 @@ DrawHelpDonate()
 if (hasBiomesPlugin) {
     Gui, Tab, Biomes
 
-    Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Biomes.png
+    Gui, Add, Picture, x14 y80 w574 h590, %PNG_BIOM_TAB%
 
     Gui, Font, s9 %GuiColorText% Normal, Segoe UI
     Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans %GuiColorDefault%, Choose which biomes are sent to Discord:
@@ -493,7 +506,7 @@ if (hasBiomesPlugin) {
 if (hasCrafterPlugin) {
     Gui, Tab, Crafter
 
-    Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Crafter.png
+    Gui, Add, Picture, x14 y80 w574 h590, %PNG_CRAF_TAB%
 
     Gui, Font, s11 %GuiColorText% Bold, Segoe UI
     Gui, Add, Text, x45 y135 w200 h25 BackgroundTrans, example text:
@@ -513,7 +526,7 @@ if (hasCrafterPlugin) {
 
 Gui, Tab, Webhook
 
-Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Webhook.png
+Gui, Add, Picture, x14 y80 w574 h590, %PNG_WEBH_TAB%
 
 Gui, Font, s10 %GuiColorText% Normal Bold
 Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
@@ -538,7 +551,7 @@ DrawHelpDonate()
 
 if (hasSnowmanPlugin) {
     Gui, Tab, Snowman
-    Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Snowman.png
+    Gui, Add, Picture, x14 y80 w574 h590, %PNG_SNOW_TAB%
 
     Gui, Font, s10 %GuiColorDefault% Normal
     Gui, Add, Text, x60 y190 w500 h50 BackgroundTrans, When toggled, The macro will automatically collect snowflakes every 2 hours and 5 minutes from the snowman located near Lime.
@@ -569,7 +582,7 @@ if (hasSnowmanPlugin) {
 }
 
 Gui, Tab, Credits
-Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Credits.png
+Gui, Add, Picture, x14 y80 w574 h590, %PNG_CRED_TAB%
 Gui, Font, s10 %GuiColorText% Normal
 loop % Devs.Count()
 {
@@ -706,11 +719,13 @@ return
 
 UpdateLoopCount:
     Gui, Submit, nohide
-    if (MaxLoopInput > 0) {
+    if MaxLoopInput is Number
+    {
         maxLoopCount := max(MaxLoopInput, 1)
         IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
     }
-    if (FishingLoopInput > 0) {
+    if FishingLoopInput is Number
+    {
         fishingLoopCount := max(FishingLoopInput, 1)
         IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
     }
@@ -815,7 +830,8 @@ return
 UpdateAutoCrafterInterval:
     Gui, Submit, NoHide
     newInterval := AutoCrafterInterval * 60000
-    if (newInterval > 0) {
+    if newInterval is Number
+    {
         autoCrafterInterval := max(newInterval, 1)
         IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
     }
@@ -1541,7 +1557,8 @@ return
 
 UpdateFishingFailsafe:
     Gui, Submit, nohide
-    if (FishingFailsafeInput > 0) {
+    if FishingFailsafeInput is Number
+    {
         fishingFailsafeTime := max(FishingFailsafeInput, 1)
         IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
     }
@@ -1549,7 +1566,8 @@ return
 
 UpdatePathingFailsafe:
     Gui, Submit, nohide
-    if (PathingFailsafeInput > 0) {
+    if PathingFailsafeInput is Number
+    {
         pathingFailsafeTime := max(PathingFailsafeInput, 1)
         IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
     }
@@ -1557,7 +1575,8 @@ return
 
 UpdateAutoRejoinFailsafe:
     Gui, Submit, nohide
-    if (AutoRejoinFailsafeInput > 0) {
+    if AutoRejoinFailsafeInput is Number
+    {
         autoRejoinFailsafeTime := max(AutoRejoinFailsafeInput, 1)
         IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
     }
@@ -2017,26 +2036,33 @@ F1::
     }
     if (!toggle) {
         Gui, Submit, nohide
-        if (MaxLoopInput > 0) {
+        if MaxLoopInput is Number
+        {
             maxLoopCount := max(MaxLoopInput, 1)
         }
-        if (FishingLoopInput > 0) {
+
+        if FishingLoopInput is Number
+        {
             fishingLoopCount := max(FishingLoopInput, 1)
         }
+
         toggle := true
         if (hasBiomesPlugin) {
             Run, "%A_ScriptDir%\plugins\biomes.ahk"
             biomeDetectionRunning := true
         }
+
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
         snowmanPathingLastRun := 0
         if (startTick = "") {
             startTick := A_TickCount
         }
+
         if (cycleCount = "") {
             cycleCount := 0
         }
+
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
         snowmanPathingLastRun := 0
@@ -2193,7 +2219,7 @@ DoMouseMove:
 
             ; More snowman pathing
             loopCount++
-            if (loopCount > maxLoopCount || restartPathing) {
+            if (loopCount > (sellAllToggle ? min(maxLoopCount, 22) : maxLoopCount) || restartPathing) {
                 restartPathing := false
 
                 if (snowmanPathing) {
@@ -2224,6 +2250,7 @@ DoMouseMove:
                     Click, Left
                     sleep 300
                 }
+
                 if (autoCloseChat) {
                     sleep 300
                     Send {/}
@@ -2787,7 +2814,7 @@ DoMouseMove2:
 
             ; More snowman pathing
             loopCount++
-            if (loopCount > maxLoopCount || restartPathing) {
+            if (loopCount > (sellAllToggle ? min(maxLoopCount, 22) : maxLoopCount) || restartPathing) {
                 restartPathing := false
 
                 if (snowmanPathing) {
@@ -2828,6 +2855,7 @@ DoMouseMove2:
                     MouseClick, Left
                     sleep 300
                 }
+                
                 return_to_spawn()
                 MouseMove, 52, 621, 3
                 sleep 220
@@ -3390,7 +3418,7 @@ DoMouseMove3:
 
             ; More snowman pathing
             loopCount++
-            if (loopCount > maxLoopCount || restartPathing) {
+            if (loopCount > (sellAllToggle ? min(maxLoopCount, 22) : maxLoopCount) || restartPathing) {
                 restartPathing := false
 
                 if (snowmanPathing) {
@@ -3421,6 +3449,7 @@ DoMouseMove3:
                     Click, Left
                     sleep 300
                 }
+
                 if (autoCloseChat) {
                     sleep 300
                     Send {/}
@@ -3430,6 +3459,7 @@ DoMouseMove3:
                     MouseClick, Left
                     sleep 300
                 }
+
                 return_to_spawn()
                 MouseMove, 26, 325, 3
                 sleep 220
@@ -3894,23 +3924,30 @@ Return
 StartScript:
     if (!toggle) {
         Gui, Submit, nohide
-        if (MaxLoopInput > 0) {
+        if MaxLoopInput is Number
+        {
             maxLoopCount := max(MaxLoopInput, 1)
         }
-        if (FishingLoopInput > 0) {
+
+        if FishingLoopInput is Number
+        {
             fishingLoopCount := max(FishingLoopInput, 1)
         }
+
         toggle := true
         if (hasBiomesPlugin) {
             Run, "%A_ScriptDir%\plugins\biomes.ahk"
             biomeDetectionRunning := true
         }
+
         if (startTick = "") {
             startTick := A_TickCount
         }
+
         if (cycleCount = "") {
             cycleCount := 0
         }
+
         WinActivate, ahk_exe RobloxPlayerBeta.exe
         ManualGUIUpdate()
         SetTimer, UpdateGUI, 1000
@@ -3932,23 +3969,30 @@ return
 StartScript(res) {
     if (!toggle) {
         Gui, Submit, nohide
-        if (MaxLoopInput > 0) {
+        if MaxLoopInput is Number
+        {
             maxLoopCount := max(MaxLoopInput, 1)
         }
-        if (FishingLoopInput > 0) {
+
+        if FishingLoopInput is Number
+        {
             fishingLoopCount := max(FishingLoopInput, 1)
         }
+
         toggle := true
         if (hasBiomesPlugin) {
             Run, "%A_ScriptDir%\plugins\biomes.ahk"
             biomeDetectionRunning := true
         }
+
         if (startTick = "") {
             startTick := A_TickCount
         }
+
         if (cycleCount = "") {
             cycleCount := 0
         }
+
         WinActivate, ahk_exe RobloxPlayerBeta.exe
         ManualGUIUpdate()
         SetTimer, UpdateGUI, 1000
