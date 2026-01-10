@@ -11,15 +11,14 @@ SetBatchLines, %MAX_SPEED% ;run as fast as possible during setup
 
 SetWorkingDir %A_ScriptDir%
 
-
 prevBiome := "None"
 prevState := "None"
 iniFilePath := A_ScriptDir "\..\settings.ini"
-biomeColors := { "NORMAL":16777215, "SAND STORM":16040572, "HELL":6033945, "STARFALL":6784224, "CORRUPTION":9454335, "NULL":0, "GLITCHED":6684517, "WINDY":9566207, "SNOWY":12908022, "RAINY":4425215, "DREAMSPACE":16743935, "PUMPKIN MOON":13983497, "GRAVEYARD":16777215, "BLOOD RAIN":16711680, "CYBERSPACE":2904999 }
+biomeColors := { "NORMAL":16777215, "SAND STORM":16040572, "HELL":6033945, "STARFALL":6784224, "CORRUPTION":9454335, "NULL":0, "GLITCHED":6684517, "WINDY":9566207, "SNOWY":12908022, "RAINY":4425215, "DREAMSPACE":16743935, "PUMPKIN MOON":13983497, "GRAVEYARD":16777215, "BLOOD RAIN":16711680, "CYBERSPACE":2904999, "AURORA":10040319 }
 EnvGet, LocalAppData, LOCALAPPDATA
 
 if (FileExist(iniFilePath)) {
-    IniRead, tempVersion, %iniFilePath%, "Macro", "LastVersion"                            ;v if set and valid use it
+    IniRead, tempVersion, %iniFilePath%, "Macro", "LastVersion"                            ;if set and valid use it
     fishSolVersion := ((tempVersion != "Error" and tempVersion ~= "1\.[2356789]\.\d)") ? tempVersion : "1.9.4")
     ;                                   ^check if set              ^regex known versions from github    ^ last known version
     IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
@@ -62,7 +61,6 @@ CheckBiome:
     if (!ProcessExist("RobloxPlayerBeta.exe")) {
         return
     }
-    
     logDir := LocalAppData "\Roblox\logs"
     newestTime := 0
     newestFile := ""

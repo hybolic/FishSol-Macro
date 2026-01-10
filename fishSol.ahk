@@ -46,17 +46,9 @@ autoCrafterWebhook := false
 
 if (FileExist(iniFilePath)) {
     ReadSetting(snowmanPathing, "Macro", "snowmanPathing", true)
-    ; IniRead, tempSnowmanPathing, %iniFilePath%, "Macro", "snowmanPathing", 0
-    ; snowmanPathing := (tempSnowmanPathing = "1" || tempSnowmanPathing = "true")
     ReadSetting(snowmanPathingWebhook, "Macro", "snowmanPathingWebhook")
-    ; IniRead, tempSnowmanPathingWebhook, %iniFilePath%, "Macro", "snowmanPathingWebhook", 0
-    ; snowmanPathingWebhook := (tempSnowmanPathingWebhook = "1" || tempSnowmanPathingWebhook = "true")
     ReadSetting(autoCrafter, "Macro", "autoCrafter", true)
-    ; IniRead, tempAutoCrafter, %iniFilePath%, "Macro", "autoCrafter", 0
-    ; autoCrafter := (tempAutoCrafter = "1" || tempAutoCrafter = "true")
     ReadSetting(autoCrafterWebhook, "Macro", "autoCrafterWebhook")
-    ; IniRead, tempAutoCrafterWebhook, %iniFilePath%, "Macro", "autoCrafterWebhook", 0
-    ; autoCrafterWebhook := (tempAutoCrafterWebhook = "1" || tempAutoCrafterWebhook = "true")
 }
 strangeControllerTime := 0
 biomeRandomizerTime := 360000
@@ -140,16 +132,7 @@ hasSnowmanPlugin := FileExist(A_ScriptDir "\plugins\snowman.pathing.ahk")
 
 ; already been checked look for [REDEFINED=crafterToggle] and [REDEFINED=autoCrafterDetection] comment above
 ; if (FileExist(iniFilePath)) {
-    ; ;IniRead, tempCrafter, %iniFilePath%, "Macro", "crafterToggle"
-    ; if (tempCrafter != "ERROR")
-    ; {
-    ;     crafterToggle := (tempCrafter = "true" || tempCrafter = "1")
-    ; }
-    ; ;IniRead, tempAutoCrafterDetection, %iniFilePath%, "Macro", "autoCrafterDetection"
-    ; if (tempAutoCrafterDetection != "ERROR")
-    ; {
-    ;     autoCrafterDetection := (tempAutoCrafterDetection = "true" || tempAutoCrafterDetection = "1")
-    ; }
+; .....
 ; }
 
 code := ""
@@ -158,10 +141,7 @@ if RegExMatch(privateServerLink, "code=([^&]+)", m)
     code := m1
 }
 
-Random, shuffle, 1, 6
-
 Random,, A_TickCount
-
 randomMessages := ["Go catch some fish IRL sometime!"
                     , "Also try FishScope!"
                     , "Also try maxstellar's Biome Macro!"
@@ -218,29 +198,37 @@ loop % Devs.Length()
     dev%A_Index%_link       := Devs[Randomised_DevOrder[A_INDEX]].dev_link
     dev%A_Index%_website    := Devs[Randomised_DevOrder[A_INDEX]].dev_website
 }
-
-global TextColorDefault := "c0xCCCCCC"
-global TextColorRed := "c0xFF4444"
-global TextColorLBlue := "c0x00D4FF"
-global TextColorLGreen := "c0x00DD00"
-global TextColorGreen := "c0x00FF00"
-global GuiDefaultColor := "0x1E1E1E"
-global ButtonFlat := "+0x8000"
-
-
+;define colors so they can be adjusted quickly on mass
+global GuiColorDefault      := "c0xCCCCCC" ; default font text color
+global GuiColorText         := "cWhite"    ; text color
+global GuiColorRed          := "c0xFF4444" ; warning status, OFF and limits
+global GuiColorLBlue        := "c0x00D4FF" ; fishsol version, need help text and "recommended for..." text
+global GuiColorLGreen       := "c0x00DD00" ; used for runtime, status text and ON text
+global GuiColorGreen        := "c0x00FF00" ; used for donate text
+global GuiColorLGrey        := "0xD3aD3D3" ; background color (ommit "c")
+global GuiColorLLGreen      := "c0x00AA00" ; start button color
+global GuiColorYellowOrange := "c0xFFAA00" ; pause button color
+global GuiColorOrange       := "c0xFF2C00" ; stop  button color
+global GuiColorDonatorBG    := "0x2D2D2D"  ; background color for donator text box (ommit "c")
+global GuiDefaultColor      := "0x1E1E1E"  ; default gui color (ommit "c")
+global GuiLinkColor         := "c0x0088FF" ; used for dev name and links
+global GuiSCBRColor         := "0x696868"  ; used for border box aroun "Strange Controller" and "Biome Randomizer" (ommit "c")
+global GuiColorGlitch       := "c0x65FF65" ; Glitched text
+global GuiColorDreamscape   := "c0xFF7DFF" ; Dreamspace text
+global GuiColorCyberspace   := "c0x00ddff" ; Cyberspace text
 
 Gui, Color, %GuiDefaultColor%
-Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %TextColorLBlue%, fishSol v%version%
+Gui, Font, s17 %GuiColorText% Bold, Segoe UI
+Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %GuiColorLBlue%, fishSol v%version%
 
-Gui, Font, s9 cWhite Normal, Segoe UI
+Gui, Font, s9 %GuiColorText% Normal, Segoe UI
 ; define DrawHelpDonate() function to reuse same code elsewhere
 DrawHelpDonate(X:=0)
 {
     global
     local xOFF1, xOFF2, xOFF3, xOFF4
     
-    Gui, Font, s10 cWhite Normal Bold
+    Gui, Font, s10 %GuiColorText% Normal Bold
     
     Gui, Color, %GuiDefaultColor%
     
@@ -249,17 +237,17 @@ DrawHelpDonate(X:=0)
     xOFF2 := 538 + X
     Gui, Add, Picture, x%xOFF2% y601 w18 h19, %A_ScriptDir%\img\Robux.png
 
-    Gui, Font, s11 cWhite Bold Underline, Segoe UI
+    Gui, Font, s11 %GuiColorText% Bold Underline, Segoe UI
     
     xOFF3 := 430 + X
-    Gui, Add, Text, x%xOFF3% y600 w150 h38 Center BackgroundTrans %TextColorGreen% gDonateClick, Donate!
+    Gui, Add, Text, x%xOFF3% y600 w150 h38 Center BackgroundTrans %GuiColorGreen% gDonateClick, Donate!
     xOFF4 := 330 + X
-    Gui, Add, Text, x%xOFF4% y600 w138 h38 Center BackgroundTrans %TextColorLBlue% gNeedHelpClick, Need Help?
-    Gui, Font, s10 cWhite Bold, Segoe UI
+    Gui, Add, Text, x%xOFF4% y600 w138 h38 Center BackgroundTrans %GuiColorLBlue% gNeedHelpClick, Need Help?
+    Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 }
 DrawHelpDonate(-5)
 
-Gui, Font, s10 cWhite Normal Bold
+Gui, Font, s10 %GuiColorText% Normal Bold
 
 ; adds plugin to tab list
 tabList := "Main|Misc|Failsafes|Webhook"
@@ -271,7 +259,7 @@ if (hasSnowmanPlugin)
     tabList .= "|Snowman"
 tabList .= "|Credits"
 
-Gui, Add, Tab3, x15 y55 w570 h600 vMainTabs gTabChange c0xFFFFFF, %tabList%
+Gui, Add, Tab3, x15 y55 w570 h600 vMainTabs gTabChange cWhite, %tabList%
 
 Gui, Tab, Main
 
@@ -279,88 +267,88 @@ Gui, Add, Picture, x14 y60 w574 h590, %A_ScriptDir%\gui\Main.png
 
 DrawHelpDonate(-5)
 
-Gui, Font, s11 cWhite Normal Bold
+Gui, Font, s11 %GuiColorText% Normal Bold
 Gui, Add, Text, x45 y110 w60 h25 BackgroundTrans, Status:
-Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans %TextColorRed%, Stopped
+Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans %GuiColorRed%, Stopped
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 %ButtonFlat% , Start
-Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 %ButtonFlat% , Pause
-Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn %TextColorRed% %ButtonFlat% , Stop
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
+Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn %GuiColorLLGreen% +0x8000 , Start
+Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn %GuiColorYellowOrange% +0x8000 , Pause
+Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn %GuiColorRed% +0x8000 , Stop
 
-Gui, Font, s8 %TextColorDefault%
+Gui, Font, s8 %GuiColorDefault%
 Gui, Add, Text, x45 y185 w240 h15 BackgroundTrans, Hotkeys: F1=Start - F2=Pause - F3=Stop
 
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x320 y110 w80 h25 BackgroundTrans, Resolution:
 Gui, Add, DropDownList, x320 y135 w120 h200 vResolution gSelectRes, 1080p|1440p|1366x768
 
-Gui, Font, s9 cWhite Bold, Segoe UI
+Gui, Font, s9 %GuiColorText% Bold, Segoe UI
 Gui, Add, Text, x320 y165 w220 h25 vResStatusText BackgroundTrans, Ready
 
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x450 y135 w100 h25 gToggleSellAll vSellAllBtn, Toggle Sell All
-Gui, Font, s8 %TextColorDefault%
-Gui, Add, Text, x450 y165 w100 h25 vSellAllStatus BackgroundTrans, OFF
+Gui, Font, s8 %GuiColorDefault%
+Gui, Add, Text, x450 y165 w100 h25 vSellAllStatus BackgroundTrans +%GuiColorRed%, OFF
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x45 y240 w180 h25 BackgroundTrans, Fishing Loop Count:
-Gui, Add, Edit, x220 y238 w60 h25 vMaxLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %maxLoopCount%
-Gui, Font, s8 %TextColorDefault%
+Gui, Add, Edit, x220 y238 w60 h25 vMaxLoopInput gUpdateLoopCount Number Background%GuiColorLGrey% cBlack, %maxLoopCount%
+Gui, Font, s8 %GuiColorDefault%
 Gui, Add, Text, x285 y242 w270 h15 BackgroundTrans, (Fishing Cycles Before Reset - default: 15)
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x45 y270 w180 h25 BackgroundTrans, Sell Loop Count:
-Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %fishingLoopCount%
-Gui, Font, s8 %TextColorDefault%
+Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background%GuiColorLGrey% cBlack, %fishingLoopCount%
+Gui, Font, s8 %GuiColorDefault%
 Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (Sell Cycles  -  If Sell All: 22)
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x45 y301 w120 h25 BackgroundTrans, Pathing Mode:
 Gui, Add, DropDownList, x145 y298 w135 h200 vPathingMode gSelectPathing, Vip Pathing|Non Vip Pathing|Abyssal Pathing
 
 Gui, Add, Text, x295 y301 w120 h25 BackgroundTrans, AZERTY Pathing:
 Gui, Add, Button, x415 y298 w80 h25 gToggleAzertyPathing vAzertyPathingBtn, Toggle
-Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-Gui, Add, Text, x510 y303 w60 h25 vAzertyPathingStatus BackgroundTrans, OFF
+Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+Gui, Add, Text, x510 y303 w60 h25 vAzertyPathingStatus BackgroundTrans +%GuiColorRed%, OFF
 
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 
 Gui, Color, %GuiDefaultColor%
-Gui, Font, s10 cWhite Bold, Segoe UI
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 
-Gui, Font, s11 c0xFF2C00 Bold
-Gui, Font, s10 cWhite Bold
+Gui, Font, s11 %GuiColorOrange% Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x270 y380 w80 h25 gToggleAdvancedFishingDetection vAdvancedFishingDetectionBtn, Toggle
-Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-Gui, Add, Text, x360 y384 w60 h25 vAdvancedFishingDetectionStatus BackgroundTrans, OFF
+Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+Gui, Add, Text, x360 y384 w60 h25 vAdvancedFishingDetectionStatus BackgroundTrans +%GuiColorRed%, OFF
 
-Gui, Font, s9 cWhite Bold, Segoe UI
+Gui, Font, s9 %GuiColorText% Bold, Segoe UI
 Gui, Add, Text, x270 y415 w260 cWhite BackgroundTrans, Advanced Detection Threshold -
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans %TextColorDefault%, Customize how many pixels are left in the fishing range before clicking.
-Gui, Font, s10 cWhite Bold
+Gui, Font, s9 %GuiColorText% Normal
+Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans %GuiColorDefault%, Customize how many pixels are left in the fishing range before clicking.
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x400 y384 w80 h25 BackgroundTrans, Pixels:
-Gui, Font, s9 cWhite Bold
-Gui, Add, Text, x453 y416 w120 BackgroundTrans %TextColorRed%, Max : 40 Pixels
-Gui, Font, s10 cWhite Bold
-Gui, Add, Edit, x455 y380 w75 h25 vAdvancedThresholdInput gUpdateAdvancedThreshold Number Background0xD3D3D3 cBlack, %advancedFishingThreshold%
+Gui, Font, s9 %GuiColorText% Bold
+Gui, Add, Text, x453 y416 w120 BackgroundTrans %GuiColorRed%, Max : 40 Pixels
+Gui, Font, s10 %GuiColorText% Bold
+Gui, Add, Edit, x455 y380 w75 h25 vAdvancedThresholdInput gUpdateAdvancedThreshold Number Background%GuiColorLGrey% cBlack, %advancedFishingThreshold%
 
-Gui, Font, s9 %TextColorDefault% Normal
+Gui, Font, s9 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y470 w515 h30 BackgroundTrans, Advanced Fishing Detection uses a system that clicks slightly before the bar exits the fish range, making the catch rate higher than ever.
 
-Gui, Font, s9 %TextColorLBlue% Bold
-Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans %TextColorLBlue%, [ Recommended For Lower End Devices ]
+Gui, Font, s9 %GuiColorLBlue% Bold
+Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans %GuiColorLBlue%, [ Recommended For Lower End Devices ]
 
-Gui, Font, s11 cWhite Bold, Segoe UI
+Gui, Font, s11 %GuiColorText% Bold, Segoe UI
 Gui, Add, Text, x50 y375 w100 h30 BackgroundTrans, Runtime:
-Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans %TextColorLGreen%, 00:00:00
+Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans %GuiColorLGreen%, 00:00:00
 
 Gui, Add, Text, x50 y405 w100 h30 BackgroundTrans, Cycles:
-Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans %TextColorLGreen%, 0
+Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans %GuiColorLGreen%, 0
 
-Gui, Font, s9 %TextColorDefault% Normal
+Gui, Font, s9 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
 Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
 
@@ -369,52 +357,52 @@ Gui, Tab, Misc
 
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Misc.png
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans %TextColorDefault%, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
+Gui, Font, s9 %GuiColorText% Normal
+Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans %GuiColorDefault%, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x45 y188 w80 h25 gToggleAutoUnequip vAutoUnequipBtn, Toggle
-Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-Gui, Add, Text, x140 y192 w60 h25 vAutoUnequipStatus BackgroundTrans, OFF
-Gui, Font, s10 cWhite Bold, Segoe UI
+Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+Gui, Add, Text, x140 y192 w60 h25 vAutoUnequipStatus BackgroundTrans +%GuiColorRed%, OFF
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 
-Gui, Font, s11 cWhite Bold
+Gui, Font, s11 %GuiColorText% Bold
 Gui, Add, Text, x45 y260 w150 h25 BackgroundTrans, Strange Controller:
 Gui, Add, Text, x45 y303 w190 h25 BackgroundTrans, Biome Randomizer:
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x200 y270 w80 h25 gToggleStrangeController vStrangeControllerBtn, Toggle
 Gui, Add, Button, x200 y314 w80 h25 gToggleBiomeRandomizer vBiomeRandomizerBtn, Toggle
-Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-Gui, Add, Text, x290 y275 w60 h25 vStrangeControllerStatus BackgroundTrans, OFF
-Gui, Add, Text, x290 y319 w60 h25 vBiomeRandomizerStatus BackgroundTrans, OFF
+Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+Gui, Add, Text, x290 y275 w60 h25 vStrangeControllerStatus BackgroundTrans +%GuiColorRed%, OFF
+Gui, Add, Text, x290 y319 w60 h25 vBiomeRandomizerStatus BackgroundTrans +%GuiColorRed%, OFF
 
-Gui, Add, Progress, x41 y270 w1 h27 Background696868
-Gui, Add, Progress, x190 y270 w1 h27 Background696868
-Gui, Add, Progress, x41 y296 w149 h1 Background696868
-Gui, Add, Progress, x184 y269 w7 h1 Background696868
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans %TextColorDefault%, Uses every 21 minutes.
+Gui, Add, Progress, x41 y270 w1 h27 Background%GuiSCBRColor%
+Gui, Add, Progress, x190 y270 w1 h27 Background%GuiSCBRColor%
+Gui, Add, Progress, x41 y296 w149 h1 Background%GuiSCBRColor%
+Gui, Add, Progress, x184 y269 w7 h1 Background%GuiSCBRColor%
+Gui, Font, s10 %GuiColorText% Normal
+Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans %GuiColorDefault%, Uses every 21 minutes.
 
-Gui, Font, s10 cWhite Normal
+Gui, Font, s10 %GuiColorText% Normal
 Gui, Add, Text, x327 y275 w500 h15 BackgroundTrans, Automatically uses Strange Controller.
 
-Gui, Add, Progress, x41 y313 w1 h27 Background696868
-Gui, Add, Progress, x190 y313 w1 h27 Background696868
-Gui, Add, Progress, x41 y339 w149 h1 Background696868
-Gui, Add, Progress, x184 y313 w7 h1 Background696868
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans %TextColorDefault%, Uses every 36 minutes.
+Gui, Add, Progress, x41 y313 w1 h27 Background%GuiSCBRColor%
+Gui, Add, Progress, x190 y313 w1 h27 Background%GuiSCBRColor%
+Gui, Add, Progress, x41 y339 w149 h1 Background%GuiSCBRColor%
+Gui, Add, Progress, x184 y313 w7 h1 Background%GuiSCBRColor%
+Gui, Font, s10 %GuiColorText% Normal
+Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans %GuiColorDefault%, Uses every 36 minutes.
 
-Gui, Font, s10 cWhite Normal
+Gui, Font, s10 %GuiColorText% Normal
 Gui, Add, Text, x327 y319 w500 h15 BackgroundTrans, Automatically uses Biome Randomizer.
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans %TextColorDefault%, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
+Gui, Font, s9 %GuiColorText% Normal
+Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans %GuiColorDefault%, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x320 y188 w80 h25 gToggleAutoCloseChat vAutoCloseChatBtn, Toggle
-Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans, OFF
+Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans +%GuiColorRed%, OFF
 
 DrawHelpDonate()
 
@@ -422,40 +410,40 @@ Gui, Tab, Failsafes
 
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Failsafes.png
 
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans %TextColorDefault%, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
+Gui, Font, s10 %GuiColorText% Normal
+Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans %GuiColorDefault%, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
 
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Text, x50 y190 w150 h25 BackgroundTrans, Private Server Link:
-Gui, Add, Edit, x50 y215 w500 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
+Gui, Add, Edit, x50 y215 w500 h25 vPrivateServerInput gUpdatePrivateServer Background%GuiColorLGrey% cBlack, %privateServerLink%
 
-Gui, Font, s8 %TextColorDefault% Normal
+Gui, Font, s8 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y245 w500 h15 BackgroundTrans, Paste your Roblox private server link here (leave empty to disable)
 
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans %TextColorDefault%, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
+Gui, Font, s10 %GuiColorText% Normal
+Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans %GuiColorDefault%, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
 
-Gui, Font, s11 cWhite Bold
+Gui, Font, s11 %GuiColorText% Bold
 Gui, Add, Text, x145 y275 w150 h25 BackgroundTrans, Seconds:
-Gui, Add, Edit, x218 y272 w150 h25 vAutoRejoinFailsafeInput gUpdateAutoRejoinFailsafe Number Background0xD3D3D3 cBlack, %autoRejoinFailsafeTime%
+Gui, Add, Edit, x218 y272 w150 h25 vAutoRejoinFailsafeInput gUpdateAutoRejoinFailsafe Number Background%GuiColorLGrey% cBlack, %autoRejoinFailsafeTime%
 
-Gui, Font, s10 cWhite Bold, Segoe UI
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans %TextColorDefault%, Customize how long until the Fishing Failsafe triggers. (Default : 31)
+Gui, Font, s9 %GuiColorText% Normal
+Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans %GuiColorDefault%, Customize how long until the Fishing Failsafe triggers. (Default : 31)
 
-Gui, Font, s11 cWhite Bold
+Gui, Font, s11 %GuiColorText% Bold
 Gui, Add, Text, x45 y413 w150 h35 BackgroundTrans, Seconds:
-Gui, Add, Edit, x125 y411 w150 h25 vFishingFailsafeInput gUpdateFishingFailsafe Number Background0xD3D3D3 cBlack, %fishingFailsafeTime%
+Gui, Add, Edit, x125 y411 w150 h25 vFishingFailsafeInput gUpdateFishingFailsafe Number Background%GuiColorLGrey% cBlack, %fishingFailsafeTime%
 
-Gui, Font, s10 cWhite Bold, Segoe UI
+Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans %TextColorDefault%, Customize how long until the Pathing Failsafe triggers. (Default : 61)
+Gui, Font, s9 %GuiColorText% Normal
+Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans %GuiColorDefault%, Customize how long until the Pathing Failsafe triggers. (Default : 61)
 
-Gui, Font, s11 cWhite Bold
+Gui, Font, s11 %GuiColorText% Bold
 Gui, Add, Text, x320 y413 w150 h35 BackgroundTrans, Seconds:
-Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background0xD3D3D3 cBlack, %pathingFailsafeTime%
+Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background%GuiColorLGrey% cBlack, %pathingFailsafeTime%
 
 DrawHelpDonate()
 
@@ -464,39 +452,39 @@ if (hasBiomesPlugin) {
 
     Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Biomes.png
 
-    Gui, Font, s9 cWhite Normal, Segoe UI
-    Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans %TextColorDefault%, Choose which biomes are sent to Discord:
+    Gui, Font, s9 %GuiColorText% Normal, Segoe UI
+    Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans %GuiColorDefault%, Choose which biomes are sent to Discord:
 
-    Gui, Font, s11 cWhite Bold, Segoe UI
-    Gui, Add, CheckBox, x50 y320 w140 h25 vBiomeWindy gSaveBiomeToggles Checked1 cWhite, Windy
-    Gui, Add, CheckBox, x50 y350 w140 h25 vBiomeSnowy gSaveBiomeToggles Checked1 cWhite, Snowy
-    Gui, Add, CheckBox, x50 y380 w140 h25 vBiomeRainy gSaveBiomeToggles Checked1 cWhite, Rainy
-    Gui, Add, CheckBox, x50 y410 w140 h25 vBiomeHeaven gSaveBiomeToggles Checked1 cWhite, Heaven
+    Gui, Font, s11 %GuiColorText% Bold, Segoe UI
+    Gui, Add, CheckBox, x50 y320 w140 h25 vBiomeWindy gSaveBiomeToggles Checked1 %GuiColorText%, Windy
+    Gui, Add, CheckBox, x50 y350 w140 h25 vBiomeSnowy gSaveBiomeToggles Checked1 %GuiColorText%, Snowy
+    Gui, Add, CheckBox, x50 y380 w140 h25 vBiomeRainy gSaveBiomeToggles Checked1 %GuiColorText%, Rainy
+    Gui, Add, CheckBox, x50 y410 w140 h25 vBiomeHeaven gSaveBiomeToggles Checked1 %GuiColorText%, Heaven
 
-    Gui, Add, CheckBox, x250 y320 w140 h25 vBiomeHell gSaveBiomeToggles Checked1 cWhite, Hell
-    Gui, Add, CheckBox, x250 y350 w140 h25 vBiomeStarfall gSaveBiomeToggles Checked1 cWhite, Starfall
-    Gui, Add, CheckBox, x250 y380 w140 h25 vBiomeCorruption gSaveBiomeToggles Checked1 cWhite, Corruption
-    Gui, Add, CheckBox, x250 y410 w140 h25 vBiomeAurora gSaveBiomeToggles Checked1 cWhite, Aurora
+    Gui, Add, CheckBox, x250 y320 w140 h25 vBiomeHell gSaveBiomeToggles Checked1 %GuiColorText%, Hell
+    Gui, Add, CheckBox, x250 y350 w140 h25 vBiomeStarfall gSaveBiomeToggles Checked1 %GuiColorText%, Starfall
+    Gui, Add, CheckBox, x250 y380 w140 h25 vBiomeCorruption gSaveBiomeToggles Checked1 %GuiColorText%, Corruption
+    Gui, Add, CheckBox, x250 y410 w140 h25 vBiomeAurora gSaveBiomeToggles Checked1 %GuiColorText%, Aurora
 
-    Gui, Add, CheckBox, x420 y380 w140 h25 vBiomeNormal gSaveBiomeToggles Checked1 cWhite, Normal
-    Gui, Add, CheckBox, x420 y320 w140 h25 vBiomeSandStorm gSaveBiomeToggles Checked1 cWhite, Sand Storm
-    Gui, Add, CheckBox, x420 y350 w140 h25 vBiomeNull gSaveBiomeToggles Checked1 cWhite, Null
+    Gui, Add, CheckBox, x420 y380 w140 h25 vBiomeNormal gSaveBiomeToggles Checked1 %GuiColorText%, Normal
+    Gui, Add, CheckBox, x420 y320 w140 h25 vBiomeSandStorm gSaveBiomeToggles Checked1 %GuiColorText%, Sand Storm
+    Gui, Add, CheckBox, x420 y350 w140 h25 vBiomeNull gSaveBiomeToggles Checked1 %GuiColorText%, Null
 
-    Gui, Font, s14 cWhite Bold
-    Gui, Add, Text, x45 y445 c0x65FF65, Glitched
+    Gui, Font, s14 %GuiColorText% Bold
+    Gui, Add, Text, x45 y445 %GuiColorGlitch%, Glitched
     Gui, Add, Text, x+2 y445, ,
-    Gui, Add, Text, x+8 y445 c0xFF7DFF, Dreamspace
+    Gui, Add, Text, x+8 y445 %GuiColorDreamscape%, Dreamspace
     Gui, Add, Text, x+8 y445, and
-    Gui, Add, Text, x+8 y445 c0x00ddff, Cyberspace
+    Gui, Add, Text, x+8 y445 %GuiColorCyberspace%, Cyberspace
     Gui, Add, Text, x+8 y445, are always on.
 
-    Gui, Font, s10 cWhite Bold
+    Gui, Font, s10 %GuiColorText% Bold
     Gui, Add, Text, x50 y155 w200 h25 BackgroundTrans, Private Server Link:
-    Gui, Add, Edit, x50 y185 w500 h25 vBiomesPrivateServerInput gUpdateBiomesPrivateServer Background0xD3D3D3 cBlack, %biomesPrivateServerLink%
-    Gui, Font, s8 %TextColorDefault% Normal
+    Gui, Add, Edit, x50 y185 w500 h25 vBiomesPrivateServerInput gUpdateBiomesPrivateServer Background%GuiColorLGrey% cBlack, %biomesPrivateServerLink%
+    Gui, Font, s8 %GuiColorDefault% Normal
     Gui, Add, Text, x50 y215 w500 h15 BackgroundTrans, Paste your Roblox private server link here for biome notifications.
 
-    Gui, Font, s10 cWhite Bold
+    Gui, Font, s10 %GuiColorText% Bold
     Gui, Add, Button, x425 y490 w115 h40 gOpenPluginsFolder, Open Plugins Folder
 
     DrawHelpDonate()
@@ -507,17 +495,17 @@ if (hasCrafterPlugin) {
 
     Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Crafter.png
 
-    Gui, Font, s11 cWhite Bold, Segoe UI
+    Gui, Font, s11 %GuiColorText% Bold, Segoe UI
     Gui, Add, Text, x45 y135 w200 h25 BackgroundTrans, example text:
-    Gui, Font, s10 cWhite Bold
+    Gui, Font, s10 %GuiColorText% Bold
     Gui, Add, Button, x250 y135 w80 h25 gToggleCrafter vCrafterBtn, Toggle
-    Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
-    Gui, Add, Text, x340 y140 w60 h25 vCrafterStatus BackgroundTrans, OFF
+    Gui, Font, s10 %GuiColorDefault% Bold, Segoe UI
+    Gui, Add, Text, x340 y140 w60 h25 vCrafterStatus BackgroundTrans +%GuiColorRed%, OFF
 
-    Gui, Font, s9 cWhite Normal, Segoe UI
-    Gui, Add, Text, x45 y185 w500 h60 BackgroundTrans %TextColorDefault%, example text
+    Gui, Font, s9 %GuiColorText% Normal, Segoe UI
+    Gui, Add, Text, x45 y185 w500 h60 BackgroundTrans %GuiColorDefault%, example text
 
-    Gui, Font, s10 cWhite Bold
+    Gui, Font, s10 %GuiColorText% Bold
     Gui, Add, Button, x425 y505 w115 h40 gOpenPluginsFolder, Open Plugins Folder
 
     DrawHelpDonate()
@@ -527,24 +515,24 @@ Gui, Tab, Webhook
 
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Webhook.png
 
-Gui, Font, s10 cWhite Normal Bold
+Gui, Font, s10 %GuiColorText% Normal Bold
 Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
-Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
-Gui, Font, s8 %TextColorDefault% Normal
+Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background%GuiColorLGrey% cBlack, %webhookURL%
+Gui, Font, s8 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y180 w500 h15 BackgroundTrans, Paste your Discord webhook URL here to be notified of actions happening in real time.
 
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when a failsafe triggers.
-Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when the macro paths to auto-sell.
-Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
+Gui, Font, s10 %GuiColorText% Normal
+Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans %GuiColorDefault%, When toggled, this sends a message when a failsafe triggers.
+Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans %GuiColorDefault%, When toggled, this sends a message when the macro paths to auto-sell.
+Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans %GuiColorDefault%, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
 
-Gui, Font, s10 cWhite Bold
+Gui, Font, s10 %GuiColorText% Bold
 Gui, Add, Button, x60 y216 w80 h25 gToggleFailsafeWebhook vFailsafeWebhookBtn, Toggle
-Gui, Add, Text, x150 y220 w60 h25 vfailsafeWebhookStatus BackgroundTrans, OFF
+Gui, Add, Text, x150 y220 w60 h25 vfailsafeWebhookStatus BackgroundTrans +%GuiColorRed%, OFF
 Gui, Add, Button, x60 y286 w80 h25 gTogglePathingWebhook vPathingWebhookBtn, Toggle
-Gui, Add, Text, x150 y290 w60 h25 vpathingWebhookStatus BackgroundTrans, OFF
+Gui, Add, Text, x150 y290 w60 h25 vpathingWebhookStatus BackgroundTrans +%GuiColorRed%, OFF
 Gui, Add, Button, x60 y356 w80 h25 gToggleItemWebhook vItemWebhookBtn, Toggle
-Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans, OFF
+Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans +%GuiColorRed%, OFF
 
 DrawHelpDonate()
 
@@ -552,37 +540,37 @@ if (hasSnowmanPlugin) {
     Gui, Tab, Snowman
     Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Snowman.png
 
-    Gui, Font, s10 %TextColorDefault% Normal
+    Gui, Font, s10 %GuiColorDefault% Normal
     Gui, Add, Text, x60 y190 w500 h50 BackgroundTrans, When toggled, The macro will automatically collect snowflakes every 2 hours and 5 minutes from the snowman located near Lime.
     Gui, Add, Text, x45 y340 w520 h50 BackgroundTrans, Pathing modes and Resolutions are automatically detected. And will work as normal for this plugin depending on what you have selected.
     Gui, Add, Text, x60 y270 w520 h50 BackgroundTrans, When toggled, you will recieve a webhook message every Snowman Pathing Loop.
 
-    Gui, Font, s11 %TextColorDefault% Normal
+    Gui, Font, s11 %GuiColorDefault% Normal
     Gui, Add, Text, x72 y385 w520 h30 BackgroundTrans, Make sure you have claimed your Snowflakes before running this script.
 
-    Gui, Font, s10 cWhite Bold
+    Gui, Font, s10 %GuiColorText% Bold
     Gui, Add, Button, x60 y160 w80 h25 gToggleSnowmanPathing vSnowmanPathingBtn, Toggle
 
     Gui, Add, Button, x60 y240 w80 h25 gToggleSnowmanPathingWebhook vSnowmanPathingWebhookBtn, Toggle
 
-    Gui, Font, s10 cWhite Normal Bold
+    Gui, Font, s10 %GuiColorText% Normal Bold
     if (snowmanPathing) {
-        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %TextColorLGreen%, ON
+        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %GuiColorLGreen%, ON
     } else {
-        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %TextColorRed%, OFF
+        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %GuiColorRed%, OFF
     }
 
     if (snowmanPathingWebhook) {
-        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %TextColorLGreen%, ON
+        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %GuiColorLGreen%, ON
     } else {
-        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %TextColorRed%, OFF
+        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %GuiColorRed%, OFF
     }
 
 }
 
 Gui, Tab, Credits
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Credits.png
-Gui, Font, s10 cWhite Normal
+Gui, Font, s10 %GuiColorText% Normal
 loop % Devs.Count()
 {
     yFULL_OFFSET := 65 * (A_INDEX - 1)
@@ -594,15 +582,15 @@ loop % Devs.Count()
     dev_name    := dev%A_INDEX%_name
     dev_role    := dev%A_INDEX%_role
     dev_discord := dev%A_INDEX%_discord
-    Gui, Font, s11 cWhite Normal Bold
+    Gui, Font, s11 %GuiColorText% Normal Bold
     Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
 
-    Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, %dev_name%
+    Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans %GuiLinkColor% gDev%A_Index%NameClick, %dev_name%
 
-    Gui, Font, s9 %TextColorDefault% Normal
+    Gui, Font, s9 %GuiColorDefault% Normal
     Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, %dev_role%
-    Gui, Font, s9 %TextColorDefault% Normal Underline
-    Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, %dev_discord%
+    Gui, Font, s9 %GuiColorDefault% Normal Underline
+    Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans %GuiLinkColor% gDev%A_Index%LinkClick, %dev_discord%
 }
 
 url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
@@ -613,12 +601,12 @@ Http.Send()
 
 content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
 
-Gui, Font, s10 cWhite Normal Bold
+Gui, Font, s10 %GuiColorText% Normal Bold
 Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
-Gui, Font, s9 %TextColorDefault% Normal
-Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D %TextColorDefault%, %content%
+Gui, Font, s9 %GuiColorDefault% Normal
+Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background%GuiColorDonatorBG% %GuiColorDefault%, %content%
 
-Gui, Font, s8 %TextColorDefault% Normal
+Gui, Font, s8 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, fishSol v%version% - %randomMessage%
 
 Gui, Show, w600 h670, fishSol v%version%
@@ -645,10 +633,10 @@ checkToggle(byref toggle, byref status)
     global
     if (toggle) {
         GuiControl,, %status%, ON
-        GuiControl, +%TextColorLGreen%, %status%
+        GuiControl, +%GuiColorLGreen%, %status%
     } else {
         GuiControl,, %status%, OFF
-        GuiControl, +%TextColorRed%, %status%
+        GuiControl, +%GuiColorRed%, %status%
     }
 }
 
@@ -676,7 +664,6 @@ checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
 checkToggle(failsafeWebhook, "failsafeWebhookStatus")
 checkToggle(pathingWebhook, "pathingWebhookStatus")
 checkToggle(itemWebhook, "itemWebhookStatus")
-
 
 if (hasCrafterPlugin) {
     checkToggle(crafterToggle, "CrafterStatus")
@@ -843,13 +830,16 @@ return
 RunAutoCrafter() {
     MouseGetPos, originalX, originalY
     global res
-
-    if (res = "1080p") {
-        RunAutoCrafter1080p()
-    } else if (res = "1440p") {
-        RunAutoCrafter1440p()
-    } else if (res = "1366x768") {
-        RunAutoCrafter768p()
+    switch res
+    {
+        case "1080p" :
+            RunAutoCrafter1080p()
+        case "1440p" :
+            RunAutoCrafter1440p()
+        case "1366x768" :
+            RunAutoCrafter768p()
+        default:
+            RunAutoCrafter1080p()
     }
 
     MouseMove, %originalX%, %originalY%, 0
@@ -1526,12 +1516,16 @@ RunSnowmanPathingNow:
     restartPathing := true
     firstLoop := true
 
-    if (res = "1080p") {
-        Gosub, DoMouseMove
-    } else if (res = "1440p") {
-        Gosub, DoMouseMove2
-    } else if (res = "1366x768") {
-        Gosub, DoMouseMove3
+    switch res
+    {
+        case "1080p" : 
+            Gosub, DoMouseMove
+        case "1080p" : 
+            Gosub, DoMouseMove2
+        case "1080p" : 
+            Gosub, DoMouseMove3
+        default :
+            Gosub, DoMouseMove
     }
 
     if (savedPathingState) {
@@ -1571,6 +1565,7 @@ return
 
 UpdateAdvancedThreshold:
 Gui, Submit, nohide
+; try max(min(AdvancedThresholdInput, 40),0) to lock variable to a range
 if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
     advancedFishingThreshold := AdvancedThresholdInput
     IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
@@ -1654,7 +1649,7 @@ SendWebhook(title, color := "16777215") {
     . "{"
     . "    ""title"": """ title ""","
     . "    ""color"": " color ","
-    . "    ""footer"": {""text"": ""fishSol v" %version% """, ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+    . "    ""footer"": {""text"": ""fishSol v" . version . """, ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
     . "    ""timestamp"": """ timestamp """"    ; ^ defined above
     . "  }"
     . "],"
@@ -1696,7 +1691,7 @@ RunStrangeController() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 491, 711s, 749, 723, 0x457dff, 3, Fast RGB
+            PixelSearch, Px, Py, 491, 711, 749, 723, 0x457dff, 3, Fast RGB
             if (!ErrorLevel) {
                 break
             } else {
@@ -1971,7 +1966,7 @@ RunBiomeRandomizer() {
 UpdateGUI:
 if (toggle) {
     GuiControl,, StatusText, Running
-    GuiControl, +%TextColorLGreen%, StatusText
+    GuiControl, +%GuiColorLGreen%, StatusText
     GuiControl,, ResStatusText, Active - %res%
 
     elapsed := A_TickCount - startTick
@@ -1980,14 +1975,14 @@ if (toggle) {
     seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
     timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
     GuiControl,, RuntimeText, %timeStr%
-    GuiControl, +%TextColorLGreen%, RuntimeText
+    GuiControl, +%GuiColorLGreen%, RuntimeText
     GuiControl,, CyclesText, %cycleCount%
-    GuiControl, +%TextColorLGreen%, CyclesText
+    GuiControl, +%GuiColorLGreen%, CyclesText
 
 
 } else {
     GuiControl,, StatusText, Stopped
-    GuiControl, +%TextColorRed%, StatusText
+    GuiControl, +%GuiColorRed%, StatusText
     GuiControl,, ResStatusText, Ready
 }
 return
@@ -1995,7 +1990,7 @@ return
 ManualGUIUpdate() {
     if (toggle) {
         GuiControl,, StatusText, Running
-        GuiControl, +%TextColorLGreen%, StatusText
+        GuiControl, +%GuiColorLGreen%, StatusText
         GuiControl,, ResStatusText, Active - %res%
 
         elapsed := A_TickCount - startTick
@@ -2004,14 +1999,14 @@ ManualGUIUpdate() {
         seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
         timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
         GuiControl,, RuntimeText, %timeStr%
-        GuiControl, +%TextColorLGreen%, RuntimeText
+        GuiControl, +%GuiColorLGreen%, RuntimeText
         GuiControl,, CyclesText, %cycleCount%
-        GuiControl, +%TextColorLGreen%, CyclesText
+        GuiControl, +%GuiColorLGreen%, CyclesText
 
 
     } else {
         GuiControl,, StatusText, Stopped
-        GuiControl, +%TextColorRed%, StatusText
+        GuiControl, +%GuiColorRed%, StatusText
         GuiControl,, ResStatusText, Ready
     }
 }
@@ -2052,12 +2047,16 @@ if (!toggle) {
     WinActivate, ahk_exe RobloxPlayerBeta.exe
     ManualGUIUpdate()
     SetTimer, UpdateGUI, 1000
-    if (res = "1080p") {
-        SetTimer, DoMouseMove, 100
-    } else if (res = "1440p") {
-    SetTimer, DoMouseMove2, 100
-    } else if (res = "1366x768") {
-        SetTimer, DoMouseMove3, 100
+    switch res
+    {
+        case "1080p" :
+            SetTimer, DoMouseMove, 100
+        case "1440p" :
+            SetTimer, DoMouseMove2, 100
+        case "1366x768" :
+            SetTimer, DoMouseMove3, 100
+        default :
+            SetTimer, DoMouseMove, 100
     }
     try SendWebhook(":green_circle: Macro Started!", "7909721")
 }
@@ -2692,17 +2691,6 @@ if (toggle) {
         sleep 300
         MouseMove, 1113, 342, 3
         Sleep 700
-        /*
-        Loop {
-        PixelGetColor, color, 1112, 342, RGB
-        if (color = 0xFFFFFF) {
-        break
-        }
-        if (!toggle) {
-        Return
-        }
-        }
-        */
         MouseClick, Left
         sleep 300
         cycleCount++
@@ -3310,17 +3298,6 @@ if (toggle) {
         sleep 300
         MouseMove, 1457, 491, 3
         sleep 700
-        /*
-        Loop {
-        PixelGetColor, color, 1455, 492, RGB
-        if (color = 0xFFFFFF) {
-        break
-        }
-        if (!toggle) {
-        Return
-        }
-        }
-        */
         MouseClick, Left
         sleep 300
         cycleCount++
@@ -3920,18 +3897,6 @@ if (toggle) {
         sleep 300
         MouseMove, 829, 218, 3
         Sleep 700
-        /*
-        Loop {
-        ErrorLevel := 0
-        PixelSearch, px, py, 816, 211, 8616, 211, 0xFEFEFE, 10, Fast RGB
-        if (ErrorLevel = 0) {
-        break
-        }
-        if (!toggle) {
-        Return
-        }
-        }
-        */
         MouseClick, Left
         sleep 300
         cycleCount++
@@ -3962,12 +3927,16 @@ if (!toggle) {
     WinActivate, ahk_exe RobloxPlayerBeta.exe
     ManualGUIUpdate()
     SetTimer, UpdateGUI, 1000
-    if (res = "1080p") {
-        SetTimer, DoMouseMove, 100
-    } else if (res = "1440p") {
-    SetTimer, DoMouseMove2, 100
-    } else if (res = "1366x768") {
-        SetTimer, DoMouseMove3, 100
+    switch res
+    {
+        case "1080p" :
+            SetTimer, DoMouseMove, 100
+        case "1440p" :
+            SetTimer, DoMouseMove2, 100
+        case "1366x768" :
+            SetTimer, DoMouseMove3, 100
+        default :
+            SetTimer, DoMouseMove, 100
     }
     try SendWebhook(":green_circle: Macro Started!", "7909721")
 }
@@ -3996,12 +3965,16 @@ StartScript(res) {
         WinActivate, ahk_exe RobloxPlayerBeta.exe
         ManualGUIUpdate()
         SetTimer, UpdateGUI, 1000
-        if (res = "1080p") {
-            SetTimer, DoMouseMove, 100
-        } else if (res = "1440p") {
-            SetTimer, DoMouseMove2, 100
-        } else if (res = "1366x768") {
-            SetTimer, DoMouseMove3, 100
+        switch res
+        {
+            case "1080p" :
+                SetTimer, DoMouseMove, 100
+            case "1440p" :
+                SetTimer, DoMouseMove2, 100
+            case "1366x768" :
+                SetTimer, DoMouseMove3, 100
+            default :
+                SetTimer, DoMouseMove, 100
         }
         try SendWebhook(":green_circle: Macro Started!", "7909721")
     }
@@ -4062,7 +4035,6 @@ IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
 pathingMode := PathingMode
 return
 
-;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1NameClick:
     global ClickIndex := 1
     goto DoNameClick
@@ -4079,7 +4051,6 @@ DoNameClick:
     }
 return
 
-;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1LinkClick:
     global ClickIndex := 1
     goto DoLinkClick
