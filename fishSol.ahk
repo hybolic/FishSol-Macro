@@ -682,18 +682,18 @@ SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
 return                          ;as ahk resets line speed for each thread
 
 GuiClose:
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
+    if (biomeDetectionRunning) {
+        DetectHiddenWindows, On
+        SetTitleMatchMode, 2
 
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
+        target := "biomes.ahk"
+        WinGet, id, ID, %target% ahk_class AutoHotkey
+        if (id) {
+            WinClose, ahk_id %id%
+        }
+        biomeDetectionRunning := false
     }
-    biomeDetectionRunning := false
-}
-try SendWebhook(":red_circle: Macro Stopped.", "14495300")
+    try SendWebhook(":red_circle: Macro Stopped.", "14495300")
 ExitApp
 
 toggle := false
@@ -705,126 +705,126 @@ TabChange:
 return
 
 UpdateLoopCount:
-Gui, Submit, nohide
-if (MaxLoopInput > 0) {
-    maxLoopCount := MaxLoopInput
-    IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-}
-if (FishingLoopInput > 0) {
-    fishingLoopCount := FishingLoopInput
-    IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
-}
+    Gui, Submit, nohide
+    if (MaxLoopInput > 0) {
+        maxLoopCount := max(MaxLoopInput, 1)
+        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+    }
+    if (FishingLoopInput > 0) {
+        fishingLoopCount := max(FishingLoopInput, 1)
+        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+    }
 return
 
 ToggleSellAll:
-sellAllToggle := !sellAllToggle
-checkToggle(sellAllToggle, "SellAllStatus")
-IniWrite, (sellAllToggle ? true : false), %iniFilePath%, "Macro", "sellAllToggle
+    sellAllToggle := !sellAllToggle
+    checkToggle(sellAllToggle, "SellAllStatus")
+    IniWrite, (sellAllToggle ? true : false), %iniFilePath%, "Macro", "sellAllToggle
 return
 
 ToggleAdvancedFishingDetection:
-advancedFishingDetection := !advancedFishingDetection
-checkToggle(advancedFishingDetection, "AdvancedFishingDetectionStatus")
-IniWrite, (advancedFishingDetection ? true : false), %iniFilePath%, "Macro", "advancedFishingDetection
+    advancedFishingDetection := !advancedFishingDetection
+    checkToggle(advancedFishingDetection, "AdvancedFishingDetectionStatus")
+    IniWrite, (advancedFishingDetection ? true : false), %iniFilePath%, "Macro", "advancedFishingDetection
 return
 
 ToggleAzertyPathing:
-azertyPathing := !azertyPathing
-checkToggle(azertyPathing, "AzertyPathingStatus")
-IniWrite, (azertyPathing ? true : false), %iniFilePath%, "Macro", "azertyPathing
+    azertyPathing := !azertyPathing
+    checkToggle(azertyPathing, "AzertyPathingStatus")
+    IniWrite, (azertyPathing ? true : false), %iniFilePath%, "Macro", "azertyPathing
 return
 
 ToggleAutoUnequip:
-autoUnequip := !autoUnequip
-checkToggle(autoUnequip, "AutoUnequipStatus")
-IniWrite, (autoUnequip ? true : false), %iniFilePath%, "Macro", "autoUnequip
+    autoUnequip := !autoUnequip
+    checkToggle(autoUnequip, "AutoUnequipStatus")
+    IniWrite, (autoUnequip ? true : false), %iniFilePath%, "Macro", "autoUnequip
 return
 
 ToggleAutoCloseChat:
-autoCloseChat := !autoCloseChat
-checkToggle(autoCloseChat, "AutoCloseChatStatus")
-IniWrite, (autoCloseChat ? true : false), %iniFilePath%, "Macro", "autoCloseChat
+    autoCloseChat := !autoCloseChat
+    checkToggle(autoCloseChat, "AutoCloseChatStatus")
+    IniWrite, (autoCloseChat ? true : false), %iniFilePath%, "Macro", "autoCloseChat
 return
 
 ToggleStrangeController:
-strangeController := !strangeController
-checkToggle(strangeController, "StrangeControllerStatus")
-IniWrite, (strangeController ? true : false), %iniFilePath%, "Macro", "strangeController"
+    strangeController := !strangeController
+    checkToggle(strangeController, "StrangeControllerStatus")
+    IniWrite, (strangeController ? true : false), %iniFilePath%, "Macro", "strangeController"
 return
 
 ToggleBiomeRandomizer:
-biomeRandomizer := !biomeRandomizer
-checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
-IniWrite, (biomeRandomizer ? true : false), %iniFilePath%, "Macro", "biomeRandomizer"
+    biomeRandomizer := !biomeRandomizer
+    checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
+    IniWrite, (biomeRandomizer ? true : false), %iniFilePath%, "Macro", "biomeRandomizer"
 return
 
 ToggleFailsafeWebhook:
-failsafeWebhook := !failsafeWebhook
-checkToggle(failsafeWebhook, "failsafeWebhookStatus")
-IniWrite, (failsafeWebhook ? true : false), %iniFilePath%, "Macro", "failsafeWebhook"
+    failsafeWebhook := !failsafeWebhook
+    checkToggle(failsafeWebhook, "failsafeWebhookStatus")
+    IniWrite, (failsafeWebhook ? true : false), %iniFilePath%, "Macro", "failsafeWebhook"
 return
 
 TogglePathingWebhook:
-pathingWebhook := !pathingWebhook
-checkToggle(pathingWebhook, "pathingWebhookStatus")
-IniWrite, (pathingWebhook ? true : false), %iniFilePath%, "Macro", "pathingWebhook"
+    pathingWebhook := !pathingWebhook
+    checkToggle(pathingWebhook, "pathingWebhookStatus")
+    IniWrite, (pathingWebhook ? true : false), %iniFilePath%, "Macro", "pathingWebhook"
 return
 
 ToggleItemWebhook:
-itemWebhook := !itemWebhook
-checkToggle(itemWebhook, "itemWebhookStatus")
-IniWrite, (itemWebhook ? true : false), %iniFilePath%, "Macro", "itemWebhook"
+    itemWebhook := !itemWebhook
+    checkToggle(itemWebhook, "itemWebhookStatus")
+    IniWrite, (itemWebhook ? true : false), %iniFilePath%, "Macro", "itemWebhook"
 return
 
 ToggleCrafter:
-crafterToggle := !crafterToggle
-checkToggle(crafterToggle, "CrafterStatus")
-IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "crafterToggle"
-IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "autoCrafterDetection"
-if (crafterToggle)
-{
-    autoCrafterDetection := true
-    autoCrafterLastCheck := A_TickCount
-}
+    crafterToggle := !crafterToggle
+    checkToggle(crafterToggle, "CrafterStatus")
+    IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "crafterToggle"
+    IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "autoCrafterDetection"
+    if (crafterToggle)
+    {
+        autoCrafterDetection := true
+        autoCrafterLastCheck := A_TickCount
+    }
 return
 
 ToggleSnowmanPathing:
-snowmanPathing := !snowmanPathing
-checkToggle(snowmanPathing, "SnowmanPathingStatus")
-IniWrite, (snowmanPathing ? true : false), %iniFilePath%, "Macro", "snowmanPathing"
+    snowmanPathing := !snowmanPathing
+    checkToggle(snowmanPathing, "SnowmanPathingStatus")
+    IniWrite, (snowmanPathing ? true : false), %iniFilePath%, "Macro", "snowmanPathing"
 
-checkToggle(autoCrafter, "AutoCrafterStatus")
-IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+    checkToggle(autoCrafter, "AutoCrafterStatus")
+    IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
 
-checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
-IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+    checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
+    IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
 return
 
 ToggleSnowmanPathingWebhook:
-snowmanPathingWebhook := !snowmanPathingWebhook
-checkToggle(snowmanPathingWebhook, "SnowmanPathingWebhookStatus")
-IniWrite, (snowmanPathingWebhook ? true : false), %iniFilePath%, "Macro", "snowmanPathingWebhook"
+    snowmanPathingWebhook := !snowmanPathingWebhook
+    checkToggle(snowmanPathingWebhook, "SnowmanPathingWebhookStatus")
+    IniWrite, (snowmanPathingWebhook ? true : false), %iniFilePath%, "Macro", "snowmanPathingWebhook"
 return
 
 ToggleAutoCrafter:
-autoCrafter := !autoCrafter
-checkToggle(autoCrafter, "AutoCrafterStatus")
-IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+    autoCrafter := !autoCrafter
+    checkToggle(autoCrafter, "AutoCrafterStatus")
+    IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
 return
 
 UpdateAutoCrafterInterval:
-Gui, Submit, NoHide
-newInterval := AutoCrafterInterval * 60000
-if (newInterval > 0) {
-    autoCrafterInterval := newInterval
-    IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
-}
+    Gui, Submit, NoHide
+    newInterval := AutoCrafterInterval * 60000
+    if (newInterval > 0) {
+        autoCrafterInterval := max(newInterval, 1)
+        IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
+    }
 return
 
 ToggleAutoCrafterWebhook:
-autoCrafterWebhook := !autoCrafterWebhook
-checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
-IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+    autoCrafterWebhook := !autoCrafterWebhook
+    checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
+    IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
 return
 
 RunAutoCrafter() {
@@ -990,20 +990,20 @@ RunAutoCrafter1440p() {
     success := false
     loopCount := 0
     Loop {
-    sleep 100
-    if (loopCount > 40) {
-    break
-    }
-    PixelGetColor, screenColor, 2509, 1389, RGB
-    if (screenColor = 0x000000) {
-    success := true
-    }
-    loopCount++
+        sleep 100
+        if (loopCount > 40) {
+            break
+        }
+        PixelGetColor, screenColor, 2509, 1389, RGB
+        if (screenColor = 0x000000) {
+            success := true
+        }
+        loopCount++
     }
     if (success) {
-    sleep, 500
+        sleep, 500
     } else {
-    reset := true
+        reset := true
     }
 
     ; potion crafting
@@ -1531,57 +1531,57 @@ RunSnowmanPathingNow:
     if (savedPathingState) {
         Suspend, On
     }
-    return
+return
 
 UpdatePrivateServer:
-Gui, Submit, nohide
-privateServerLink := PrivateServerInput
-IniWrite, %privateServerLink%, %iniFilePath%, "Macro", "privateServerLink"
+    Gui, Submit, nohide
+    privateServerLink := PrivateServerInput
+    IniWrite, %privateServerLink%, %iniFilePath%, "Macro", "privateServerLink"
 return
 
 UpdateFishingFailsafe:
-Gui, Submit, nohide
-if (FishingFailsafeInput > 0) {
-    fishingFailsafeTime := FishingFailsafeInput
-    IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
-}
+    Gui, Submit, nohide
+    if (FishingFailsafeInput > 0) {
+        fishingFailsafeTime := max(FishingFailsafeInput, 1)
+        IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
+    }
 return
 
 UpdatePathingFailsafe:
-Gui, Submit, nohide
-if (PathingFailsafeInput > 0) {
-    pathingFailsafeTime := PathingFailsafeInput
-    IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
-}
+    Gui, Submit, nohide
+    if (PathingFailsafeInput > 0) {
+        pathingFailsafeTime := max(PathingFailsafeInput, 1)
+        IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
+    }
 return
 
 UpdateAutoRejoinFailsafe:
-Gui, Submit, nohide
-if (AutoRejoinFailsafeInput > 0) {
-    autoRejoinFailsafeTime := AutoRejoinFailsafeInput
-    IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-}
+    Gui, Submit, nohide
+    if (AutoRejoinFailsafeInput > 0) {
+        autoRejoinFailsafeTime := max(AutoRejoinFailsafeInput, 1)
+        IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+    }
 return
 
 UpdateAdvancedThreshold:
-Gui, Submit, nohide
-; try max(min(AdvancedThresholdInput, 40),0) to lock variable to a range
-if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
-    advancedFishingThreshold := AdvancedThresholdInput
-    IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
-}
+    Gui, Submit, nohide
+    ; try max(min(AdvancedThresholdInput, 40),0) to lock variable to a range
+    if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
+        advancedFishingThreshold := max(min(AdvancedThresholdInput, 40), 0)
+        IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
+    }
 return
 
 UpdateWebhook:
-Gui, Submit, nohide
-webhookURL := WebhookInput
-IniWrite, %webhookURL%, %iniFilePath%, "Macro", "webhookURL"
+    Gui, Submit, nohide
+    webhookURL := WebhookInput
+    IniWrite, %webhookURL%, %iniFilePath%, "Macro", "webhookURL"
 return
 
 UpdateBiomesPrivateServer:
-Gui, Submit, nohide
-biomesPrivateServerLink := BiomesPrivateServerInput
-IniWrite, %biomesPrivateServerLink%, %iniFilePath%, "Biomes", "privateServerLink"
+    Gui, Submit, nohide
+    biomesPrivateServerLink := BiomesPrivateServerInput
+    IniWrite, %biomesPrivateServerLink%, %iniFilePath%, "Biomes", "privateServerLink"
 return
 
 LoadBiomeToggles() {
@@ -1618,21 +1618,21 @@ LoadBiomeToggles() {
 }
 
 SaveBiomeToggles:
-Gui, Submit, NoHide
-IniWrite, %BiomeNormal%, %iniFilePath%, "Biomes", BiomeNormal
-IniWrite, %BiomeSandStorm%, %iniFilePath%, "Biomes", BiomeSandStorm
-IniWrite, %BiomeHell%, %iniFilePath%, "Biomes", BiomeHell
-IniWrite, %BiomeStarfall%, %iniFilePath%, "Biomes", BiomeStarfall
-IniWrite, %BiomeCorruption%, %iniFilePath%, "Biomes", BiomeCorruption
-IniWrite, %BiomeWindy%, %iniFilePath%, "Biomes", BiomeWindy
-IniWrite, %BiomeSnowy%, %iniFilePath%, "Biomes", BiomeSnowy
-IniWrite, %BiomeRainy%, %iniFilePath%, "Biomes", BiomeRainy
-IniWrite, %BiomeHeaven%, %iniFilePath%, "Biomes", BiomeHeaven
-IniWrite, %BiomeAurora%, %iniFilePath%, "Biomes", BiomeAurora
-IniWrite, %BiomePumpkinMoon%, %iniFilePath%, "Biomes", BiomePumpkinMoon
-IniWrite, %BiomeGraveyard%, %iniFilePath%, "Biomes", BiomeGraveyard
-IniWrite, %BiomeBloodRain%, %iniFilePath%, "Biomes", BiomeBloodRain
-IniWrite, %BiomeNull%, %iniFilePath%, "Biomes", BiomeNull
+    Gui, Submit, NoHide
+    IniWrite, %BiomeNormal%, %iniFilePath%, "Biomes", BiomeNormal
+    IniWrite, %BiomeSandStorm%, %iniFilePath%, "Biomes", BiomeSandStorm
+    IniWrite, %BiomeHell%, %iniFilePath%, "Biomes", BiomeHell
+    IniWrite, %BiomeStarfall%, %iniFilePath%, "Biomes", BiomeStarfall
+    IniWrite, %BiomeCorruption%, %iniFilePath%, "Biomes", BiomeCorruption
+    IniWrite, %BiomeWindy%, %iniFilePath%, "Biomes", BiomeWindy
+    IniWrite, %BiomeSnowy%, %iniFilePath%, "Biomes", BiomeSnowy
+    IniWrite, %BiomeRainy%, %iniFilePath%, "Biomes", BiomeRainy
+    IniWrite, %BiomeHeaven%, %iniFilePath%, "Biomes", BiomeHeaven
+    IniWrite, %BiomeAurora%, %iniFilePath%, "Biomes", BiomeAurora
+    IniWrite, %BiomePumpkinMoon%, %iniFilePath%, "Biomes", BiomePumpkinMoon
+    IniWrite, %BiomeGraveyard%, %iniFilePath%, "Biomes", BiomeGraveyard
+    IniWrite, %BiomeBloodRain%, %iniFilePath%, "Biomes", BiomeBloodRain
+    IniWrite, %BiomeNull%, %iniFilePath%, "Biomes", BiomeNull
 return
 
 ; webhooks!
@@ -1964,27 +1964,27 @@ RunBiomeRandomizer() {
 }
 
 UpdateGUI:
-if (toggle) {
-    GuiControl,, StatusText, Running
-    GuiControl, +%GuiColorLGreen%, StatusText
-    GuiControl,, ResStatusText, Active - %res%
+    if (toggle) {
+        GuiControl,, StatusText, Running
+        GuiControl, +%GuiColorLGreen%, StatusText
+        GuiControl,, ResStatusText, Active - %res%
 
-    elapsed := A_TickCount - startTick
-    hours := elapsed // 3600000
-    minutes := (elapsed - hours * 3600000) // 60000
-    seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
-    timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
-    GuiControl,, RuntimeText, %timeStr%
-    GuiControl, +%GuiColorLGreen%, RuntimeText
-    GuiControl,, CyclesText, %cycleCount%
-    GuiControl, +%GuiColorLGreen%, CyclesText
+        elapsed := A_TickCount - startTick
+        hours := elapsed // 3600000
+        minutes := (elapsed - hours * 3600000) // 60000
+        seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
+        timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
+        GuiControl,, RuntimeText, %timeStr%
+        GuiControl, +%GuiColorLGreen%, RuntimeText
+        GuiControl,, CyclesText, %cycleCount%
+        GuiControl, +%GuiColorLGreen%, CyclesText
 
 
-} else {
-    GuiControl,, StatusText, Stopped
-    GuiControl, +%GuiColorRed%, StatusText
-    GuiControl,, ResStatusText, Ready
-}
+    } else {
+        GuiControl,, StatusText, Stopped
+        GuiControl, +%GuiColorRed%, StatusText
+        GuiControl,, ResStatusText, Ready
+    }
 return
 
 ManualGUIUpdate() {
@@ -2012,58 +2012,82 @@ ManualGUIUpdate() {
 }
 
 F1::
-if (!res) {
-    res := "1080p"
-}
-if (!toggle) {
-    Gui, Submit, nohide
-    if (MaxLoopInput > 0) {
-        maxLoopCount := MaxLoopInput
+    if (!res) {
+        res := "1080p"
     }
-    if (FishingLoopInput > 0) {
-        fishingLoopCount := FishingLoopInput
-    }
-    toggle := true
-    if (hasBiomesPlugin) {
-    Run, "%A_ScriptDir%\plugins\biomes.ahk"
-    biomeDetectionRunning := true
-    }
-    strangeControllerLastRun := 0
-    biomeRandomizerLastRun := 0
-    snowmanPathingLastRun := 0
-    if (startTick = "") {
-        startTick := A_TickCount
-    }
-    if (cycleCount = "") {
-        cycleCount := 0
-    }
-    strangeControllerLastRun := 0
-    biomeRandomizerLastRun := 0
-    snowmanPathingLastRun := 0
-    IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-    IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-    IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+    if (!toggle) {
+        Gui, Submit, nohide
+        if (MaxLoopInput > 0) {
+            maxLoopCount := max(MaxLoopInput, 1)
+        }
+        if (FishingLoopInput > 0) {
+            fishingLoopCount := max(FishingLoopInput, 1)
+        }
+        toggle := true
+        if (hasBiomesPlugin) {
+            Run, "%A_ScriptDir%\plugins\biomes.ahk"
+            biomeDetectionRunning := true
+        }
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        snowmanPathingLastRun := 0
+        if (startTick = "") {
+            startTick := A_TickCount
+        }
+        if (cycleCount = "") {
+            cycleCount := 0
+        }
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        snowmanPathingLastRun := 0
+        IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
+        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
 
-    WinActivate, ahk_exe RobloxPlayerBeta.exe
-    ManualGUIUpdate()
-    SetTimer, UpdateGUI, 1000
-    switch res
-    {
-        case "1080p" :
-            SetTimer, DoMouseMove, 100
-        case "1440p" :
-            SetTimer, DoMouseMove2, 100
-        case "1366x768" :
-            SetTimer, DoMouseMove3, 100
-        default :
-            SetTimer, DoMouseMove, 100
+        WinActivate, ahk_exe RobloxPlayerBeta.exe
+        ManualGUIUpdate()
+        SetTimer, UpdateGUI, 1000
+        switch res
+        {
+            case "1080p" :
+                SetTimer, DoMouseMove, 100
+            case "1440p" :
+                SetTimer, DoMouseMove2, 100
+            case "1366x768" :
+                SetTimer, DoMouseMove3, 100
+            default :
+                SetTimer, DoMouseMove, 100
+        }
+        try SendWebhook(":green_circle: Macro Started!", "7909721")
     }
-    try SendWebhook(":green_circle: Macro Started!", "7909721")
-}
 Return
 
 F2::
-if (toggle) {
+    if (toggle) {
+        if (biomeDetectionRunning) {
+            DetectHiddenWindows, On
+            SetTitleMatchMode, 2
+
+            target := "biomes.ahk"
+            WinGet, id, ID, %target% ahk_class AutoHotkey
+            if (id) {
+                WinClose, ahk_id %id%
+            }
+            biomeDetectionRunning := false
+        }
+        toggle := false
+        firstLoop := true
+        SetTimer, DoMouseMove, Off
+        SetTimer, DoMouseMove2, Off
+        SetTimer, DoMouseMove3, Off
+        SetTimer, UpdateGUI, Off
+        ManualGUIUpdate()
+        ToolTip
+        try SendWebhook(":yellow_circle: Macro Paused", "16632664")
+    }
+Return
+
+F3::
     if (biomeDetectionRunning) {
         DetectHiddenWindows, On
         SetTitleMatchMode, 2
@@ -2075,618 +2099,591 @@ if (toggle) {
         }
         biomeDetectionRunning := false
     }
-    toggle := false
-    firstLoop := true
-    SetTimer, DoMouseMove, Off
-    SetTimer, DoMouseMove2, Off
-    SetTimer, DoMouseMove3, Off
-    SetTimer, UpdateGUI, Off
-    ManualGUIUpdate()
-    ToolTip
-    try SendWebhook(":yellow_circle: Macro Paused", "16632664")
-}
-Return
-
-F3::
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
-
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
-    }
-    biomeDetectionRunning := false
-}
-try SendWebhook(":red_circle: Macro Stopped.", "14495300")
+    try SendWebhook(":red_circle: Macro Stopped.", "14495300")
 ExitApp
 
 ;1080p
 DoMouseMove:
-if (toggle) {
-
-    global pathingMode
-    global privateServerLink
-    global globalFailsafeTimer
-    global azertyPathing
-    global autoUnequip
-    global autoCloseChat
-    global code
-    global strangeController
-    global biomeRandomizer
-    global strangeControllerTime
-    global biomeRandomizerTime
-    global strangeControllerInterval
-    global biomeRandomizerInterval
-    global strangeControllerLastRun
-    global biomeRandomizerLastRun
-    global snowmanPathingLastRun
-    global startTick
-    global failsafeWebhook
-    global pathingWebhook
-    global hasCrafterPlugin
-    global crafterToggle
-    global autoCrafterDetection
-    global autoCrafterLastCheck
-    global autoCrafterCheckInterval
-    loopCount := 0
-    keyW := azertyPathing ? "z" : "w"
-    keyA := azertyPathing ? "q" : "a"
-    restartPathing := false
-    Loop {
-        if (!toggle) {
-            break
-        }
-
-
-        ; SC Toggle
-        if (strangeController) {
-            elapsed := A_TickCount - startTick
-            if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
-            } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
+    if (toggle) {
+        global pathingMode
+        global privateServerLink
+        global globalFailsafeTimer
+        global azertyPathing
+        global autoUnequip
+        global autoCloseChat
+        global code
+        global strangeController
+        global biomeRandomizer
+        global strangeControllerTime
+        global biomeRandomizerTime
+        global strangeControllerInterval
+        global biomeRandomizerInterval
+        global strangeControllerLastRun
+        global biomeRandomizerLastRun
+        global snowmanPathingLastRun
+        global startTick
+        global failsafeWebhook
+        global pathingWebhook
+        global hasCrafterPlugin
+        global crafterToggle
+        global autoCrafterDetection
+        global autoCrafterLastCheck
+        global autoCrafterCheckInterval
+        loopCount := 0
+        keyW := azertyPathing ? "z" : "w"
+        keyA := azertyPathing ? "q" : "a"
+        restartPathing := false
+        Loop {
+            if (!toggle) {
+                break
             }
-        }
 
-        ; Snowman Pathing Toggle
-        if (snowmanPathing) {
-            elapsed := A_TickCount - startTick
-            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
-                return_to_spawn()
-
-                if (snowmanPathingWebhook) {
-                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
-                }
-                RunSnowmanPathing()
-                snowmanPathingLastRun := elapsed
-
-                restartPathing := true
-                continue
-            }
-        }
-
-        ; BR Toggle
-        if (biomeRandomizer) {
-            elapsed := A_TickCount - startTick
-            if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            }
-        }
-
-        ; Auto Crafter Detection (copy and pasted, need to change the coords)
-        if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
-            currentTime := A_TickCount
-            if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
-                autoCrafterLastCheck := currentTime
-                PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
-                if (!ErrorLevel) {
-                    RunAutoCrafter()
+            ; SC Toggle
+            if (strangeController) {
+                elapsed := A_TickCount - startTick
+                if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
+                } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
                 }
             }
-        }
 
-        ; More snowman pathing
-        loopCount++
-        if (loopCount > maxLoopCount || restartPathing) {
-            restartPathing := false
-
+            ; Snowman Pathing Toggle
             if (snowmanPathing) {
-            Sleep, 2000
+                elapsed := A_TickCount - startTick
+                if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                    return_to_spawn()
 
-        }
+                    if (snowmanPathingWebhook) {
+                        try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                    }
+                    RunSnowmanPathing()
+                    snowmanPathingLastRun := elapsed
 
-            if (pathingWebhook) {
-                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
-            }
-
-            if (autoUnequip) {
-            MouseMove, 45, 412, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 830, 441, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 634, 638, 3
-            sleep 300
-            Click, Left
-            sleep 1200
-            Click, Left
-            sleep 300
-            MouseMove, 1425, 303, 3
-            sleep 300
-            Click, Left
-            sleep 300
-        }
-        if (autoCloseChat) {
-            sleep 300
-            Send {/}
-            sleep 300
-            MouseMove, 149, 40, 3
-            sleep 300
-            MouseClick, Left
-            sleep 300
-        }
-
-        return_to_spawn()
-        MouseMove, 47, 467, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 382, 126, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        Click, WheelUp 80
-        sleep 500
-        Click, WheelDown 45
-        sleep 300
-
-        if (pathingMode = "Non Vip Pathing") {
-            ; Non VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 5190
-            Send, {%keyW% Up}
-            sleep 800
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 550
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 240
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1450
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1100
-            Send {Space Up}
-            sleep 520
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 956, 803, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 956, 938, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 828, 404, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 680, 804, 3
-                } else {
-                    MouseMove, 512, 804, 3
+                    restartPathing := true
+                    continue
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 801, 626, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1458, 266, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 3300
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Vip Pathing") {
-            ; VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 4150
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 400
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 180
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1100
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1200
-            Send {Space Up}
-            sleep 200
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 956, 803, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 956, 938, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 828, 404, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 680, 804, 3
-                } else {
-                    MouseMove, 512, 804, 3
+            ; BR Toggle
+            if (biomeRandomizer) {
+                elapsed := A_TickCount - startTick
+                if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
+                } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 801, 626, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1458, 266, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 2670
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Abyssal Pathing") {
-            ; Abyssal Pathing
-            MouseMove, 30, 406, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            MouseMove, 947, 335, 3
-            sleep 200
-            MouseClick, Left
-            sleep 100
-            MouseMove, 1102, 367, 3
-            sleep 100
-            MouseClick, Left
-            sleep 100
-            ClipBoard := "Abyssal Hunter"
-            sleep 100
-            Send, ^v
-            sleep 200
-            MouseMove, 819, 434, 3
-            sleep 200
-            Click, WheelUp 100
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            ErrorLevel := 0
-            PixelSearch, px, py, 576, 626, 666, 645, 0xfc7f98, 3, Fast RGB
-            if (ErrorLevel != 0) {
-                MouseMove, 623, 634, 3
-                sleep 200
-                MouseClick, Left
-            }
-
-            sleep 200
-            MouseMove, 1412, 296, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            Send, {%keyW% Down}
-            sleep 500
-            Send, {%keyA% Down}
-            sleep 2650
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 500
-            Send {%keyW% Up}
-            sleep 200
-            Send {s Down}
-            sleep 120
-            Send {s Up}
-            sleep 100
-            Send {d Down}
-            sleep 280
-            Send {d Up}
-            sleep 200
-            Send {%keyA% Down}
-            sleep 50
-            Send {Space Down}
-            sleep 730
-            Send {Space Up}
-            sleep 200
-            Send {%keyA% Up}
-            sleep 100
-            Send {%keyW% Down}
-            sleep 810
-            Send {%keyW% Up}
-            sleep 150
-            Send {space Down}
-            sleep 15
-            Send {d Down}
-            sleep 150
-            Send {space Up}
-            sleep 580
-            Send {d Up}
-            sleep 100
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-
-            MouseMove, 981, 805, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 967, 948, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 838, 413, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 678, 810, 3
-                } else {
-                    MouseMove, 525, 809, 3
+            ; Auto Crafter Detection (copy and pasted, need to change the coords)
+            if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
+                currentTime := A_TickCount
+                if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
+                    autoCrafterLastCheck := currentTime
+                    PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
+                    if (!ErrorLevel) {
+                        RunAutoCrafter()
+                    }
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 801, 626, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1469, 271, 3
-            sleep 200
+            ; More snowman pathing
+            loopCount++
+            if (loopCount > maxLoopCount || restartPathing) {
+                restartPathing := false
+
+                if (snowmanPathing) {
+                    Sleep, 2000
+                }
+
+                if (pathingWebhook) {
+                    try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+                }
+
+                if (autoUnequip) {
+                    MouseMove, 45, 412, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 830, 441, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 634, 638, 3
+                    sleep 300
+                    Click, Left
+                    sleep 1200
+                    Click, Left
+                    sleep 300
+                    MouseMove, 1425, 303, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                }
+                if (autoCloseChat) {
+                    sleep 300
+                    Send {/}
+                    sleep 300
+                    MouseMove, 149, 40, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                }
+
+                return_to_spawn()
+                MouseMove, 47, 467, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                MouseMove, 382, 126, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                Click, WheelUp 80
+                sleep 500
+                Click, WheelDown 45
+                sleep 300
+
+                if (pathingMode = "Non Vip Pathing") {
+                    ; Non VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 5190
+                    Send, {%keyW% Up}
+                    sleep 800
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 550
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 240
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1450
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
+                    sleep 25
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {Space Up}
+                    sleep 520
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 956, 803, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 956, 938, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 828, 404, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 680, 804, 3
+                        } else {
+                            MouseMove, 512, 804, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 801, 626, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1458, 266, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 3300
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Vip Pathing") {
+                    ; VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 4150
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 400
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 180
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
+                    sleep 25
+                    Send {%keyW% Down}
+                    sleep 1200
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 956, 803, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 956, 938, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 828, 404, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 680, 804, 3
+                        } else {
+                            MouseMove, 512, 804, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 801, 626, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1458, 266, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 2670
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Abyssal Pathing") {
+                    ; Abyssal Pathing
+                    MouseMove, 30, 406, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 947, 335, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 100
+                    MouseMove, 1102, 367, 3
+                    sleep 100
+                    MouseClick, Left
+                    sleep 100
+                    ClipBoard := "Abyssal Hunter"
+                    sleep 100
+                    Send, ^v
+                    sleep 200
+                    MouseMove, 819, 434, 3
+                    sleep 200
+                    Click, WheelUp 100
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    ErrorLevel := 0
+                    PixelSearch, px, py, 576, 626, 666, 645, 0xfc7f98, 3, Fast RGB
+                    if (ErrorLevel != 0) {
+                        MouseMove, 623, 634, 3
+                        sleep 200
+                        MouseClick, Left
+                    }
+
+                    sleep 200
+                    MouseMove, 1412, 296, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    Send, {%keyW% Down}
+                    sleep 500
+                    Send, {%keyA% Down}
+                    sleep 2650
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 500
+                    Send {%keyW% Up}
+                    sleep 200
+                    Send {s Down}
+                    sleep 120
+                    Send {s Up}
+                    sleep 100
+                    Send {d Down}
+                    sleep 280
+                    Send {d Up}
+                    sleep 200
+                    Send {%keyA% Down}
+                    sleep 50
+                    Send {Space Down}
+                    sleep 730
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyA% Up}
+                    sleep 100
+                    Send {%keyW% Down}
+                    sleep 810
+                    Send {%keyW% Up}
+                    sleep 150
+                    Send {space Down}
+                    sleep 15
+                    Send {d Down}
+                    sleep 150
+                    Send {space Up}
+                    sleep 580
+                    Send {d Up}
+                    sleep 100
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+
+                    MouseMove, 981, 805, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 967, 948, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 838, 413, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 678, 810, 3
+                        } else {
+                            MouseMove, 525, 809, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 801, 626, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1469, 271, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 800
+                    Send, {%keyA% Up}
+                    sleep 100
+                    Send, {%keyW% Down}
+                    sleep 1760
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                }
+            }
+
+            MouseMove, 862, 843, 3
+            Sleep 300
             MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 800
-            Send, {%keyA% Up}
-            sleep 100
-            Send, {%keyW% Down}
-            sleep 1760
-            Send, {%keyW% Up}
-            loopCount := 0
-        }
-    }
+            sleep 300
+            barColor := 0
+            otherBarColor := 0
 
-        MouseMove, 862, 843, 3
-        Sleep 300
-        MouseClick, Left
-        sleep 300
-        barColor := 0
-        otherBarColor := 0
-
-        ; Check for white pixel
-        startWhitePixelSearch := A_TickCount
-        if (globalFailsafeTimer = 0) {
-        globalFailsafeTimer := A_TickCount
-        }
-        fishingFailsafeRan := false
-        Loop {
-        PixelGetColor, color, 1176, 836, RGB
-        if (color = 0xFFFFFF) {
-        MouseMove, 950, 880, 3
-        ; Get randomized bar color
-        Sleep 50
-        PixelGetColor, barColor, 955, 767, RGB
-        SetTimer, DoMouseMove, Off
-        globalFailsafeTimer := 0
-        break
-        }
-
-        ; Auto Rejoin Failsafe
-        if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-        PixelGetColor, checkColor, 1175, 837, RGB
-        if (checkColor != 0xFFFFFF) {
-        Process, Close, RobloxPlayerBeta.exe
-        sleep 500
-        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-        sleep 5000
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        sleep 7000
-        MouseMove, 960, 540, 3
-        sleep 200
-        MouseClick, Left
-        sleep 6000
-
-        ; Start button
-        sleep 1000
-        Loop {
-        ErrorLevel := 0
-        PixelSearch, px, py, 205, 1019, 325, 978, 0x82ff95, 5, Fast RGB
-        if (ErrorLevel = 0) {
-        sleep 1000
-        MouseMove, 267, 1000, 3
-        sleep 350
-        MouseClick, Left
-        break
-        }
-        }
-
-        sleep 3000
-        restartPathing := true
-        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
-        break
-        }
-        }
-
-        ; Fishing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-        MouseMove, 1268, 941, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 1167, 476, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 1113, 342, 3
-        sleep 300
-        MouseClick, left
-        sleep 300
-        MouseMove, 851, 832, 3
-        sleep 300
-        MouseClick, Left
-        fishingFailsafeRan := true
-        if (failsafeWebhook) {
-            try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
-        }
-        }
-        ; Pathing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
-        restartPathing := true
-        if (failsafeWebhook) {
-            try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
-        }
-        break
-        }
-        if (!toggle) {
-        Return
-        }
-        }
-
-        if (restartPathing) {
-        continue
-        }
-
-        ; PixelSearch loop
-        startTime := A_TickCount
-        Loop {
-        if (!toggle)
-        break
-        if (A_TickCount - startTime > 9000)
-        break
-
-        ; Advanced detection
-        if (advancedFishingDetection) {
-            ErrorLevel := 0
-            PixelSearch, leftX, leftY, 757, 767, 1161, 767, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-                rightX := leftX
+            ; Check for white pixel
+            startWhitePixelSearch := A_TickCount
+            if (globalFailsafeTimer = 0) {
+                globalFailsafeTimer := A_TickCount
+            }
+            fishingFailsafeRan := false
                 Loop {
-                    testX := rightX + 1
-                    if (testX > 1161)
-                        break
-                    PixelGetColor, testColor, %testX%, 767, RGB
-                    if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-                        rightX := testX
-                    } else {
+                PixelGetColor, color, 1176, 836, RGB
+                if (color = 0xFFFFFF) {
+                    MouseMove, 950, 880, 3
+                    ; Get randomized bar color
+                    Sleep 50
+                    PixelGetColor, barColor, 955, 767, RGB
+                    SetTimer, DoMouseMove, Off
+                    globalFailsafeTimer := 0
+                    break
+                }
+
+                ; Auto Rejoin Failsafe
+                if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
+                    PixelGetColor, checkColor, 1175, 837, RGB
+                    if (checkColor != 0xFFFFFF) {
+                        Process, Close, RobloxPlayerBeta.exe
+                        sleep 500
+                        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
+                        sleep 5000
+                        WinActivate, ahk_exe RobloxPlayerBeta.exe
+                        sleep 7000
+                        MouseMove, 960, 540, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 6000
+
+                        ; Start button
+                        sleep 1000
+                        Loop {
+                            ErrorLevel := 0
+                            PixelSearch, px, py, 205, 1019, 325, 978, 0x82ff95, 5, Fast RGB
+                            if (ErrorLevel = 0) {
+                                sleep 1000
+                                MouseMove, 267, 1000, 3
+                                sleep 350
+                                MouseClick, Left
+                                break
+                            }
+                        }
+
+                        sleep 3000
+                        restartPathing := true
+                        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
                         break
                     }
                 }
-                barWidth := rightX - leftX
-                if (barWidth < advancedFishingThreshold) {
+
+                ; Fishing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
+                    MouseMove, 1268, 941, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 1167, 476, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 1113, 342, 3
+                    sleep 300
                     MouseClick, left
-                    sleep 25
+                    sleep 300
+                    MouseMove, 851, 832, 3
+                    sleep 300
+                    MouseClick, Left
+                    fishingFailsafeRan := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
+                    }
                 }
-            } else {
-                MouseClick, left
+                ; Pathing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
+                    restartPathing := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
+                    }
+                    break
+                }
+                if (!toggle) {
+                    Return
+                }
             }
-            sleep 10
-        } else {
-            ; Normal detection
-            ErrorLevel := 0
-            PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-            } else {
-                MouseClick, left
+
+            if (restartPathing) {
+            continue
             }
-        }
+
+            ; PixelSearch loop
+            startTime := A_TickCount
+            Loop {
+            if (!toggle)
+            break
+            if (A_TickCount - startTime > 9000)
+            break
+
+            ; Advanced detection
+            if (advancedFishingDetection) {
+                ErrorLevel := 0
+                PixelSearch, leftX, leftY, 757, 767, 1161, 767, barColor, 5, Fast RGB
+                if (ErrorLevel = 0) {
+                    rightX := leftX
+                    Loop {
+                        testX := rightX + 1
+                        if (testX > 1161)
+                            break
+                        PixelGetColor, testColor, %testX%, 767, RGB
+                        if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
+                            rightX := testX
+                        } else {
+                            break
+                        }
+                    }
+                    barWidth := rightX - leftX
+                    if (barWidth < advancedFishingThreshold) {
+                        MouseClick, left
+                        sleep 25
+                    }
+                } else {
+                    MouseClick, left
+                }
+                sleep 10
+            } else {
+                ; Normal detection
+                ErrorLevel := 0
+                PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
+                if (ErrorLevel = 0) {
+                } else {
+                    MouseClick, left
+                }
+            }
         }
         sleep 300
         MouseMove, 1113, 342, 3
@@ -2694,1262 +2691,1252 @@ if (toggle) {
         MouseClick, Left
         sleep 300
         cycleCount++
+        }
     }
-}
 Return
 
 ;1440p
 DoMouseMove2:
-if (toggle) {
+    if (toggle) {
 
-    global pathingMode
-    global privateServerLink
-    global globalFailsafeTimer
-    global azertyPathing
-    global autoUnequip
-    global autoCloseChat
-    global code
-    global strangeController
-    global biomeRandomizer
-    global strangeControllerTime
-    global biomeRandomizerTime
-    global strangeControllerInterval
-    global biomeRandomizerInterval
-    global strangeControllerLastRun
-    global biomeRandomizerLastRun
-    global snowmanPathingLastRun
-    global startTick
-    global failsafeWebhook
-    global pathingWebhook
-    global hasCrafterPlugin
-    global crafterToggle
-    global autoCrafterDetection
-    global autoCrafterLastCheck
-    global autoCrafterCheckInterval
-    loopCount := 0
-    keyW := azertyPathing ? "z" : "w"
-    keyA := azertyPathing ? "q" : "a"
-    restartPathing := false
-    Loop {
-        if (!toggle) {
-            break
-        }
-
-        ; SC Toggle
-        if (strangeController) {
-            elapsed := A_TickCount - startTick
-            if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
-            } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
+        global pathingMode
+        global privateServerLink
+        global globalFailsafeTimer
+        global azertyPathing
+        global autoUnequip
+        global autoCloseChat
+        global code
+        global strangeController
+        global biomeRandomizer
+        global strangeControllerTime
+        global biomeRandomizerTime
+        global strangeControllerInterval
+        global biomeRandomizerInterval
+        global strangeControllerLastRun
+        global biomeRandomizerLastRun
+        global snowmanPathingLastRun
+        global startTick
+        global failsafeWebhook
+        global pathingWebhook
+        global hasCrafterPlugin
+        global crafterToggle
+        global autoCrafterDetection
+        global autoCrafterLastCheck
+        global autoCrafterCheckInterval
+        loopCount := 0
+        keyW := azertyPathing ? "z" : "w"
+        keyA := azertyPathing ? "q" : "a"
+        restartPathing := false
+        Loop {
+            if (!toggle) {
+                break
             }
-        }
 
-        ; Snowman Pathing Toggle
-        if (snowmanPathing) {
-            elapsed := A_TickCount - startTick
-            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
-                return_to_spawn()
-
-                if (snowmanPathingWebhook) {
-                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
-                }
-                RunSnowmanPathing()
-                snowmanPathingLastRun := elapsed
-
-                restartPathing := true
-                continue
-            }
-        }
-
-        ; BR Toggle
-        if (biomeRandomizer) {
-            elapsed := A_TickCount - startTick
-            if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            }
-        }
-
-        ; Auto Crafter Detection
-        if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
-            currentTime := A_TickCount
-            if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
-                autoCrafterLastCheck := currentTime
-                PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
-                if (!ErrorLevel) {
-                    RunAutoCrafter()
+            ; SC Toggle
+            if (strangeController) {
+                elapsed := A_TickCount - startTick
+                if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
+                } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
                 }
             }
-        }
 
-        ; More snowman pathing
-        loopCount++
-        if (loopCount > maxLoopCount || restartPathing) {
-            restartPathing := false
-
+            ; Snowman Pathing Toggle
             if (snowmanPathing) {
-            Sleep, 2000
+                elapsed := A_TickCount - startTick
+                if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                    return_to_spawn()
 
-        }
+                    if (snowmanPathingWebhook) {
+                        try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                    }
+                    RunSnowmanPathing()
+                    snowmanPathingLastRun := elapsed
 
-            if (pathingWebhook) {
-                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
-            }
-
-            if (autoUnequip) {
-            MouseMove, 41, 538, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 1089, 575, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 835, 845, 3
-            sleep 300
-            Click, Left
-            sleep 1200
-            Click, Left
-            sleep 300
-            MouseMove, 1882, 395, 3
-            sleep 300
-            Click, Left
-            sleep 300
-        }
-        if (autoCloseChat) {
-            sleep 300
-            Send {/}
-            sleep 300
-            MouseMove, 151, 38, 3
-            sleep 300
-            MouseClick, Left
-            sleep 300
-        }
-        sleep 500
-        Send, {Esc}
-        sleep 650
-        Send, {r}
-        sleep 650
-        Send, {Enter}
-        sleep 2600
-        MouseMove, 52, 621, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 525, 158, 3
-        sleep 220
-        Click, Left
-        sleep 220
-		Click, WheelUp 80
-		sleep 500
-		Click, WheelDown 35
-		sleep 300
-
-        ; Regular Pathing
-        if (pathingMode = "Non Vip Pathing") {
-            ; Non VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 5190
-            Send, {%keyW% Up}
-            sleep 800
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 550
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 240
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1450
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1100
-            Send {Space Up}
-            sleep 520
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 1308, 1073, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 1289, 1264, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 1117, 550, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 904, 1080, 3
-                } else {
-                    MouseMove, 700, 1078, 3
+                    restartPathing := true
+                    continue
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 1002, 831, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1958, 361, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 3300
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Vip Pathing") {
-            ; VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 4150
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 400
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 180
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1100
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1200
-            Send {Space Up}
-            sleep 200
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 1308, 1073, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 1289, 1264, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 1117, 550, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 904, 1080, 3
-                } else {
-                    MouseMove, 700, 1078, 3
+            ; BR Toggle
+            if (biomeRandomizer) {
+                elapsed := A_TickCount - startTick
+                if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
+                } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 1002, 831, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1958, 361, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 2670
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Abyssal Pathing") {
-            ; Abyssal Pathing
-            MouseMove, 40, 541, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            MouseMove, 1262, 447, 3
-            sleep 200
-            MouseClick, Left
-            sleep 100
-            MouseMove, 1469, 489, 3
-            sleep 100
-            MouseClick, Left
-            sleep 100
-            ClipBoard := "Abyssal Hunter"
-            sleep 100
-            Send, ^v
-            sleep 200
-            MouseMove, 1092, 579, 3
-            sleep 200
-            Click, WheelUp 100
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            ErrorLevel := 0
-            PixelSearch, px, py, 768, 835, 888, 860, 0xfc7f98, 3, Fast RGB
-            if (ErrorLevel != 0) {
-                MouseMove, 830, 845, 3
-                sleep 200
-                MouseClick, Left
-            }
-
-            sleep 200
-            MouseMove, 1883, 395, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            Send, {%keyW% Down}
-            sleep 500
-            Send, {%keyA% Down}
-            sleep 2650
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 500
-            Send {%keyW% Up}
-            sleep 200
-            Send {s Down}
-            sleep 120
-            Send {s Up}
-            sleep 100
-            Send {d Down}
-            sleep 280
-            Send {d Up}
-            sleep 200
-            Send {%keyA% Down}
-            sleep 50
-            Send {Space Down}
-            sleep 730
-            Send {Space Up}
-            sleep 200
-            Send {%keyA% Up}
-            sleep 100
-            Send {%keyW% Down}
-            sleep 810
-            Send {%keyW% Up}
-            sleep 150
-            Send {space Down}
-            sleep 15
-            Send {d Down}
-            sleep 150
-            Send {space Up}
-            sleep 580
-            Send {d Up}
-            sleep 100
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-
-            MouseMove, 1308, 1073, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 1289, 1264, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 1117, 550, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 904, 1080, 3
-                } else {
-                    MouseMove, 700, 1078, 3
+            ; Auto Crafter Detection
+            if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
+                currentTime := A_TickCount
+                if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
+                    autoCrafterLastCheck := currentTime
+                    PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
+                    if (!ErrorLevel) {
+                        RunAutoCrafter()
+                    }
                 }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 1002, 831, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
             }
 
-            MouseMove, 1958, 361, 3
-            sleep 200
+            ; More snowman pathing
+            loopCount++
+            if (loopCount > maxLoopCount || restartPathing) {
+                restartPathing := false
+
+                if (snowmanPathing) {
+                    Sleep, 2000
+                }
+
+                if (pathingWebhook) {
+                    try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+                }
+
+                if (autoUnequip) {
+                    MouseMove, 41, 538, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 1089, 575, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 835, 845, 3
+                    sleep 300
+                    Click, Left
+                    sleep 1200
+                    Click, Left
+                    sleep 300
+                    MouseMove, 1882, 395, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                }
+
+                if (autoCloseChat) {
+                    sleep 300
+                    Send {/}
+                    sleep 300
+                    MouseMove, 151, 38, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                }
+                return_to_spawn()
+                MouseMove, 52, 621, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                MouseMove, 525, 158, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                Click, WheelUp 80
+                sleep 500
+                Click, WheelDown 35
+                sleep 300
+
+                ; Regular Pathing
+                if (pathingMode = "Non Vip Pathing") {
+                    ; Non VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 5190
+                    Send, {%keyW% Up}
+                    sleep 800
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 550
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 240
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1450
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
+                    sleep 25
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {Space Up}
+                    sleep 520
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 1308, 1073, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 1289, 1264, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 1117, 550, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 904, 1080, 3
+                        } else {
+                            MouseMove, 700, 1078, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 1002, 831, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1958, 361, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 3300
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Vip Pathing") {
+                    ; VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 4150
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 400
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 180
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
+                    sleep 25
+                    Send {%keyW% Down}
+                    sleep 1200
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 1308, 1073, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 1289, 1264, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 1117, 550, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 904, 1080, 3
+                        } else {
+                            MouseMove, 700, 1078, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 1002, 831, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1958, 361, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 2670
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Abyssal Pathing") {
+                    ; Abyssal Pathing
+                    MouseMove, 40, 541, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 1262, 447, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 100
+                    MouseMove, 1469, 489, 3
+                    sleep 100
+                    MouseClick, Left
+                    sleep 100
+                    ClipBoard := "Abyssal Hunter"
+                    sleep 100
+                    Send, ^v
+                    sleep 200
+                    MouseMove, 1092, 579, 3
+                    sleep 200
+                    Click, WheelUp 100
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    ErrorLevel := 0
+                    PixelSearch, px, py, 768, 835, 888, 860, 0xfc7f98, 3, Fast RGB
+                    if (ErrorLevel != 0) {
+                        MouseMove, 830, 845, 3
+                        sleep 200
+                        MouseClick, Left
+                    }
+
+                    sleep 200
+                    MouseMove, 1883, 395, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    Send, {%keyW% Down}
+                    sleep 500
+                    Send, {%keyA% Down}
+                    sleep 2650
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 500
+                    Send {%keyW% Up}
+                    sleep 200
+                    Send {s Down}
+                    sleep 120
+                    Send {s Up}
+                    sleep 100
+                    Send {d Down}
+                    sleep 280
+                    Send {d Up}
+                    sleep 200
+                    Send {%keyA% Down}
+                    sleep 50
+                    Send {Space Down}
+                    sleep 730
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyA% Up}
+                    sleep 100
+                    Send {%keyW% Down}
+                    sleep 810
+                    Send {%keyW% Up}
+                    sleep 150
+                    Send {space Down}
+                    sleep 15
+                    Send {d Down}
+                    sleep 150
+                    Send {space Up}
+                    sleep 580
+                    Send {d Up}
+                    sleep 100
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+
+                    MouseMove, 1308, 1073, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 1289, 1264, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 1117, 550, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 904, 1080, 3
+                        } else {
+                            MouseMove, 700, 1078, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 1002, 831, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1958, 361, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 800
+                    Send, {%keyA% Up}
+                    sleep 100
+                    Send, {%keyW% Down}
+                    sleep 1760
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                }
+            }
+            ; Fishing Minigame
+            MouseMove, 1161, 1124, 3
+            Sleep 30
             MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 800
-            Send, {%keyA% Up}
-            sleep 100
-            Send, {%keyW% Down}
-            sleep 1760
-            Send, {%keyW% Up}
-            loopCount := 0
-        }
-    }
-        ; Fishing Minigame
-        MouseMove, 1161, 1124, 3
-        Sleep 30
-        MouseClick, Left
-        sleep 300
-        barColor := 0
-        otherBarColor := 0
+            sleep 300
+            barColor := 0
+            otherBarColor := 0
 
-        ; Check for white pixel
-        startWhitePixelSearch := A_TickCount
-        if (globalFailsafeTimer = 0) {
-        globalFailsafeTimer := A_TickCount
-        }
-        fishingFailsafeRan := false
-        Loop {
-        PixelGetColor, color, 1536, 1119, RGB
-        if (color = 0xFFFFFF) {
-        MouseMove, 1263, 1177, 3
-        ; Get randomized bar color
-        Sleep 50
-        PixelGetColor, barColor, 1261, 1033, RGB
-        SetTimer, DoMouseMove2, Off
-        globalFailsafeTimer := 0
-        break
-        }
+            ; Check for white pixel
+            startWhitePixelSearch := A_TickCount
+            if (globalFailsafeTimer = 0) {
+                globalFailsafeTimer := A_TickCount
+            }
+            fishingFailsafeRan := false
+            Loop {
+                PixelGetColor, color, 1536, 1119, RGB
+                if (color = 0xFFFFFF) {
+                    MouseMove, 1263, 1177, 3
+                    ; Get randomized bar color
+                    Sleep 50
+                    PixelGetColor, barColor, 1261, 1033, RGB
+                    SetTimer, DoMouseMove2, Off
+                    globalFailsafeTimer := 0
+                    break
+                }
 
-        ; Auto Rejoin Failsafe
-        if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-        PixelGetColor, checkColor, 1535, 1120, RGB
-        if (checkColor != 0xFFFFFF) {
-        Process, Close, RobloxPlayerBeta.exe
-        sleep 500
-        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-        sleep 5000
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        sleep 6000
+                ; Auto Rejoin Failsafe
+                if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
+                    PixelGetColor, checkColor, 1535, 1120, RGB
+                    if (checkColor != 0xFFFFFF) {
+                        Process, Close, RobloxPlayerBeta.exe
+                        sleep 500
+                        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
+                        sleep 5000
+                        WinActivate, ahk_exe RobloxPlayerBeta.exe
+                        sleep 6000
 
-        ; Skip button
-        sleep 1000
-        MouseMove, 1280, 720, 3
-        sleep 200
-        MouseClick, Left
-        sleep 6000
+                        ; Skip button
+                        sleep 1000
+                        MouseMove, 1280, 720, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 6000
 
-        ; Start button
-        sleep 1000
-        Loop {
-        ErrorLevel := 0
-        PixelSearch, px, py, 295, 1364, 445, 1311, 0x82ff95, 5, Fast RGB
-        if (ErrorLevel = 0) {
-        sleep 1000
-        MouseMove, 347, 1329, 3
-        sleep 350
-        MouseClick, Left
-        break
-        }
-        sleep 100
-        }
+                        ; Start button
+                        sleep 1000
+                        Loop {
+                            ErrorLevel := 0
+                            PixelSearch, px, py, 295, 1364, 445, 1311, 0x82ff95, 5, Fast RGB
+                            if (ErrorLevel = 0) {
+                                sleep 1000
+                                MouseMove, 347, 1329, 3
+                                sleep 350
+                                MouseClick, Left
+                                break
+                            }
+                            sleep 100
+                        }
 
-        sleep 3000
-        restartPathing := true
-        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
-        break
-        }
-        }
-
-        ; Fishing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-        MouseMove, 1690, 1224, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 1523, 649, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 1457, 491, 3
-        sleep 300
-        MouseClick, left
-        sleep 300
-        MouseMove, 1163, 1126, 3
-        sleep 300
-        MouseClick, Left
-        fishingFailsafeRan := true
-        if (failsafeWebhook) {
-            try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
-        }
-        }
-
-        ; Pathing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
-        restartPathing := true
-        if (failsafeWebhook) {
-            try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
-        }
-        break
-        }
-
-        if (!toggle) {
-        Return
-        }
-        }
-
-        if (restartPathing) {
-        continue
-        }
-
-
-        ; PixelSearch loop
-        startTime := A_TickCount
-        Loop {
-        if (!toggle)
-        break
-        if (A_TickCount - startTime > 9000)
-        break
-
-        ; Advanced detection
-        if (advancedFishingDetection) {
-            ErrorLevel := 0
-            PixelSearch, leftX, leftY, 1043, 1033, 1519, 1033, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-                rightX := leftX
-                Loop {
-                    testX := rightX + 1
-                    if (testX > 1519)
-                        break
-                    PixelGetColor, testColor, %testX%, 1033, RGB
-                    if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-                        rightX := testX
-                    } else {
+                        sleep 3000
+                        restartPathing := true
+                        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
                         break
                     }
                 }
-                barWidth := rightX - leftX
-                if (barWidth < advancedFishingThreshold) {
+
+                ; Fishing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
+                    MouseMove, 1690, 1224, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 1523, 649, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 1457, 491, 3
+                    sleep 300
                     MouseClick, left
-                    sleep 25
+                    sleep 300
+                    MouseMove, 1163, 1126, 3
+                    sleep 300
+                    MouseClick, Left
+                    fishingFailsafeRan := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
+                    }
                 }
-            } else {
-                MouseClick, left
+
+                ; Pathing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
+                    restartPathing := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
+                    }
+                    break
+                }
+
+                if (!toggle) {
+                    Return
+                }
             }
-        } else {
-            ; Normal detection
-            ErrorLevel := 0
-            PixelSearch, FoundX, FoundY, 1043, 1033, 1519, 1058, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-            } else {
-                MouseClick, left
+
+            if (restartPathing) {
+                continue
             }
+
+            ; PixelSearch loop
+            startTime := A_TickCount
+            Loop {
+                if (!toggle)
+                    break
+                if (A_TickCount - startTime > 9000)
+                    break
+
+                ; Advanced detection
+                if (advancedFishingDetection) {
+                    ErrorLevel := 0
+                    PixelSearch, leftX, leftY, 1043, 1033, 1519, 1033, barColor, 5, Fast RGB
+                    if (ErrorLevel = 0) {
+                        rightX := leftX
+                        Loop {
+                            testX := rightX + 1
+                            if (testX > 1519)
+                                break
+                            PixelGetColor, testColor, %testX%, 1033, RGB
+                            if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
+                                rightX := testX
+                            } else {
+                                break
+                            }
+                        }
+                        barWidth := rightX - leftX
+                        if (barWidth < advancedFishingThreshold) {
+                            MouseClick, left
+                            sleep 25
+                        }
+                    } else {
+                        MouseClick, left
+                    }
+                } else {
+                    ; Normal detection
+                    ErrorLevel := 0
+                    PixelSearch, FoundX, FoundY, 1043, 1033, 1519, 1058, barColor, 5, Fast RGB
+                    if (ErrorLevel = 0) {
+                    } else {
+                        MouseClick, left
+                    }
+                }
+            }
+            sleep 300
+            MouseMove, 1457, 491, 3
+            sleep 700
+            MouseClick, Left
+            sleep 300
+            cycleCount++
         }
-        }
-        sleep 300
-        MouseMove, 1457, 491, 3
-        sleep 700
-        MouseClick, Left
-        sleep 300
-        cycleCount++
     }
-}
 Return
 
 ;786p
 DoMouseMove3:
-if (toggle) {
+    if (toggle) {
 
-    global pathingMode
-    global privateServerLink
-    global globalFailsafeTimer
-    global azertyPathing
-    global autoUnequip
-    global autoCloseChat
-    global code
-    global strangeController
-    global biomeRandomizer
-    global strangeControllerTime
-    global biomeRandomizerTime
-    global strangeControllerInterval
-    global biomeRandomizerInterval
-    global strangeControllerLastRun
-    global biomeRandomizerLastRun
-    global snowmanPathingLastRun
-    global startTick
-    global failsafeWebhook
-    global pathingWebhook
-    global hasCrafterPlugin
-    global crafterToggle
-    global autoCrafterDetection
-    global autoCrafterLastCheck
-    global autoCrafterCheckInterval
-    loopCount := 0
-    keyW := azertyPathing ? "z" : "w"
-    keyA := azertyPathing ? "q" : "a"
-    restartPathing := false
-    Loop {
-        if (!toggle) {
-            break
-        }
-
-
-        ; SC Toggle
-        if (strangeController) {
-            elapsed := A_TickCount - startTick
-            if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
-            } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-                RunStrangeController()
-                strangeControllerLastRun := elapsed
+        global pathingMode
+        global privateServerLink
+        global globalFailsafeTimer
+        global azertyPathing
+        global autoUnequip
+        global autoCloseChat
+        global code
+        global strangeController
+        global biomeRandomizer
+        global strangeControllerTime
+        global biomeRandomizerTime
+        global strangeControllerInterval
+        global biomeRandomizerInterval
+        global strangeControllerLastRun
+        global biomeRandomizerLastRun
+        global snowmanPathingLastRun
+        global startTick
+        global failsafeWebhook
+        global pathingWebhook
+        global hasCrafterPlugin
+        global crafterToggle
+        global autoCrafterDetection
+        global autoCrafterLastCheck
+        global autoCrafterCheckInterval
+        loopCount := 0
+        keyW := azertyPathing ? "z" : "w"
+        keyA := azertyPathing ? "q" : "a"
+        restartPathing := false
+        Loop {
+            if (!toggle) {
+                break
             }
-        }
 
-        ; Snowman Pathing
-        if (snowmanPathing) {
-            elapsed := A_TickCount - startTick
-            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
-                if (snowmanPathingWebhook) {
-                    try SendWebhook(":moneybag: Resetting character after snowman pathing...", "16636040")
+            ; SC Toggle
+            if (strangeController) {
+                elapsed := A_TickCount - startTick
+                if (strangeControllerLastRun = 0 && elapsed >= strangeControllerTime) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
+                } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
+                    RunStrangeController()
+                    strangeControllerLastRun := elapsed
+                }
+            }
+
+            ; Snowman Pathing
+            if (snowmanPathing) {
+                elapsed := A_TickCount - startTick
+                if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                    if (snowmanPathingWebhook) {
+                        try SendWebhook(":moneybag: Resetting character after snowman pathing...", "16636040")
+                    }
+                    return_to_spawn()
+
+                    if (snowmanPathingWebhook) {
+                        try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                    }
+                    RunSnowmanPathing()
+                    snowmanPathingLastRun := elapsed
+
+                    restartPathing := true
+                    continue
+                }
+            }
+
+            ; BR Toggle
+            if (biomeRandomizer) {
+                elapsed := A_TickCount - startTick
+                if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
+                } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
+                    RunBiomeRandomizer()
+                    biomeRandomizerLastRun := elapsed
+                }
+            }
+
+            ; Auto Crafter Detection (copy and pasted, need to change the coords)
+            if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
+                currentTime := A_TickCount
+                if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
+                    autoCrafterLastCheck := currentTime
+                    PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
+                    if (!ErrorLevel) {
+                        RunAutoCrafter()
+                    }
+                }
+            }
+
+            ; More snowman pathing
+            loopCount++
+            if (loopCount > maxLoopCount || restartPathing) {
+                restartPathing := false
+
+                if (snowmanPathing) {
+                    Sleep, 2000
+                }
+
+                if (pathingWebhook) {
+                    try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+                }
+
+                if (autoUnequip) {
+                    MouseMove, 38, 292, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 594, 314, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                    MouseMove, 458, 457, 3
+                    sleep 300
+                    Click, Left
+                    sleep 1200
+                    Click, Left
+                    sleep 300
+                    MouseMove, 1016, 218, 3
+                    sleep 300
+                    Click, Left
+                    sleep 300
+                }
+                if (autoCloseChat) {
+                    sleep 300
+                    Send {/}
+                    sleep 300
+                    MouseMove, 151, 42, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
                 }
                 return_to_spawn()
-
-                if (snowmanPathingWebhook) {
-                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
-                }
-                RunSnowmanPathing()
-                snowmanPathingLastRun := elapsed
-
-                restartPathing := true
-                continue
-            }
-        }
-
-        ; BR Toggle
-        if (biomeRandomizer) {
-            elapsed := A_TickCount - startTick
-            if (biomeRandomizerLastRun = 0 && elapsed >= biomeRandomizerTime) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            } else if (biomeRandomizerLastRun > 0 && (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
-                RunBiomeRandomizer()
-                biomeRandomizerLastRun := elapsed
-            }
-        }
-
-        ; Auto Crafter Detection (copy and pasted, need to change the coords)
-        if (hasCrafterPlugin && crafterToggle && autoCrafterDetection) {
-            currentTime := A_TickCount
-            if (currentTime - autoCrafterLastCheck >= autoCrafterCheckInterval) {
-                autoCrafterLastCheck := currentTime
-                PixelSearch, Px, Py, 2203, 959, 2203, 959, 0x6eb4ff, 3, RGB
-                if (!ErrorLevel) {
-                    RunAutoCrafter()
-                }
-            }
-        }
-
-        ; More snowman pathing
-        loopCount++
-        if (loopCount > maxLoopCount || restartPathing) {
-            restartPathing := false
-
-            if (snowmanPathing) {
-            Sleep, 2000
-
-        }
-
-            if (pathingWebhook) {
-                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
-            }
-
-            if (autoUnequip) {
-            MouseMove, 38, 292, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 594, 314, 3
-            sleep 300
-            Click, Left
-            sleep 300
-            MouseMove, 458, 457, 3
-            sleep 300
-            Click, Left
-            sleep 1200
-            Click, Left
-            sleep 300
-            MouseMove, 1016, 218, 3
-            sleep 300
-            Click, Left
-            sleep 300
-        }
-        if (autoCloseChat) {
-            sleep 300
-            Send {/}
-            sleep 300
-            MouseMove, 151, 42, 3
-            sleep 300
-            MouseClick, Left
-            sleep 300
-        }
-        return_to_spawn()
-        MouseMove, 26, 325, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 273, 106, 3
-        sleep 220
-        Click, Left
-        sleep 220
-		Click, WheelUp 80
-		sleep 500
-		Click, WheelDown 90
-		sleep 300
-
-        if (pathingMode = "Non Vip Pathing") {
-            ; Non VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 5190
-            Send, {%keyW% Up}
-            sleep 800
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 550
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 240
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1450
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1100
-            Send {Space Up}
-            sleep 520
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 682, 563, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 682, 667, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 586, 287, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 486, 570, 3
-                } else {
-                    MouseMove, 365, 570, 3
-                }
-                sleep 200
-                MouseClick, Left
+                MouseMove, 26, 325, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                MouseMove, 273, 106, 3
+                sleep 220
+                Click, Left
+                sleep 220
+                Click, WheelUp 80
+                sleep 500
+                Click, WheelDown 90
                 sleep 300
-                MouseMove, 573, 447, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
-            }
 
-            MouseMove, 1050, 197, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 3300
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Vip Pathing") {
-            ; VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 4150
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 400
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 180
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1100
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {s Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1200
-            Send {Space Up}
-            sleep 200
-            Send {%keyW% Up}
-            sleep 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 682, 563, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 682, 667, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
+                if (pathingMode = "Non Vip Pathing") {
+                    ; Non VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 5190
+                    Send, {%keyW% Up}
+                    sleep 800
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 550
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 240
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1450
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
+                    sleep 25
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {Space Up}
+                    sleep 520
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 682, 563, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 682, 667, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
 
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 586, 287, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 486, 570, 3
-                } else {
-                    MouseMove, 365, 570, 3
-                }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 573, 447, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
-            }
-
-            MouseMove, 1050, 197, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1400
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 2670
-            Send, {%keyW% Up}
-            loopCount := 0
-        } else if (pathingMode = "Abyssal Pathing") {
-            ; Abyssal Pathing
-            MouseMove, 21, 289, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            MouseMove, 675, 239, 3
-            sleep 200
-            MouseClick, Left
-            sleep 100
-            MouseMove, 786, 261, 3
-            sleep 100
-            MouseClick, Left
-            sleep 100
-            ClipBoard := "Abyssal Hunter"
-            sleep 100
-            Send, ^v
-            sleep 200
-            MouseMove, 584, 310, 3
-            sleep 200
-            Click, WheelUp 100
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            ErrorLevel := 0
-            PixelSearch, px, py, 411, 446, 475, 460, 0xed7389, 3, Fast RGB
-            if (ErrorLevel != 0) {
-                MouseMove, 444, 452, 3
-                sleep 200
-                MouseClick, Left
-            }
-
-            sleep 200
-            MouseMove, 1007, 211, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-
-            Send, {%keyW% Down}
-            sleep 500
-            Send, {%keyA% Down}
-            sleep 2650
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 500
-            Send {%keyW% Up}
-            sleep 200
-            Send {s Down}
-            sleep 120
-            Send {s Up}
-            sleep 100
-            Send {d Down}
-            sleep 280
-            Send {d Up}
-            sleep 200
-            Send {%keyA% Down}
-            sleep 50
-            Send {Space Down}
-            sleep 730
-            Send {Space Up}
-            sleep 200
-            Send {%keyA% Up}
-            sleep 100
-            Send {%keyW% Down}
-            sleep 810
-            Send {%keyW% Up}
-            sleep 150
-            Send {space Down}
-            sleep 15
-            Send {d Down}
-            sleep 150
-            Send {space Up}
-            sleep 580
-            Send {d Up}
-            sleep 100
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-
-            MouseMove, 699, 574, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 689, 676, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 597, 294, 3
-                sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 484, 577, 3
-                } else {
-                    MouseMove, 374, 576, 3
-                }
-                sleep 200
-                MouseClick, Left
-                sleep 300
-                MouseMove, 573, 447, 3
-                sleep 200
-                MouseClick, Left
-                sleep 1000
-                loopCount++
-            }
-
-            MouseMove, 1047, 193, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 800
-            Send, {%keyA% Up}
-            sleep 100
-            Send, {%keyW% Down}
-            sleep 1760
-            Send, {%keyW% Up}
-            loopCount := 0
-        }
-    }
-
-        MouseMove, 603, 597, 3
-        Sleep 300
-        MouseClick, Left
-        sleep 300
-        barColor := 0
-        otherBarColor := 0
-
-        ; Check for white pixel
-        startWhitePixelSearch := A_TickCount
-        if (globalFailsafeTimer = 0) {
-        globalFailsafeTimer := A_TickCount
-        }
-        fishingFailsafeRan := false
-        Loop {
-        ErrorLevel := 0
-        PixelSearch, px, py, 866, 593, 865, 593, 0xFFFFFF, 10, Fast RGB
-        if (ErrorLevel = 0) {
-        MouseMove, 676, 638, 3
-        ; Determine randomized bar color
-        Sleep 50
-        PixelGetColor, barColor, 674, 533, RGB
-        SetTimer, DoMouseMove, Off
-        break
-        }
-
-        ; Auto Rejoin Failsafe
-        if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-        PixelGetColor, checkColor, 865, 593, RGB
-        if (checkColor != 0xFFFFFF) {
-        Process, Close, RobloxPlayerBeta.exe
-        sleep 500
-        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-        sleep 5000
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        sleep 7000
-        MouseMove, 683, 384, 3
-        sleep 200
-        MouseClick, Left
-        sleep 6000
-
-        ; Start button
-        sleep 1000
-        Loop {
-        ErrorLevel := 0
-        PixelSearch, px, py, 160, 734, 244, 708, 0x82ff95, 5, Fast RGB
-        if (ErrorLevel = 0) {
-        sleep 1000
-        MouseMove, 200, 715, 3
-        sleep 350
-        MouseClick, Left
-        break
-        }
-        }
-
-        sleep 3000
-        restartPathing := true
-        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
-        break
-        }
-        }
-
-        ; Fishing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-        MouseMove, 902, 668, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 858, 331, 3
-        sleep 300
-        MouseClick, Left
-        sleep 300
-        MouseMove, 817, 210, 3
-        sleep 300
-        MouseClick, left
-        sleep 300
-        MouseMove, 588, 588, 3
-        sleep 300
-        MouseClick, Left
-        fishingFailsafeRan := true
-        if (failsafeWebhook) {
-            try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
-        }
-        }
-        ; Pathing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
-        restartPathing := true
-        if (failsafeWebhook) {
-            try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
-        }
-        break
-        }
-        if (!toggle) {
-        Return
-        }
-        }
-
-        if (restartPathing) {
-        continue
-        }
-
-        ; PixelSearch loop
-        startTime := A_TickCount
-        Loop {
-        if (!toggle)
-        break
-        if (A_TickCount - startTime > 9000)
-        break
-
-        ; Advanced detection
-        if (advancedFishingDetection) {
-            ErrorLevel := 0
-            PixelSearch, leftX, leftY, 513, 531, 856, 549, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-                rightX := leftX
-                Loop {
-                    testX := rightX + 1
-                    if (testX > 856)
-                        break
-                    PixelGetColor, testColor, %testX%, 531, RGB
-                    if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-                        rightX := testX
-                    } else {
-                        break
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 586, 287, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 486, 570, 3
+                        } else {
+                            MouseMove, 365, 570, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 573, 447, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
                     }
 
-                }
-                barWidth := rightX - leftX
-                if (barWidth < advancedFishingThreshold) {
-                    MouseClick, left
+                    MouseMove, 1050, 197, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 3300
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Vip Pathing") {
+                    ; VIP Pathing
+                    Send, {%keyW% Down}
+                    Send, {%keyA% Down}
+                    sleep 4150
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 400
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {d Down}
+                    sleep 180
+                    Send {d Up}
+                    sleep 150
+                    Send {%keyW% Down}
+                    sleep 1100
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {s Down}
+                    sleep 300
+                    Send {s Up}
+                    sleep 300
+                    Send {Space Down}
                     sleep 25
+                    Send {%keyW% Down}
+                    sleep 1200
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyW% Up}
+                    sleep 300
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+                    MouseMove, 682, 563, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 682, 667, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 586, 287, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 486, 570, 3
+                        } else {
+                            MouseMove, 365, 570, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 573, 447, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1050, 197, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 1400
+                    Send, {%keyA% Up}
+                    sleep 75
+                    Send, {%keyW% Down}
+                    sleep 2670
+                    Send, {%keyW% Up}
+                    loopCount := 0
+                } else if (pathingMode = "Abyssal Pathing") {
+                    ; Abyssal Pathing
+                    MouseMove, 21, 289, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 675, 239, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 100
+                    MouseMove, 786, 261, 3
+                    sleep 100
+                    MouseClick, Left
+                    sleep 100
+                    ClipBoard := "Abyssal Hunter"
+                    sleep 100
+                    Send, ^v
+                    sleep 200
+                    MouseMove, 584, 310, 3
+                    sleep 200
+                    Click, WheelUp 100
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    ErrorLevel := 0
+                    PixelSearch, px, py, 411, 446, 475, 460, 0xed7389, 3, Fast RGB
+                    if (ErrorLevel != 0) {
+                        MouseMove, 444, 452, 3
+                        sleep 200
+                        MouseClick, Left
+                    }
+
+                    sleep 200
+                    MouseMove, 1007, 211, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+
+                    Send, {%keyW% Down}
+                    sleep 500
+                    Send, {%keyA% Down}
+                    sleep 2650
+                    Send, {%keyW% Up}
+                    sleep 600
+                    Send {%keyA% Up}
+                    sleep 200
+                    Send {%keyW% Down}
+                    sleep 500
+                    Send {%keyW% Up}
+                    sleep 200
+                    Send {s Down}
+                    sleep 120
+                    Send {s Up}
+                    sleep 100
+                    Send {d Down}
+                    sleep 280
+                    Send {d Up}
+                    sleep 200
+                    Send {%keyA% Down}
+                    sleep 50
+                    Send {Space Down}
+                    sleep 730
+                    Send {Space Up}
+                    sleep 200
+                    Send {%keyA% Up}
+                    sleep 100
+                    Send {%keyW% Down}
+                    sleep 810
+                    Send {%keyW% Up}
+                    sleep 150
+                    Send {space Down}
+                    sleep 15
+                    Send {d Down}
+                    sleep 150
+                    Send {space Up}
+                    sleep 580
+                    Send {d Up}
+                    sleep 100
+                    Send {e Down}
+                    sleep 300
+                    Send {e Up}
+                    sleep 300
+
+                    MouseMove, 699, 574, 3
+                    sleep 50
+                    MouseClick, Left
+                    sleep 50
+                    MouseClick, Left
+                    sleep 200
+                    MouseMove, 689, 676, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 800
+                    loopCount := 0
+
+                    while (loopCount < fishingLoopCount) {
+                        MouseMove, 597, 294, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 200
+                        if (sellAllToggle) {
+                            MouseMove, 484, 577, 3
+                        } else {
+                            MouseMove, 374, 576, 3
+                        }
+                        sleep 200
+                        MouseClick, Left
+                        sleep 300
+                        MouseMove, 573, 447, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 1000
+                        loopCount++
+                    }
+
+                    MouseMove, 1047, 193, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    Send, {%keyA% Down}
+                    sleep 800
+                    Send, {%keyA% Up}
+                    sleep 100
+                    Send, {%keyW% Down}
+                    sleep 1760
+                    Send, {%keyW% Up}
+                    loopCount := 0
                 }
-            } else {
-                MouseClick, left
             }
-            sleep 10
-        } else {
-            ; Normal detection
-            ErrorLevel := 0
-            PixelSearch, FoundX, FoundY, 513, 531, 856, 549, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-            } else {
-                MouseClick, left
+
+            MouseMove, 603, 597, 3
+            Sleep 300
+            MouseClick, Left
+            sleep 300
+            barColor := 0
+            otherBarColor := 0
+
+            ; Check for white pixel
+            startWhitePixelSearch := A_TickCount
+            if (globalFailsafeTimer = 0) {
+                globalFailsafeTimer := A_TickCount
             }
+            fishingFailsafeRan := false
+            Loop {
+                ErrorLevel := 0
+                PixelSearch, px, py, 866, 593, 865, 593, 0xFFFFFF, 10, Fast RGB
+                if (ErrorLevel = 0) {
+                    MouseMove, 676, 638, 3
+                    ; Determine randomized bar color
+                    Sleep 50
+                    PixelGetColor, barColor, 674, 533, RGB
+                    SetTimer, DoMouseMove, Off
+                    break
+                }
+
+                ; Auto Rejoin Failsafe
+                if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
+                    PixelGetColor, checkColor, 865, 593, RGB
+                    if (checkColor != 0xFFFFFF) {
+                        Process, Close, RobloxPlayerBeta.exe
+                        sleep 500
+                        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
+                        sleep 5000
+                        WinActivate, ahk_exe RobloxPlayerBeta.exe
+                        sleep 7000
+                        MouseMove, 683, 384, 3
+                        sleep 200
+                        MouseClick, Left
+                        sleep 6000
+
+                        ; Start button
+                        sleep 1000
+                        Loop {
+                            ErrorLevel := 0
+                            PixelSearch, px, py, 160, 734, 244, 708, 0x82ff95, 5, Fast RGB
+                            if (ErrorLevel = 0) {
+                                sleep 1000
+                                MouseMove, 200, 715, 3
+                                sleep 350
+                                MouseClick, Left
+                                break
+                            }
+                        }
+
+                        sleep 3000
+                        restartPathing := true
+                        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
+                        break
+                    }
+                }
+
+                ; Fishing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
+                    MouseMove, 902, 668, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 858, 331, 3
+                    sleep 300
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 817, 210, 3
+                    sleep 300
+                    MouseClick, left
+                    sleep 300
+                    MouseMove, 588, 588, 3
+                    sleep 300
+                    MouseClick, Left
+                    fishingFailsafeRan := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":grey_question: Fishing failsafe was triggered.", "13424349")
+                    }
+                }
+                ; Pathing Failsafe
+                if (A_TickCount - startWhitePixelSearch > (pathingFailsafeTime * 1000)) {
+                    restartPathing := true
+                    if (failsafeWebhook) {
+                        try SendWebhook(":feet: Pathing failsafe was triggered.", "6693139")
+                    }
+                    break
+                }
+                if (!toggle) {
+                    Return
+                }
+            }
+
+            if (restartPathing) {
+                continue
+            }
+
+            ; PixelSearch loop
+            startTime := A_TickCount
+            Loop {
+                if (!toggle)
+                    break
+                if (A_TickCount - startTime > 9000)
+                    break
+
+                ; Advanced detection
+                if (advancedFishingDetection) {
+                    ErrorLevel := 0
+                    PixelSearch, leftX, leftY, 513, 531, 856, 549, barColor, 5, Fast RGB
+                    if (ErrorLevel = 0) {
+                        rightX := leftX
+                        Loop {
+                            testX := rightX + 1
+                            if (testX > 856)
+                                break
+                            PixelGetColor, testColor, %testX%, 531, RGB
+                            if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
+                                rightX := testX
+                            } else {
+                                break
+                            }
+                        }
+                        barWidth := rightX - leftX
+                        if (barWidth < advancedFishingThreshold) {
+                            MouseClick, left
+                            sleep 25
+                        }
+                    } else {
+                        MouseClick, left
+                    }
+                    sleep 10
+                } else {
+                    ; Normal detection
+                    ErrorLevel := 0
+                    PixelSearch, FoundX, FoundY, 513, 531, 856, 549, barColor, 5, Fast RGB
+                    if (ErrorLevel = 0) {
+                    } else {
+                        MouseClick, left
+                    }
+                }
+            }
+            sleep 300
+            MouseMove, 829, 218, 3
+            Sleep 700
+            MouseClick, Left
+            sleep 300
+            cycleCount++
         }
-        }
-        sleep 300
-        MouseMove, 829, 218, 3
-        Sleep 700
-        MouseClick, Left
-        sleep 300
-        cycleCount++
     }
-}
 Return
 
 StartScript:
-if (!toggle) {
-    Gui, Submit, nohide
-    if (MaxLoopInput > 0) {
-        maxLoopCount := MaxLoopInput
+    if (!toggle) {
+        Gui, Submit, nohide
+        if (MaxLoopInput > 0) {
+            maxLoopCount := max(MaxLoopInput, 1)
+        }
+        if (FishingLoopInput > 0) {
+            fishingLoopCount := max(FishingLoopInput, 1)
+        }
+        toggle := true
+        if (hasBiomesPlugin) {
+            Run, "%A_ScriptDir%\plugins\biomes.ahk"
+            biomeDetectionRunning := true
+        }
+        if (startTick = "") {
+            startTick := A_TickCount
+        }
+        if (cycleCount = "") {
+            cycleCount := 0
+        }
+        WinActivate, ahk_exe RobloxPlayerBeta.exe
+        ManualGUIUpdate()
+        SetTimer, UpdateGUI, 1000
+        switch res
+        {
+            case "1080p" :
+                SetTimer, DoMouseMove, 100
+            case "1440p" :
+                SetTimer, DoMouseMove2, 100
+            case "1366x768" :
+                SetTimer, DoMouseMove3, 100
+            default :
+                SetTimer, DoMouseMove, 100
+        }
+        try SendWebhook(":green_circle: Macro Started!", "7909721")
     }
-    if (FishingLoopInput > 0) {
-        fishingLoopCount := FishingLoopInput
-    }
-    toggle := true
-    if (hasBiomesPlugin) {
-        Run, "%A_ScriptDir%\plugins\biomes.ahk"
-        biomeDetectionRunning := true
-    }
-    if (startTick = "") {
-        startTick := A_TickCount
-    }
-    if (cycleCount = "") {
-        cycleCount := 0
-    }
-    WinActivate, ahk_exe RobloxPlayerBeta.exe
-    ManualGUIUpdate()
-    SetTimer, UpdateGUI, 1000
-    switch res
-    {
-        case "1080p" :
-            SetTimer, DoMouseMove, 100
-        case "1440p" :
-            SetTimer, DoMouseMove2, 100
-        case "1366x768" :
-            SetTimer, DoMouseMove3, 100
-        default :
-            SetTimer, DoMouseMove, 100
-    }
-    try SendWebhook(":green_circle: Macro Started!", "7909721")
-}
 return
 
 StartScript(res) {
     if (!toggle) {
         Gui, Submit, nohide
         if (MaxLoopInput > 0) {
-            maxLoopCount := MaxLoopInput
+            maxLoopCount := max(MaxLoopInput, 1)
         }
         if (FishingLoopInput > 0) {
-            fishingLoopCount := FishingLoopInput
+            fishingLoopCount := max(FishingLoopInput, 1)
         }
         toggle := true
         if (hasBiomesPlugin) {
@@ -3982,57 +3969,56 @@ StartScript(res) {
 }
 
 PauseScript:
-if (toggle) {
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
+    if (toggle) {
+        if (biomeDetectionRunning) {
+            DetectHiddenWindows, On
+            SetTitleMatchMode, 2
 
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
+            target := "biomes.ahk"
+            WinGet, id, ID, %target% ahk_class AutoHotkey
+            if (id) {
+                WinClose, ahk_id %id%
+            }
+            biomeDetectionRunning := false
+        }
+        toggle := false
+        firstLoop := true
+        SetTimer, DoMouseMove, Off
+        SetTimer, DoMouseMove2, Off
+        SetTimer, DoMouseMove3, Off
+        SetTimer, UpdateGUI, Off
+        ManualGUIUpdate()
+        ToolTip
+        try SendWebhook(":yellow_circle: Macro Paused", "16632664")
     }
-    biomeDetectionRunning := false
-}
-toggle := false
-firstLoop := true
-SetTimer, DoMouseMove, Off
-SetTimer, DoMouseMove2, Off
-SetTimer, DoMouseMove3, Off
-SetTimer, UpdateGUI, Off
-ManualGUIUpdate()
-ToolTip
-try SendWebhook(":yellow_circle: Macro Paused", "16632664")
-}
 return
 
 CloseScript:
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
+    if (biomeDetectionRunning) {
+        DetectHiddenWindows, On
+        SetTitleMatchMode, 2
 
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
+        target := "biomes.ahk"
+        WinGet, id, ID, %target% ahk_class AutoHotkey
+        if (id) {
+            WinClose, ahk_id %id%
+        }
+        biomeDetectionRunning := false
     }
-    biomeDetectionRunning := false
-}
-try SendWebhook(":red_circle: Macro Stopped.", "14495300")
+    try SendWebhook(":red_circle: Macro Stopped.", "14495300")
 ExitApp
-return
 
 SelectRes:
-Gui, Submit, nohide
-res := Resolution
-IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-ManualGUIUpdate()
+    Gui, Submit, nohide
+    res := Resolution
+    IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
+    ManualGUIUpdate()
 return
 
 SelectPathing:
-Gui, Submit, nohide
-IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
-pathingMode := PathingMode
+    Gui, Submit, nohide
+    IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
+    pathingMode := PathingMode
 return
 
 Dev1NameClick:
@@ -4068,13 +4054,13 @@ DoLinkClick:
 return
 
 DonateClick:
-Run, https://www.roblox.com/games/106268429577845/fishSol-Donations#!/store
+    Run, https://www.roblox.com/games/106268429577845/fishSol-Donations#!/store
 return
 
 NeedHelpClick:
-Run, https://discord.gg/nPvA54ShTm
+    Run, https://discord.gg/nPvA54ShTm
 return
 
 OpenPluginsFolder:
-Run, %A_ScriptDir%\plugins
+    Run, %A_ScriptDir%\plugins
 return
