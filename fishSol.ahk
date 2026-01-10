@@ -1,6 +1,12 @@
 #Requires AutoHotkey v1.1
 #NoEnv
 #SingleInstance Force
+
+global MAX_SPEED := -1 ;max speed
+global STANDARD_SPEED := A_BatchLines ;store default speed
+
+SetBatchLines, %MAX_SPEED% ;run as fast as possible during setup
+
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
@@ -9,6 +15,11 @@ iconFilePath := A_ScriptDir "\img\icon.ico"
 if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
 }
+
+global version := "1.9.4" ;EASIER VERSION MANAGEMENT
+IniRead, lastVersion, %iniFilePath%, "Macro", "LastVersion" ;check if version number is saved to ini
+if lastVersion != %version%
+    IniWrite, %version%, %iniFilePath%, "Macro", "LastVersion" ;write version to file for plugins to pull
 
 res := "1080p"
 maxLoopCount := 15
@@ -28,13 +39,38 @@ crafterToggle := false
 autoCrafterDetection := false
 autoCrafterLastCheck := 0
 autoCrafterCheckInterval := 2000
+snowmanPathing := false
+snowmanPathingWebhook := false
+autoCrafter := false
+autoCrafterWebhook := false
+
+if (FileExist(iniFilePath)) {
+    ReadSetting(snowmanPathing, "Macro", "snowmanPathing", true)
+    ; IniRead, tempSnowmanPathing, %iniFilePath%, "Macro", "snowmanPathing", 0
+    ; snowmanPathing := (tempSnowmanPathing = "1" || tempSnowmanPathing = "true")
+    ReadSetting(snowmanPathingWebhook, "Macro", "snowmanPathingWebhook")
+    ; IniRead, tempSnowmanPathingWebhook, %iniFilePath%, "Macro", "snowmanPathingWebhook", 0
+    ; snowmanPathingWebhook := (tempSnowmanPathingWebhook = "1" || tempSnowmanPathingWebhook = "true")
+    ReadSetting(autoCrafter, "Macro", "autoCrafter", true)
+    ; IniRead, tempAutoCrafter, %iniFilePath%, "Macro", "autoCrafter", 0
+    ; autoCrafter := (tempAutoCrafter = "1" || tempAutoCrafter = "true")
+    ReadSetting(autoCrafterWebhook, "Macro", "autoCrafterWebhook")
+    ; IniRead, tempAutoCrafterWebhook, %iniFilePath%, "Macro", "autoCrafterWebhook", 0
+    ; autoCrafterWebhook := (tempAutoCrafterWebhook = "1" || tempAutoCrafterWebhook = "true")
+}
 strangeControllerTime := 0
 biomeRandomizerTime := 360000
+snowmanPathingTime := 7500000
+autoCrafterTime := 300000 ; defined but never used
 strangeControllerInterval := 1260000
-biomeRandomizerInterval := 2160000
+biomeRandomizerInterval := 1260000
+snowmanPathingInterval := 7500000
+autoCrafterInterval := 300000
 elapsed := 0
 strangeControllerLastRun := 0
 biomeRandomizerLastRun := 0
+snowmanPathingLastRun := 0
+autoCrafterLastRun := 0  ; defined but never used
 privateServerLink := ""
 globalFailsafeTimer := 0
 fishingFailsafeTime := 31
@@ -44,134 +80,77 @@ advancedFishingThreshold := 25
 webhookURL := ""
 biomesPrivateServerLink := ""
 biomeDetectionRunning := false
-hasCrafterPlugin := FileExist(A_ScriptDir "\plugins\potions.ahk")
+auroraDetection := false ; defined but never used
+;hasCrafterPlugin := FileExist(A_ScriptDir "\plugins\auto crafter.ahk") ; already defined below look for [REDFINED=hasCrafterPlugin]
+
+ReadSetting(byref var, catagory, name, isBoolOrMin:=false, max:="")
+{
+    global
+    IniRead, temp_var, %iniFilePath%, % """" . catagory . """", % """" . name . """"
+    if (temp_var != "ERROR")
+    {
+        if max is Number ; and max != ""
+            var := max(min(temp_var, max), isBoolOrMin)
+        else if isBoolOrMin
+            var := (temp_var = "true" || temp_var = "1")
+        else
+            var := temp_var
+    }
+}
 
 if (FileExist(iniFilePath)) {
-    IniRead, tempRes, %iniFilePath%, "Macro", "resolution"
-    if (tempRes != "ERROR")
-    {
-        res := tempRes
-    }
-    IniRead, tempMaxLoop, %iniFilePath%, "Macro", "maxLoopCount"
-    if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
-    {
-        maxLoopCount := tempMaxLoop
-    }
-    IniRead, tempFishingLoop, %iniFilePath%, "Macro", "fishingLoopCount"
-    if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
-    {
-        fishingLoopCount := tempFishingLoop
-    }
-    IniRead, tempSellAll, %iniFilePath%, "Macro", "sellAllToggle"
-    if (tempSellAll != "ERROR")
-    {
-        sellAllToggle := (tempSellAll = "true" || tempSellAll = "1")
-    }
-    IniRead, tempPathing, %iniFilePath%, "Macro", "pathingMode"
-    if (tempPathing != "ERROR")
-    {
-        pathingMode := tempPathing
-    }
-    IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-    if (tempAzerty != "ERROR")
-    {
-        azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-    }
-    IniRead, tempPrivateServer, %iniFilePath%, "Macro", "privateServerLink"
-    if (tempPrivateServer != "ERROR")
-    {
-        privateServerLink := tempPrivateServer
-    }
-    IniRead, tempAdvancedDetection, %iniFilePath%, "Macro", "advancedFishingDetection"
-    if (tempAdvancedDetection != "ERROR")
-    {
-        advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
-    }
-    IniRead, tempFishingFailsafe, %iniFilePath%, "Macro", "fishingFailsafeTime"
-    if (tempFishingFailsafe != "ERROR" && tempFishingFailsafe > 0)
-    {
-        fishingFailsafeTime := tempFishingFailsafe
-    }
-    IniRead, tempPathingFailsafe, %iniFilePath%, "Macro", "pathingFailsafeTime"
-    if (tempPathingFailsafe != "ERROR" && tempPathingFailsafe > 0)
-    {
-        pathingFailsafeTime := tempPathingFailsafe
-    }
-    IniRead, tempAutoRejoinFailsafe, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-    if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
-    {
-        autoRejoinFailsafeTime := tempAutoRejoinFailsafe
-    }
-    IniRead, tempAutoUnequip, %iniFilePath%, "Macro", "autoUnequip"
-    if (tempAutoUnequip != "ERROR")
-    {
-        autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
-    }
-    IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-    if (tempAzerty != "ERROR")
-    {
-        azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-    }
-    IniRead, tempAdvancedThreshold, %iniFilePath%, "Macro", "advancedFishingThreshold"
-    if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
-    {
-        advancedFishingThreshold := tempAdvancedThreshold
-    }
-    IniRead, tempStrangeController, %iniFilePath%, "Macro", "strangeController"
-    if (tempStrangeController != "ERROR")
-    {
-        strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
-    }
-    IniRead, tempBiomeRandomizer, %iniFilePath%, "Macro", "biomeRandomizer"
-    if (tempBiomeRandomizer != "ERROR")
-    {
-        biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
-    }
-    IniRead, tempAutoCloseChat, %iniFilePath%, "Macro", "autoCloseChat"
-    if (tempAutoCloseChat != "ERROR")
-    {
-        autoCloseChat := (tempAutoCloseChat = "true" || tempAutoCloseChat = "1")
-    }
-    IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
-    if (tempWebhook != "ERROR")
-    {
-        webhookURL := tempWebhook
-    }
-    IniRead, tempBiomesPS, %iniFilePath%, "Biomes", "privateServerLink"
-    if (tempBiomesPS != "ERROR")
-    {
-        biomesPrivateServerLink := tempBiomesPS
-    }
-    IniRead, tempFsWebhook, %iniFilePath%, "Macro", "failsafeWebhook"
-    if (tempFsWebhook != "ERROR")
-    {
-        failsafeWebhook := (tempFsWebhook = "true" || tempFsWebhook = "1")
-    }
-    IniRead, tempPathingWebhook, %iniFilePath%, "Macro", "pathingWebhook"
-    if (tempPathingWebhook != "ERROR")
-    {
-        pathingWebhook := (tempPathingWebhook = "true" || tempPathingWebhook = "1")
-    }
-    IniRead, tempItemWebhook, %iniFilePath%, "Macro", "itemWebhook"
-    if (tempItemWebhook != "ERROR")
-    {
-        itemWebhook := (tempItemWebhook = "true" || tempItemWebhook = "1")
-    }
-    IniRead, tempCrafter, %iniFilePath%, "Macro", "crafterToggle"
-    if (tempCrafter != "ERROR")
-    {
-        crafterToggle := (tempCrafter = "true" || tempCrafter = "1")
-    }
-    IniRead, tempAutoCrafterDetection, %iniFilePath%, "Macro", "autoCrafterDetection"
-    if (tempAutoCrafterDetection != "ERROR")
-    {
-        autoCrafterDetection := (tempAutoCrafterDetection = "true" || tempAutoCrafterDetection = "1")
-    }
+    ReadSetting(res, "Macro", "resolution")
+    ReadSetting(maxLoopCount, "Macro", "maxLoopCount")
+    ReadSetting(fishingLoopCount, "Macro", "fishingLoopCount", 0, 1000) ; adjust if needed
+    ReadSetting(sellAllToggle, "Macro", "sellAllToggle", true)
+    ReadSetting(pathingMode, "Macro", "pathingMode")
+    ; [REDFINED=azertyPathing]
+    ReadSetting(azertyPathing, "Macro", "azertyPathing", true)
+    ReadSetting(privateServerLink, "Macro", "privateServerLink")
+    ReadSetting(advancedFishingDetection, "Macro", "advancedFishingDetection", true)
+    ReadSetting(fishingFailsafeTime, "Macro", "fishingFailsafeTime", 0, 36000000) ; adjust if needed
+    ReadSetting(pathingFailsafeTime, "Macro", "pathingFailsafeTime", 0, 36000000) ; adjust if needed
+    ReadSetting(autoRejoinFailsafeTime, "Macro", "autoRejoinFailsafeTime", 0, 36000000) ; adjust if needed
+    ReadSetting(autoUnequip, "Macro", "autoUnequip", true)
+    ; on here twice check [REDFINED=azertyPathing]
+    ; IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
+    ; if (tempAzerty != "ERROR")
+    ; {
+    ;     azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
+    ; }
+    ReadSetting(advancedFishingThreshold, "Macro", "advancedFishingThreshold", 0, 40) ; adjust if needed
+    ReadSetting(strangeController, "Macro", "strangeController", true)
+    ReadSetting(biomeRandomizer, "Macro", "biomeRandomizer", true)
+    ReadSetting(autoCloseChat, "Macro", "autoCloseChat", true)
+    ReadSetting(webhookURL, "Macro", "webhookURL")
+    ReadSetting(biomesPrivateServerLink, "Biomes", "privateServerLink")
+    ReadSetting(failsafeWebhook, "Macro", "failsafeWebhook", true)
+    ReadSetting(pathingWebhook, "Macro", "pathingWebhook", true)
+    ReadSetting(itemWebhook, "Macro", "itemWebhook", true)
+    ; [REDEFINED=crafterToggle]
+    ReadSetting(crafterToggle, "Macro", "crafterToggle", true)
+    ; [REDEFINED=autoCrafterDetection]
+    ReadSetting(autoCrafterDetection, "Macro", "autoCrafterDetection", true)
 }
 
 ; checks plugin folder
 hasBiomesPlugin := FileExist(A_ScriptDir "\plugins\biomes.ahk")
-hasCrafterPlugin := FileExist(A_ScriptDir "\plugins\potions.ahk")
+hasCrafterPlugin := FileExist(A_ScriptDir "\plugins\auto crafter.ahk") ; [REDFINED=hasCrafterPlugin]
+hasSnowmanPlugin := FileExist(A_ScriptDir "\plugins\snowman.pathing.ahk")
+
+; already been checked look for [REDEFINED=crafterToggle] and [REDEFINED=autoCrafterDetection] comment above
+; if (FileExist(iniFilePath)) {
+    ; ;IniRead, tempCrafter, %iniFilePath%, "Macro", "crafterToggle"
+    ; if (tempCrafter != "ERROR")
+    ; {
+    ;     crafterToggle := (tempCrafter = "true" || tempCrafter = "1")
+    ; }
+    ; ;IniRead, tempAutoCrafterDetection, %iniFilePath%, "Macro", "autoCrafterDetection"
+    ; if (tempAutoCrafterDetection != "ERROR")
+    ; {
+    ;     autoCrafterDetection := (tempAutoCrafterDetection = "true" || tempAutoCrafterDetection = "1")
+    ; }
+; }
 
 code := ""
 if RegExMatch(privateServerLink, "code=([^&]+)", m)
@@ -179,138 +158,108 @@ if RegExMatch(privateServerLink, "code=([^&]+)", m)
     code := m1
 }
 
-Random,, A_TickCount
 Random, shuffle, 1, 6
-Random, messageRand, 1, 10
 
-if (messageRand = 1) {
-    randomMessage := "Go catch some fish IRL sometime!"
-} else if (messageRand = 2) {
-    randomMessage := "Also try FishScope!"
-} else if (messageRand = 3) {
-    randomMessage := "Also try maxstellar's Biome Macro!"
-} else if (messageRand = 4) {
-    randomMessage := "Also try MultiScope!"
-} else if (messageRand = 5) {
-    randomMessage := "Patch notes: Fixed a Geneva Convention violation"
-} else if (messageRand = 6) {
-    randomMessage := "Patch notes: Removed Herobrine"
-} else if (messageRand = 7) {
-    randomMessage := "oof"
-} else if (messageRand = 8) {
-    randomMessage := "Now with 100% more fishing!"
-} else if (messageRand = 9) {
-    randomMessage := "Gone fishing"
-} else {
-    randomMessage := "No fish were harmed in the making of this macro"
+Random,, A_TickCount
+
+randomMessages := ["Go catch some fish IRL sometime!"
+                    , "Also try FishScope!"
+                    , "Also try maxstellar's Biome Macro!"
+                    , "Also try MultiScope!"
+                    , "Patch notes: Fixed a Geneva Convention violation"
+                    , "Patch notes: Removed Herobrine"
+                    , "oof"
+                    , "Now with 100% more fishing!"
+                    , "Gone fishing"
+                    , "No fish were harmed in the making of this macro"]
+
+Random, messageRand, 1, randomMessages.Length()
+
+randomMessage := randomMessages[messageRand]
+
+Devs := []
+
+Devs.Push({dev_name:"maxstellar"
+         , dev_role:"Twitch"
+         , dev_discord:"Lead Developer"
+         , dev_img:A_ScriptDir . "\img\maxstellar.png"
+         , dev_link:"https://www.twitch.tv/maxstellar"})
+Devs.Push({dev_name:"ivelchampion249"
+         , dev_role:"YouTube"
+         , dev_discord:"Original Creator"
+         , dev_img:A_ScriptDir . "\img\Ivel.png"
+         , dev_link:"https://www.youtube.com/@ivelchampion"})
+Devs.Push({dev_name:"cresqnt"
+         , dev_role:"Scope Development (other macros)"
+         , dev_discord:"Frontend Developer"
+         , dev_img:A_ScriptDir . "\img\cresqnt.png"
+         , dev_link:"https://scopedevelopment.tech"
+         , dev_website:"https://cresqnt.com"})
+
+       
+Randomised_DevOrder := ""
+
+loop % Devs.Length()
+{
+    Randomised_DevOrder .= A_Index
+    if (A_Index) < (Devs.Length())
+        Randomised_DevOrder .= "|"
+} 
+
+Sort, Randomised_DevOrder, Random D|
+Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
+
+loop % Devs.Length()
+{
+    dev%A_Index%_name       := Devs[Randomised_DevOrder[A_INDEX]].dev_name
+    dev%A_Index%_role       := Devs[Randomised_DevOrder[A_INDEX]].dev_role
+    dev%A_Index%_discord    := Devs[Randomised_DevOrder[A_INDEX]].dev_discord
+    dev%A_Index%_img        := Devs[Randomised_DevOrder[A_INDEX]].dev_img
+    dev%A_Index%_link       := Devs[Randomised_DevOrder[A_INDEX]].dev_link
+    dev%A_Index%_website    := Devs[Randomised_DevOrder[A_INDEX]].dev_website
 }
 
-if (shuffle = 1) {
-    dev1_name := "maxstellar"
-    dev1_discord := "Twitch"
-    dev1_role := "Lead Developer"
-    dev2_name := "ivelchampion249"
-    dev2_discord := "YouTube"
-    dev2_role := "Original Creator"
-    dev3_name := "cresqnt"
-    dev3_discord := "Scope Development (other macros)"
-    dev3_role := "Frontend Developer"
-} else if (shuffle = 2) {
-    dev1_name := "maxstellar"
-    dev1_discord := "Twitch"
-    dev1_role := "Lead Developer"
-    dev2_name := "cresqnt"
-    dev2_discord := "Scope Development (other macros)"
-    dev2_role := "Frontend Developer"
-    dev3_name := "ivelchampion249"
-    dev3_discord := "YouTube"
-    dev3_role := "Original Creator"
-} else if (shuffle = 3) {
-    dev1_name := "cresqnt"
-    dev1_discord := "Scope Development (other macros)"
-    dev1_role := "Frontend Developer"
-    dev2_name := "ivelchampion249"
-    dev2_discord := "YouTube"
-    dev2_role := "Original Creator"
-    dev3_name := "maxstellar"
-    dev3_discord := "Twitch"
-    dev3_role := "Lead Developer"
-} else if (shuffle = 4) {
-    dev1_name := "cresqnt"
-    dev1_discord := "Scope Development (other macros)"
-    dev1_role := "Frontend Developer"
-    dev2_name := "maxstellar"
-    dev2_discord := "Twitch"
-    dev2_role := "Lead Developer"
-    dev3_name := "ivelchampion249"
-    dev3_discord := "YouTube"
-    dev3_role := "Original Creator"
-} else if (shuffle = 5) {
-    dev1_name := "ivelchampion249"
-    dev1_discord := "YouTube"
-    dev1_role := "Original Creator"
-    dev2_name := "maxstellar"
-    dev2_discord := "Twitch"
-    dev2_role := "Lead Developer"
-    dev3_name := "cresqnt"
-    dev3_discord := "Scope Development (other macros)"
-    dev3_role := "Frontend Developer"
-} else {
-    dev1_name := "ivelchampion249"
-    dev1_discord := "YouTube"
-    dev1_role := "Original Creator"
-    dev2_name := "cresqnt"
-    dev2_discord := "Scope Development (other macros)"
-    dev2_role := "Frontend Developer"
-    dev3_name := "maxstellar"
-    dev3_discord := "Twitch"
-    dev3_role := "Lead Developer"
-}
+global TextColorDefault := "c0xCCCCCC"
+global TextColorRed := "c0xFF4444"
+global TextColorLBlue := "c0x00D4FF"
+global TextColorLGreen := "c0x00DD00"
+global TextColorGreen := "c0x00FF00"
+global GuiDefaultColor := "0x1E1E1E"
+global ButtonFlat := "+0x8000"
 
-dev1_img := ""
-dev2_img := ""
-dev3_img := ""
 
-if (dev1_name = "ivelchampion249") {
-    dev1_img := A_ScriptDir . "\img\Ivel.png"
-} else if (dev1_name = "maxstellar") {
-    dev1_img := A_ScriptDir . "\img\maxstellar.png"
-} else if (dev1_name = "cresqnt") {
-    dev1_img := A_ScriptDir . "\img\cresqnt.png"
-}
 
-if (dev2_name = "ivelchampion249") {
-    dev2_img := A_ScriptDir . "\img\Ivel.png"
-} else if (dev2_name = "maxstellar") {
-    dev2_img := A_ScriptDir . "\img\maxstellar.png"
-} else if (dev2_name = "cresqnt") {
-    dev2_img := A_ScriptDir . "\img\cresqnt.png"
-}
-
-if (dev3_name = "ivelchampion249") {
-    dev3_img := A_ScriptDir . "\img\Ivel.png"
-} else if (dev3_name = "maxstellar") {
-    dev3_img := A_ScriptDir . "\img\maxstellar.png"
-} else if (dev3_name = "cresqnt") {
-    dev3_img := A_ScriptDir . "\img\cresqnt.png"
-}
-
-Gui, Color, 0x1E1E1E
+Gui, Color, %GuiDefaultColor%
 Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans c0x00D4FF, fishSol v1.9
+Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %TextColorLBlue%, fishSol v%version%
 
 Gui, Font, s9 cWhite Normal, Segoe UI
+; define DrawHelpDonate() function to reuse same code elsewhere
+DrawHelpDonate(X:=0)
+{
+    global
+    local xOFF1, xOFF2, xOFF3, xOFF4
+    
+    Gui, Font, s10 cWhite Normal Bold
+    
+    Gui, Color, %GuiDefaultColor%
+    
+    xOFF1 := 445 + X
+    Gui, Add, Picture, x%xOFF1% y600 w27 h19, %A_ScriptDir%\img\Discord.png
+    xOFF2 := 538 + X
+    Gui, Add, Picture, x%xOFF2% y601 w18 h19, %A_ScriptDir%\img\Robux.png
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x440 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x533 y601 w18 h19, %A_ScriptDir%\img\Robux.png
+    Gui, Font, s11 cWhite Bold Underline, Segoe UI
+    
+    xOFF3 := 430 + X
+    Gui, Add, Text, x%xOFF3% y600 w150 h38 Center BackgroundTrans %TextColorGreen% gDonateClick, Donate!
+    xOFF4 := 330 + X
+    Gui, Add, Text, x%xOFF4% y600 w138 h38 Center BackgroundTrans %TextColorLBlue% gNeedHelpClick, Need Help?
+    Gui, Font, s10 cWhite Bold, Segoe UI
+}
+DrawHelpDonate(-5)
 
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x425 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x325 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
-Gui, Font, s10 cWhite Normal, Segoe UI
+Gui, Font, s10 cWhite Normal Bold
 
 ; adds plugin to tab list
 tabList := "Main|Misc|Failsafes|Webhook"
@@ -318,6 +267,8 @@ if (hasBiomesPlugin)
     tabList .= "|Biomes"
 if (hasCrafterPlugin)
     tabList .= "|Crafter"
+if (hasSnowmanPlugin)
+    tabList .= "|Snowman"
 tabList .= "|Credits"
 
 Gui, Add, Tab3, x15 y55 w570 h600 vMainTabs gTabChange c0xFFFFFF, %tabList%
@@ -326,27 +277,19 @@ Gui, Tab, Main
 
 Gui, Add, Picture, x14 y60 w574 h590, %A_ScriptDir%\gui\Main.png
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x440 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x533 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x425 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x325 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
+DrawHelpDonate(-5)
 
 Gui, Font, s11 cWhite Normal Bold
 Gui, Add, Text, x45 y110 w60 h25 BackgroundTrans, Status:
-Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans c0xFF4444, Stopped
+Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans %TextColorRed%, Stopped
 
 Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 +0x8000, Start
-Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 +0x8000, Pause
-Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn c0xFF4444 +0x8000, Stop
+Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 %ButtonFlat% , Start
+Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 %ButtonFlat% , Pause
+Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn %TextColorRed% %ButtonFlat% , Stop
 
-Gui, Font, s8 c0xCCCCCC
+Gui, Font, s8 %TextColorDefault%
 Gui, Add, Text, x45 y185 w240 h15 BackgroundTrans, Hotkeys: F1=Start - F2=Pause - F3=Stop
-
 
 
 Gui, Font, s10 cWhite Bold, Segoe UI
@@ -354,24 +297,24 @@ Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x320 y110 w80 h25 BackgroundTrans, Resolution:
 Gui, Add, DropDownList, x320 y135 w120 h200 vResolution gSelectRes, 1080p|1440p|1366x768
 
-Gui, Font, s9 c0x00DD00 Bold
+Gui, Font, s9 cWhite Bold, Segoe UI
 Gui, Add, Text, x320 y165 w220 h25 vResStatusText BackgroundTrans, Ready
 
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x450 y135 w100 h25 gToggleSellAll vSellAllBtn, Toggle Sell All
-Gui, Font, s8 c0xCCCCCC
+Gui, Font, s8 %TextColorDefault%
 Gui, Add, Text, x450 y165 w100 h25 vSellAllStatus BackgroundTrans, OFF
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x45 y240 w180 h25 BackgroundTrans, Fishing Loop Count:
 Gui, Add, Edit, x220 y238 w60 h25 vMaxLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %maxLoopCount%
-Gui, Font, s8 c0xCCCCCC
+Gui, Font, s8 %TextColorDefault%
 Gui, Add, Text, x285 y242 w270 h15 BackgroundTrans, (Fishing Cycles Before Reset - default: 15)
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x45 y270 w180 h25 BackgroundTrans, Sell Loop Count:
 Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %fishingLoopCount%
-Gui, Font, s8 c0xCCCCCC
+Gui, Font, s8 %TextColorDefault%
 Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (Sell Cycles  -  If Sell All: 22)
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x45 y301 w120 h25 BackgroundTrans, Pathing Mode:
@@ -379,45 +322,45 @@ Gui, Add, DropDownList, x145 y298 w135 h200 vPathingMode gSelectPathing, Vip Pat
 
 Gui, Add, Text, x295 y301 w120 h25 BackgroundTrans, AZERTY Pathing:
 Gui, Add, Button, x415 y298 w80 h25 gToggleAzertyPathing vAzertyPathingBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
 Gui, Add, Text, x510 y303 w60 h25 vAzertyPathingStatus BackgroundTrans, OFF
 
 Gui, Font, s10 cWhite Bold
 
-Gui, Color, 0x1E1E1E
+Gui, Color, %GuiDefaultColor%
 Gui, Font, s10 cWhite Bold, Segoe UI
 
 Gui, Font, s11 c0xFF2C00 Bold
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x270 y380 w80 h25 gToggleAdvancedFishingDetection vAdvancedFishingDetectionBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
 Gui, Add, Text, x360 y384 w60 h25 vAdvancedFishingDetectionStatus BackgroundTrans, OFF
 
 Gui, Font, s9 cWhite Bold, Segoe UI
 Gui, Add, Text, x270 y415 w260 cWhite BackgroundTrans, Advanced Detection Threshold -
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans c0xCCCCCC, Customize how many pixels are left in the fishing range before clicking.
+Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans %TextColorDefault%, Customize how many pixels are left in the fishing range before clicking.
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x400 y384 w80 h25 BackgroundTrans, Pixels:
 Gui, Font, s9 cWhite Bold
-Gui, Add, Text, x453 y416 w120 BackgroundTrans c0xFF4444, Max : 40 Pixels
+Gui, Add, Text, x453 y416 w120 BackgroundTrans %TextColorRed%, Max : 40 Pixels
 Gui, Font, s10 cWhite Bold
 Gui, Add, Edit, x455 y380 w75 h25 vAdvancedThresholdInput gUpdateAdvancedThreshold Number Background0xD3D3D3 cBlack, %advancedFishingThreshold%
 
-Gui, Font, s9 c0xCCCCCC Normal
+Gui, Font, s9 %TextColorDefault% Normal
 Gui, Add, Text, x50 y470 w515 h30 BackgroundTrans, Advanced Fishing Detection uses a system that clicks slightly before the bar exits the fish range, making the catch rate higher than ever.
 
-Gui, Font, s9 c0x00D4FF Bold
-Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans c0x00D4FF, [ Recommended For Lower End Devices ]
+Gui, Font, s9 %TextColorLBlue% Bold
+Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans %TextColorLBlue%, [ Recommended For Lower End Devices ]
 
 Gui, Font, s11 cWhite Bold, Segoe UI
 Gui, Add, Text, x50 y375 w100 h30 BackgroundTrans, Runtime:
-Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans c0x00DD00, 00:00:00
+Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans %TextColorLGreen%, 00:00:00
 
 Gui, Add, Text, x50 y405 w100 h30 BackgroundTrans, Cycles:
-Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans c0x00DD00, 0
+Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans %TextColorLGreen%, 0
 
-Gui, Font, s9 c0xCCCCCC Normal
+Gui, Font, s9 %TextColorDefault% Normal
 Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
 Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
 
@@ -428,10 +371,10 @@ Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Misc.png
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans c0xCCCCCC, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
+Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans %TextColorDefault%, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x45 y188 w80 h25 gToggleAutoUnequip vAutoUnequipBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
 Gui, Add, Text, x140 y192 w60 h25 vAutoUnequipStatus BackgroundTrans, OFF
 Gui, Font, s10 cWhite Bold, Segoe UI
 
@@ -441,7 +384,7 @@ Gui, Add, Text, x45 y303 w190 h25 BackgroundTrans, Biome Randomizer:
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x200 y270 w80 h25 gToggleStrangeController vStrangeControllerBtn, Toggle
 Gui, Add, Button, x200 y314 w80 h25 gToggleBiomeRandomizer vBiomeRandomizerBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
 Gui, Add, Text, x290 y275 w60 h25 vStrangeControllerStatus BackgroundTrans, OFF
 Gui, Add, Text, x290 y319 w60 h25 vBiomeRandomizerStatus BackgroundTrans, OFF
 
@@ -450,7 +393,7 @@ Gui, Add, Progress, x190 y270 w1 h27 Background696868
 Gui, Add, Progress, x41 y296 w149 h1 Background696868
 Gui, Add, Progress, x184 y269 w7 h1 Background696868
 Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 21 minutes.
+Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans %TextColorDefault%, Uses every 21 minutes.
 
 Gui, Font, s10 cWhite Normal
 Gui, Add, Text, x327 y275 w500 h15 BackgroundTrans, Automatically uses Strange Controller.
@@ -460,43 +403,37 @@ Gui, Add, Progress, x190 y313 w1 h27 Background696868
 Gui, Add, Progress, x41 y339 w149 h1 Background696868
 Gui, Add, Progress, x184 y313 w7 h1 Background696868
 Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 36 minutes.
+Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans %TextColorDefault%, Uses every 36 minutes.
 
 Gui, Font, s10 cWhite Normal
 Gui, Add, Text, x327 y319 w500 h15 BackgroundTrans, Automatically uses Biome Randomizer.
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans c0xCCCCCC, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
+Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans %TextColorDefault%, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x320 y188 w80 h25 gToggleAutoCloseChat vAutoCloseChatBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
 Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans, OFF
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+DrawHelpDonate()
 
 Gui, Tab, Failsafes
 
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Failsafes.png
 
 Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans c0xCCCCCC, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
+Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans %TextColorDefault%, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
 
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x50 y190 w150 h25 BackgroundTrans, Private Server Link:
 Gui, Add, Edit, x50 y215 w500 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
 
-Gui, Font, s8 c0xCCCCCC Normal
+Gui, Font, s8 %TextColorDefault% Normal
 Gui, Add, Text, x50 y245 w500 h15 BackgroundTrans, Paste your Roblox private server link here (leave empty to disable)
 
 Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
+Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans %TextColorDefault%, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
 
 Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x145 y275 w150 h25 BackgroundTrans, Seconds:
@@ -505,7 +442,7 @@ Gui, Add, Edit, x218 y272 w150 h25 vAutoRejoinFailsafeInput gUpdateAutoRejoinFai
 Gui, Font, s10 cWhite Bold, Segoe UI
 
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Fishing Failsafe triggers. (Default : 31)
+Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans %TextColorDefault%, Customize how long until the Fishing Failsafe triggers. (Default : 31)
 
 Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x45 y413 w150 h35 BackgroundTrans, Seconds:
@@ -514,20 +451,13 @@ Gui, Add, Edit, x125 y411 w150 h25 vFishingFailsafeInput gUpdateFishingFailsafe 
 Gui, Font, s10 cWhite Bold, Segoe UI
 
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans c0xCCCCCC, Customize how long until the Pathing Failsafe triggers. (Default : 61)
+Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans %TextColorDefault%, Customize how long until the Pathing Failsafe triggers. (Default : 61)
 
 Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x320 y413 w150 h35 BackgroundTrans, Seconds:
 Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background0xD3D3D3 cBlack, %pathingFailsafeTime%
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
+DrawHelpDonate()
 
 if (hasBiomesPlugin) {
     Gui, Tab, Biomes
@@ -535,45 +465,41 @@ if (hasBiomesPlugin) {
     Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Biomes.png
 
     Gui, Font, s9 cWhite Normal, Segoe UI
-    Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans c0xCCCCCC, Choose which biomes are sent to Discord:
+    Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans %TextColorDefault%, Choose which biomes are sent to Discord:
 
     Gui, Font, s11 cWhite Bold, Segoe UI
     Gui, Add, CheckBox, x50 y320 w140 h25 vBiomeWindy gSaveBiomeToggles Checked1 cWhite, Windy
     Gui, Add, CheckBox, x50 y350 w140 h25 vBiomeSnowy gSaveBiomeToggles Checked1 cWhite, Snowy
     Gui, Add, CheckBox, x50 y380 w140 h25 vBiomeRainy gSaveBiomeToggles Checked1 cWhite, Rainy
+    Gui, Add, CheckBox, x50 y410 w140 h25 vBiomeHeaven gSaveBiomeToggles Checked1 cWhite, Heaven
 
     Gui, Add, CheckBox, x250 y320 w140 h25 vBiomeHell gSaveBiomeToggles Checked1 cWhite, Hell
     Gui, Add, CheckBox, x250 y350 w140 h25 vBiomeStarfall gSaveBiomeToggles Checked1 cWhite, Starfall
     Gui, Add, CheckBox, x250 y380 w140 h25 vBiomeCorruption gSaveBiomeToggles Checked1 cWhite, Corruption
+    Gui, Add, CheckBox, x250 y410 w140 h25 vBiomeAurora gSaveBiomeToggles Checked1 cWhite, Aurora
 
     Gui, Add, CheckBox, x420 y380 w140 h25 vBiomeNormal gSaveBiomeToggles Checked1 cWhite, Normal
     Gui, Add, CheckBox, x420 y320 w140 h25 vBiomeSandStorm gSaveBiomeToggles Checked1 cWhite, Sand Storm
     Gui, Add, CheckBox, x420 y350 w140 h25 vBiomeNull gSaveBiomeToggles Checked1 cWhite, Null
 
     Gui, Font, s14 cWhite Bold
-    Gui, Add, Text, x65 y420 c0x65FF65, Glitched
-    Gui, Add, Text, x+1 y420, ,
-    Gui, Add, Text, x+5 y420 c0xFF7DFF, Dreamspace
-    Gui, Add, Text, x+5 y420, and
-    Gui, Add, Text, x+5 y420 c0x00ddff, Cyberspace
-    Gui, Add, Text, x+5 y420, are always on.
+    Gui, Add, Text, x45 y445 c0x65FF65, Glitched
+    Gui, Add, Text, x+2 y445, ,
+    Gui, Add, Text, x+8 y445 c0xFF7DFF, Dreamspace
+    Gui, Add, Text, x+8 y445, and
+    Gui, Add, Text, x+8 y445 c0x00ddff, Cyberspace
+    Gui, Add, Text, x+8 y445, are always on.
 
     Gui, Font, s10 cWhite Bold
     Gui, Add, Text, x50 y155 w200 h25 BackgroundTrans, Private Server Link:
     Gui, Add, Edit, x50 y185 w500 h25 vBiomesPrivateServerInput gUpdateBiomesPrivateServer Background0xD3D3D3 cBlack, %biomesPrivateServerLink%
-    Gui, Font, s8 c0xCCCCCC Normal
+    Gui, Font, s8 %TextColorDefault% Normal
     Gui, Add, Text, x50 y215 w500 h15 BackgroundTrans, Paste your Roblox private server link here for biome notifications.
 
     Gui, Font, s10 cWhite Bold
-    Gui, Add, Button, x425 y465 w115 h40 gOpenPluginsFolder, Open Plugins Folder
+    Gui, Add, Button, x425 y490 w115 h40 gOpenPluginsFolder, Open Plugins Folder
 
-    Gui, Color, 0x1E1E1E
-    Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-    Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-    Gui, Font, s11 cWhite Bold Underline, Segoe UI
-    Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-    Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+    DrawHelpDonate()
 }
 
 if (hasCrafterPlugin) {
@@ -585,22 +511,16 @@ if (hasCrafterPlugin) {
     Gui, Add, Text, x45 y135 w200 h25 BackgroundTrans, example text:
     Gui, Font, s10 cWhite Bold
     Gui, Add, Button, x250 y135 w80 h25 gToggleCrafter vCrafterBtn, Toggle
-    Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+    Gui, Font, s10 %TextColorDefault% Bold, Segoe UI
     Gui, Add, Text, x340 y140 w60 h25 vCrafterStatus BackgroundTrans, OFF
 
     Gui, Font, s9 cWhite Normal, Segoe UI
-    Gui, Add, Text, x45 y185 w500 h60 BackgroundTrans c0xCCCCCC, example text
+    Gui, Add, Text, x45 y185 w500 h60 BackgroundTrans %TextColorDefault%, example text
 
     Gui, Font, s10 cWhite Bold
     Gui, Add, Button, x425 y505 w115 h40 gOpenPluginsFolder, Open Plugins Folder
 
-    Gui, Color, 0x1E1E1E
-    Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-    Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-    Gui, Font, s11 cWhite Bold Underline, Segoe UI
-    Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-    Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+    DrawHelpDonate()
 }
 
 Gui, Tab, Webhook
@@ -610,13 +530,13 @@ Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Webhook.png
 Gui, Font, s10 cWhite Normal Bold
 Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
 Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
-Gui, Font, s8 c0xCCCCCC Normal
+Gui, Font, s8 %TextColorDefault% Normal
 Gui, Add, Text, x50 y180 w500 h15 BackgroundTrans, Paste your Discord webhook URL here to be notified of actions happening in real time.
 
 Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when a failsafe triggers.
-Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when the macro paths to auto-sell.
-Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
+Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when a failsafe triggers.
+Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when the macro paths to auto-sell.
+Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans %TextColorDefault%, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
 
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x60 y216 w80 h25 gToggleFailsafeWebhook vFailsafeWebhookBtn, Toggle
@@ -625,203 +545,154 @@ Gui, Add, Button, x60 y286 w80 h25 gTogglePathingWebhook vPathingWebhookBtn, Tog
 Gui, Add, Text, x150 y290 w60 h25 vpathingWebhookStatus BackgroundTrans, OFF
 Gui, Add, Button, x60 y356 w80 h25 gToggleItemWebhook vItemWebhookBtn, Toggle
 Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans, OFF
-Gui, Font, s10 cWhite Normal
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
+DrawHelpDonate()
 
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+if (hasSnowmanPlugin) {
+    Gui, Tab, Snowman
+    Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Snowman.png
+
+    Gui, Font, s10 %TextColorDefault% Normal
+    Gui, Add, Text, x60 y190 w500 h50 BackgroundTrans, When toggled, The macro will automatically collect snowflakes every 2 hours and 5 minutes from the snowman located near Lime.
+    Gui, Add, Text, x45 y340 w520 h50 BackgroundTrans, Pathing modes and Resolutions are automatically detected. And will work as normal for this plugin depending on what you have selected.
+    Gui, Add, Text, x60 y270 w520 h50 BackgroundTrans, When toggled, you will recieve a webhook message every Snowman Pathing Loop.
+
+    Gui, Font, s11 %TextColorDefault% Normal
+    Gui, Add, Text, x72 y385 w520 h30 BackgroundTrans, Make sure you have claimed your Snowflakes before running this script.
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, Button, x60 y160 w80 h25 gToggleSnowmanPathing vSnowmanPathingBtn, Toggle
+
+    Gui, Add, Button, x60 y240 w80 h25 gToggleSnowmanPathingWebhook vSnowmanPathingWebhookBtn, Toggle
+
+    Gui, Font, s10 cWhite Normal Bold
+    if (snowmanPathing) {
+        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %TextColorLGreen%, ON
+    } else {
+        Gui, Add, Text, x150 y165 w40 h25 vSnowmanPathingStatus BackgroundTrans %TextColorRed%, OFF
+    }
+
+    if (snowmanPathingWebhook) {
+        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %TextColorLGreen%, ON
+    } else {
+        Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %TextColorRed%, OFF
+    }
+
+}
 
 Gui, Tab, Credits
-
 Gui, Add, Picture, x14 y80 w574 h590, %A_ScriptDir%\gui\Credits.png
+Gui, Font, s10 cWhite Normal
+loop % Devs.Count()
+{
+    yFULL_OFFSET := 65 * (A_INDEX - 1)
+    yoff1 := 130 + yFULL_OFFSET
+    yoff2 := 135 + yFULL_OFFSET
+    yoff3 := 155 + yFULL_OFFSET
+    yoff4 := 170 + yFULL_OFFSET
+    dev_img     := dev%A_INDEX%_img
+    dev_name    := dev%A_INDEX%_name
+    dev_role    := dev%A_INDEX%_role
+    dev_discord := dev%A_INDEX%_discord
+    Gui, Font, s11 cWhite Normal Bold
+    Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
 
-Gui, Add, Picture, x50 y130 w50 h50, %dev1_img%
-Gui, Font, s11 cWhite Normal Bold
-if (dev1_name = "cresqnt") {
-    Gui, Add, Text, x110 y135 w200 h20 BackgroundTrans c0x0088FF gDev1NameClick, %dev1_name%
-} else {
-    Gui, Add, Text, x110 y135 w200 h20 BackgroundTrans c0x00DD00, %dev1_name%
+    Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, %dev_name%
+
+    Gui, Font, s9 %TextColorDefault% Normal
+    Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, %dev_role%
+    Gui, Font, s9 %TextColorDefault% Normal Underline
+    Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, %dev_discord%
 }
-Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y155 w300 h15 BackgroundTrans, %dev1_role%
-Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y170 w300 h15 BackgroundTrans c0x0088FF gDev1LinkClick, %dev1_discord%
 
-Gui, Font, s11 cWhite Normal Bold
-Gui, Add, Picture, x50 y195 w50 h50, %dev2_img%
-if (dev2_name = "cresqnt") {
-    Gui, Add, Text, x110 y200 w200 h20 BackgroundTrans c0x0088FF gDev2NameClick, %dev2_name%
-} else {
-    Gui, Add, Text, x110 y200 w200 h20 BackgroundTrans c0x00DD00, %dev2_name%
-}
-Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y220 w300 h15 BackgroundTrans, %dev2_role%
-Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y235 w300 h15 BackgroundTrans c0x0088FF gDev2LinkClick, %dev2_discord%
+url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
 
-Gui, Add, Picture, x50 y260 w50 h50, %dev3_img%
-Gui, Font, s11 cWhite Normal Bold
-if (dev3_name = "cresqnt") {
-    Gui, Add, Text, x110 y265 w200 h20 BackgroundTrans c0x0088FF gDev3NameClick, %dev3_name%
-} else {
-    Gui, Add, Text, x110 y265 w200 h20 BackgroundTrans c0x00DD00, %dev3_name%
-}
-Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y285 w300 h15 BackgroundTrans, %dev3_role%
-Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y300 w300 h15 BackgroundTrans c0x0088FF gDev3LinkClick, %dev3_discord%
+Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+Http.Open("GET", url, false)
+Http.Send()
 
-try {
-    url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
+content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
 
-    Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-    Http.Open("GET", url, false)
-    Http.Send()
-
-    content := Http.ResponseText
-} catch {
-    content := "Failed to grab donator list."
-}
 Gui, Font, s10 cWhite Normal Bold
 Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
-Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, %content%
+Gui, Font, s9 %TextColorDefault% Normal
+Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D %TextColorDefault%, %content%
 
-Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, fishSol v1.9 - %randomMessage%
+Gui, Font, s8 %TextColorDefault% Normal
+Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, fishSol v%version% - %randomMessage%
 
-Gui, Show, w600 h670, fishSol v1.9
+Gui, Show, w600 h670, fishSol v%version%
 
-Gui, Color, 0x1E1E1E
-Gui, Add, Picture, x445 y600 w27 h19, %A_ScriptDir%\img\Discord.png
-Gui, Add, Picture, x538 y601 w18 h19, %A_ScriptDir%\img\Robux.png
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+DrawHelpDonate()
 
 LoadBiomeToggles()
 
-if (res = "1080p") {
-    GuiControl, Choose, Resolution, 1
-} else if (res = "1440p") {
-    GuiControl, Choose, Resolution, 2
-} else if (res = "1366x768") {
-    GuiControl, Choose, Resolution, 3
-} else {
-    GuiControl, Choose, Resolution, 1
-    res := "1080p"
+switch res
+{
+    case "1080p" :
+        GuiControl, Choose, Resolution, 1
+    case "1440p" : 
+        GuiControl, Choose, Resolution, 2
+    case "1366x768" : 
+        GuiControl, Choose, Resolution, 3
+    default :
+        GuiControl, Choose, Resolution, 1
+        res := "1080p"
 }
 
-if (sellAllToggle) {
-    GuiControl,, SellAllStatus, ON
-    GuiControl, +c0x00DD00, SellAllStatus
-} else {
-    GuiControl,, SellAllStatus, OFF
-    GuiControl, +c0xFF4444, SellAllStatus
-}
-
-if (advancedFishingDetection) {
-    GuiControl,, AdvancedFishingDetectionStatus, ON
-    GuiControl, +c0x00DD00, AdvancedFishingDetectionStatus
-} else {
-    GuiControl,, AdvancedFishingDetectionStatus, OFF
-    GuiControl, +c0xFF4444, AdvancedFishingDetectionStatus
-}
-
-if (pathingMode = "Vip Pathing") {
-    GuiControl, Choose, PathingMode, 1
-} else if (pathingMode = "Non Vip Pathing") {
-    GuiControl, Choose, PathingMode, 2
-} else if (pathingMode = "Abyssal Pathing") {
-    GuiControl, Choose, PathingMode, 3
-} else {
-    GuiControl, Choose, PathingMode, 1
-    pathingMode := "Vip Pathing"
-}
-
-if (azertyPathing) {
-    GuiControl,, AzertyPathingStatus, ON
-    GuiControl, +c0x00DD00, AzertyPathingStatus
-} else {
-    GuiControl,, AzertyPathingStatus, OFF
-    GuiControl, +c0xFF4444, AzertyPathingStatus
-}
-
-if (autoUnequip) {
-    GuiControl,, AutoUnequipStatus, ON
-    GuiControl, +c0x00DD00, AutoUnequipStatus
-} else {
-    GuiControl,, AutoUnequipStatus, OFF
-    GuiControl, +c0xFF4444, AutoUnequipStatus
-}
-
-if (autoCloseChat) {
-    GuiControl,, AutoCloseChatStatus, ON
-    GuiControl, +c0x00DD00, AutoCloseChatStatus
-} else {
-    GuiControl,, AutoCloseChatStatus, OFF
-    GuiControl, +c0xFF4444, AutoCloseChatStatus
-}
-
-if (strangeController) {
-    GuiControl,, StrangeControllerStatus, ON
-    GuiControl, +c0x00DD00, StrangeControllerStatus
-} else {
-    GuiControl,, StrangeControllerStatus, OFF
-    GuiControl, +c0xFF4444, StrangeControllerStatus
-}
-
-if (biomeRandomizer) {
-    GuiControl,, BiomeRandomizerStatus, ON
-    GuiControl, +c0x00DD00, BiomeRandomizerStatus
-} else {
-    GuiControl,, BiomeRandomizerStatus, OFF
-    GuiControl, +c0xFF4444, BiomeRandomizerStatus
-}
-
-if (failsafeWebhook) {
-    GuiControl,, failsafeWebhookStatus, ON
-    GuiControl, +c0x00DD00, failsafeWebhookStatus
-} else {
-    GuiControl,, failsafeWebhookStatus, OFF
-    GuiControl, +c0xFF4444, failsafeWebhookStatus
-}
-
-if (pathingWebhook) {
-    GuiControl,, pathingWebhookStatus, ON
-    GuiControl, +c0x00DD00, pathingWebhookStatus
-} else {
-    GuiControl,, pathingWebhookStatus, OFF
-    GuiControl, +c0xFF4444, pathingWebhookStatus
-}
-
-if (itemWebhook) {
-    GuiControl,, itemWebhookStatus, ON
-    GuiControl, +c0x00DD00, itemWebhookStatus
-} else {
-    GuiControl,, itemWebhookStatus, OFF
-    GuiControl, +c0xFF4444, itemWebhookStatus
-}
-
-if (hasCrafterPlugin) {
-    if (crafterToggle) {
-        GuiControl,, CrafterStatus, ON
-        GuiControl, +c0x00DD00, CrafterStatus
-        autoCrafterDetection := true
-        autoCrafterLastCheck := A_TickCount
+checkToggle(byref toggle, byref status)
+{
+    global
+    if (toggle) {
+        GuiControl,, %status%, ON
+        GuiControl, +%TextColorLGreen%, %status%
     } else {
-        GuiControl,, CrafterStatus, OFF
-        GuiControl, +c0xFF4444, CrafterStatus
-        autoCrafterDetection := false
+        GuiControl,, %status%, OFF
+        GuiControl, +%TextColorRed%, %status%
     }
 }
 
-return
+checkToggle(sellAllToggle, "SellAllStatus")
+checkToggle(advancedFishingDetection, "AdvancedFishingDetectionStatus")
+
+switch pathingMode
+{
+    case "Vip Pathing" : 
+        GuiControl, Choose, PathingMode, 1
+    case "Non Vip Pathing" : 
+        GuiControl, Choose, PathingMode, 2
+    case "Abyssal Pathing" : 
+        GuiControl, Choose, PathingMode, 3
+    default :
+        GuiControl, Choose, PathingMode, 1
+        pathingMode := "Vip Pathing"
+}
+
+checkToggle(azertyPathing, "AzertyPathingStatus")
+checkToggle(autoUnequip, "AutoUnequipStatus")
+checkToggle(autoCloseChat, "AutoCloseChatStatus")
+checkToggle(strangeController, "StrangeControllerStatus")
+checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
+checkToggle(failsafeWebhook, "failsafeWebhookStatus")
+checkToggle(pathingWebhook, "pathingWebhookStatus")
+checkToggle(itemWebhook, "itemWebhookStatus")
+
+
+if (hasCrafterPlugin) {
+    checkToggle(crafterToggle, "CrafterStatus")
+    autoCrafterDetection := crafterToggle
+    if (crafterToggle) {
+        autoCrafterLastCheck := A_TickCount
+    }
+}
+
+if (hasSnowmanPlugin) {
+    checkToggle(snowmanPathing, "SnowmanPathingStatus")
+    GuiControl,, SnowmanIntervalInput, % (snowmanInterval / 60000)
+}
+
+SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
+return                          ;as ahk resets line speed for each thread
 
 GuiClose:
 if (biomeDetectionRunning) {
@@ -860,202 +731,813 @@ return
 
 ToggleSellAll:
 sellAllToggle := !sellAllToggle
-if (sellAllToggle) {
-    GuiControl,, SellAllStatus, ON
-    GuiControl, +c0x00DD00, SellAllStatus
-    IniWrite, true, %iniFilePath%, "Macro", "sellAllToggle"
-} else {
-    GuiControl,, SellAllStatus, OFF
-    GuiControl, +c0xFF4444, SellAllStatus
-    IniWrite, false, %iniFilePath%, "Macro", "sellAllToggle"
-}
+checkToggle(sellAllToggle, "SellAllStatus")
+IniWrite, (sellAllToggle ? true : false), %iniFilePath%, "Macro", "sellAllToggle
 return
 
 ToggleAdvancedFishingDetection:
 advancedFishingDetection := !advancedFishingDetection
-if (advancedFishingDetection) {
-    GuiControl,, AdvancedFishingDetectionStatus, ON
-    GuiControl, +c0x00DD00, AdvancedFishingDetectionStatus
-    IniWrite, true, %iniFilePath%, "Macro", "advancedFishingDetection"
-} else {
-    GuiControl,, AdvancedFishingDetectionStatus, OFF
-    GuiControl, +c0xFF4444, AdvancedFishingDetectionStatus
-    IniWrite, false, %iniFilePath%, "Macro", "advancedFishingDetection"
-}
+checkToggle(advancedFishingDetection, "AdvancedFishingDetectionStatus")
+IniWrite, (advancedFishingDetection ? true : false), %iniFilePath%, "Macro", "advancedFishingDetection
 return
 
 ToggleAzertyPathing:
 azertyPathing := !azertyPathing
-if (azertyPathing) {
-    GuiControl,, AzertyPathingStatus, ON
-    GuiControl, +c0x00DD00, AzertyPathingStatus
-    IniWrite, true, %iniFilePath%, "Macro", "azertyPathing"
-} else {
-    GuiControl,, AzertyPathingStatus, OFF
-    GuiControl, +c0xFF4444, AzertyPathingStatus
-    IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
-}
+checkToggle(azertyPathing, "AzertyPathingStatus")
+IniWrite, (azertyPathing ? true : false), %iniFilePath%, "Macro", "azertyPathing
 return
 
 ToggleAutoUnequip:
 autoUnequip := !autoUnequip
-if (autoUnequip) {
-    GuiControl,, AutoUnequipStatus, ON
-    GuiControl, +c0x00DD00, AutoUnequipStatus
-    IniWrite, true, %iniFilePath%, "Macro", "autoUnequip"
-} else {
-    GuiControl,, AutoUnequipStatus, OFF
-    IniWrite, false, %iniFilePath%, "Macro", "autoUnequip"
-}
+checkToggle(autoUnequip, "AutoUnequipStatus")
+IniWrite, (autoUnequip ? true : false), %iniFilePath%, "Macro", "autoUnequip
 return
 
 ToggleAutoCloseChat:
 autoCloseChat := !autoCloseChat
-if (autoCloseChat) {
-    GuiControl,, AutoCloseChatStatus, ON
-    GuiControl, +c0x00DD00, AutoCloseChatStatus
-    IniWrite, true, %iniFilePath%, "Macro", "autoCloseChat"
-} else {
-    GuiControl,, AutoCloseChatStatus, OFF
-    GuiControl, +c0xFF4444, AutoCloseChatStatus
-    IniWrite, false, %iniFilePath%, "Macro", "autoCloseChat"
-}
+checkToggle(autoCloseChat, "AutoCloseChatStatus")
+IniWrite, (autoCloseChat ? true : false), %iniFilePath%, "Macro", "autoCloseChat
 return
 
 ToggleStrangeController:
 strangeController := !strangeController
-if (strangeController) {
-    GuiControl,, StrangeControllerStatus, ON
-    GuiControl, +c0x00DD00, StrangeControllerStatus
-    IniWrite, true, %iniFilePath%, "Macro", "strangeController"
-} else {
-    GuiControl,, StrangeControllerStatus, OFF
-    GuiControl, +c0xFF4444, StrangeControllerStatus
-    IniWrite, false, %iniFilePath%, "Macro", "strangeController"
-}
+checkToggle(strangeController, "StrangeControllerStatus")
+IniWrite, (strangeController ? true : false), %iniFilePath%, "Macro", "strangeController"
 return
 
 ToggleBiomeRandomizer:
 biomeRandomizer := !biomeRandomizer
-if (biomeRandomizer) {
-    GuiControl,, BiomeRandomizerStatus, ON
-    GuiControl, +c0x00DD00, BiomeRandomizerStatus
-    IniWrite, true, %iniFilePath%, "Macro", "biomeRandomizer"
-} else {
-    GuiControl,, BiomeRandomizerStatus, OFF
-    GuiControl, +c0xFF4444, BiomeRandomizerStatus
-    IniWrite, false, %iniFilePath%, "Macro", "biomeRandomizer"
-}
+checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
+IniWrite, (biomeRandomizer ? true : false), %iniFilePath%, "Macro", "biomeRandomizer"
 return
 
 ToggleFailsafeWebhook:
 failsafeWebhook := !failsafeWebhook
-if (failsafeWebhook) {
-    GuiControl,, failsafeWebhookStatus, ON
-    GuiControl, +c0x00DD00, failsafeWebhookStatus
-    IniWrite, true, %iniFilePath%, "Macro", "failsafeWebhook"
-} else {
-    GuiControl,, failsafeWebhookStatus, OFF
-    GuiControl, +c0xFF4444, failsafeWebhookStatus
-    IniWrite, false, %iniFilePath%, "Macro", "failsafeWebhook"
-}
+checkToggle(failsafeWebhook, "failsafeWebhookStatus")
+IniWrite, (failsafeWebhook ? true : false), %iniFilePath%, "Macro", "failsafeWebhook"
 return
 
 TogglePathingWebhook:
 pathingWebhook := !pathingWebhook
-if (pathingWebhook) {
-    GuiControl,, pathingWebhookStatus, ON
-    GuiControl, +c0x00DD00, pathingWebhookStatus
-    IniWrite, true, %iniFilePath%, "Macro", "pathingWebhook"
-} else {
-    GuiControl,, pathingWebhookStatus, OFF
-    GuiControl, +c0xFF4444, pathingWebhookStatus
-    IniWrite, false, %iniFilePath%, "Macro", "pathingWebhook"
-}
+checkToggle(pathingWebhook, "pathingWebhookStatus")
+IniWrite, (pathingWebhook ? true : false), %iniFilePath%, "Macro", "pathingWebhook"
 return
 
 ToggleItemWebhook:
 itemWebhook := !itemWebhook
-if (itemWebhook) {
-    GuiControl,, itemWebhookStatus, ON
-    GuiControl, +c0x00DD00, itemWebhookStatus
-    IniWrite, true, %iniFilePath%, "Macro", "itemWebhook"
-} else {
-    GuiControl,, itemWebhookStatus, OFF
-    GuiControl, +c0xFF4444, itemWebhookStatus
-    IniWrite, false, %iniFilePath%, "Macro", "itemWebhook"
-}
+checkToggle(itemWebhook, "itemWebhookStatus")
+IniWrite, (itemWebhook ? true : false), %iniFilePath%, "Macro", "itemWebhook"
 return
 
 ToggleCrafter:
 crafterToggle := !crafterToggle
-if (crafterToggle) {
-    GuiControl,, CrafterStatus, ON
-    GuiControl, +c0x00DD00, CrafterStatus
-    IniWrite, true, %iniFilePath%, "Macro", "crafterToggle"
+checkToggle(crafterToggle, "CrafterStatus")
+IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "crafterToggle"
+IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "autoCrafterDetection"
+if (crafterToggle)
+{
     autoCrafterDetection := true
     autoCrafterLastCheck := A_TickCount
-    IniWrite, true, %iniFilePath%, "Macro", "autoCrafterDetection"
-} else {
-    GuiControl,, CrafterStatus, OFF
-    GuiControl, +c0xFF4444, CrafterStatus
-    IniWrite, false, %iniFilePath%, "Macro", "crafterToggle"
-    autoCrafterDetection := false
-    IniWrite, false, %iniFilePath%, "Macro", "autoCrafterDetection"
 }
 return
 
-; Auto Crafter
+ToggleSnowmanPathing:
+snowmanPathing := !snowmanPathing
+checkToggle(snowmanPathing, "SnowmanPathingStatus")
+IniWrite, (snowmanPathing ? true : false), %iniFilePath%, "Macro", "snowmanPathing"
+
+checkToggle(autoCrafter, "AutoCrafterStatus")
+IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+
+checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
+IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+return
+
+ToggleSnowmanPathingWebhook:
+snowmanPathingWebhook := !snowmanPathingWebhook
+checkToggle(snowmanPathingWebhook, "SnowmanPathingWebhookStatus")
+IniWrite, (snowmanPathingWebhook ? true : false), %iniFilePath%, "Macro", "snowmanPathingWebhook"
+return
+
+ToggleAutoCrafter:
+autoCrafter := !autoCrafter
+checkToggle(autoCrafter, "AutoCrafterStatus")
+IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+return
+
+UpdateAutoCrafterInterval:
+Gui, Submit, NoHide
+newInterval := AutoCrafterInterval * 60000
+if (newInterval > 0) {
+    autoCrafterInterval := newInterval
+    IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
+}
+return
+
+ToggleAutoCrafterWebhook:
+autoCrafterWebhook := !autoCrafterWebhook
+checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
+IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+return
+
 RunAutoCrafter() {
-    global hasCrafterPlugin
-    global itemWebhook
-    global globalFailsafeTimer
-    global fishingFailsafeTime
-    global pathingFailsafeTime
-    global autoRejoinFailsafeTime
+    MouseGetPos, originalX, originalY
+    global res
 
-    if (!hasCrafterPlugin) {
-        return
+    if (res = "1080p") {
+        RunAutoCrafter1080p()
+    } else if (res = "1440p") {
+        RunAutoCrafter1440p()
+    } else if (res = "1366x768") {
+        RunAutoCrafter768p()
     }
 
-    autoCrafterDetection := false
+    MouseMove, %originalX%, %originalY%, 0
+}
 
-    originalFishingFailsafeTime := fishingFailsafeTime
-    originalPathingFailsafeTime := pathingFailsafeTime
-    originalAutoRejoinFailsafeTime := autoRejoinFailsafeTime
-    originalGlobalFailsafeTimer := globalFailsafeTimer
-
-    fishingFailsafeTime := 999999
-    pathingFailsafeTime := 999999
-    autoRejoinFailsafeTime := 999999
-    globalFailsafeTimer := 0
-
-    Run, "%A_ScriptDir%\plugins\potions.ahk"
-
-    ; webhoook
-    if (itemWebhook) {
-        try SendWebhook(":tools: Auto Crafter activated!", "9932cc")
-    }
-
-    Sleep, 1000
-    Sleep, 5000
-
-    fishingFailsafeTime := originalFishingFailsafeTime
-    pathingFailsafeTime := originalPathingFailsafeTime
-    autoRejoinFailsafeTime := originalAutoRejoinFailsafeTime
-    globalFailsafeTimer := originalGlobalFailsafeTimer
-
+return_to_spawn()
+{
     Send, {Esc}
     Sleep, 650
     Send, R
     Sleep, 650
     Send, {Enter}
-    sleep 2600
-
-    ; Re-enable detection
-    autoCrafterDetection := true
-    autoCrafterLastCheck := A_TickCount
+    Sleep, 2600
 }
+
+release_held_keys()
+{
+    Send, {space Up}
+    Send, {w Up}
+    Send, {a Up}
+    Send, {s Up}
+    Send, {d Up}
+    Send, {e Up}
+}
+
+; 1080p Auto Crafter
+RunAutoCrafter1080p() {
+    return_to_spawn()
+
+    MouseMove, 100, 400, 3
+    Sleep, 200
+    Click, Left
+    Sleep, 200
+
+    MouseMove, 500, 300, 3
+    Sleep, 200
+    Click, Left
+    Sleep, 500
+
+    Click, WheelUp 80
+    Sleep, 500
+    Click, WheelDown 35
+    Sleep, 300
+
+    Send, {s Down}
+    Send, {a Down}
+    Sleep, 2000
+    Send, {a Up}
+    Sleep, 1500
+    Send, {d Down}
+    Sleep, 1000
+    Send, {d Up}
+    Sleep, 500
+
+    Send, {a Down}
+    Send, {w Down}
+    Sleep, 500
+    Send, {a Up}
+    Send, {w Up}
+    Sleep, 100
+    Send, {Space Down}
+    Send, {s Down}
+    Sleep, 100
+    Send, {Space Up}
+    Sleep, 500
+    Send, {s Up}
+    Sleep, 100
+}
+
+; 1440p Auto Crafter
+RunAutoCrafter1440p() {
+    release_held_keys()
+    reset := false
+    Sleep 300
+
+    return_to_spawn()
+    MouseMove, 52, 621, 3
+    sleep 300
+    Click, Left
+    sleep 300
+    MouseMove, 525, 158, 3
+    sleep 300
+    Click, Left
+    sleep 300
+    Click, WheelUp 80
+    sleep 500
+    Click, WheelDown 90
+    sleep 300
+
+    ; start pathing to stella
+    Send, {s down}
+    Send, {a down}
+    sleep 2660
+    Send, {a up}
+    Sleep, 2500
+    Send, {d down}
+    Sleep, 1100
+    Send, {d up}
+    Send, {s up}
+    sleep 10
+    Send, {a down}
+    Send, {w down}
+    Sleep, 300
+    Send, {a up}
+    Send, {w up}
+    sleep 100
+    Send, {Space down}
+    Send, {s down}
+    Sleep, 100
+    Send, {Space up}
+    Sleep, 500
+    Send, {s up}
+    sleep 10
+    Send, {a down}
+    Send, {s down}
+    Sleep, 400
+    Send, {a up}
+    Sleep, 6000
+    Send, {s up}
+    Send, {a down}
+    Sleep, 1500
+    Send, {a up}
+    Send, {s down}
+    Sleep, 1250
+    Send, {a down}
+    Sleep, 200
+    Send, {a up}
+    Sleep, 1000
+    Send, {a down}
+    Send, {Space down}
+    Sleep, 100
+    Send, {Space up}
+    Sleep, 750
+    Send, {Space down}
+    Sleep, 100
+    Send, {Space up}
+    Sleep, 700
+    Send, {s up}
+    Sleep, 2500
+    Send, {a up}
+    Send, {s down}
+    Sleep, 1300
+    Send, {s up}
+    sleep 500
+
+    ; portal detection
+    screenColor := 0
+    success := false
+    loopCount := 0
+    Loop {
+    sleep 100
+    if (loopCount > 40) {
+    break
+    }
+    PixelGetColor, screenColor, 2509, 1389, RGB
+    if (screenColor = 0x000000) {
+    success := true
+    }
+    loopCount++
+    }
+    if (success) {
+    sleep, 500
+    } else {
+    reset := true
+    }
+
+    ; potion crafting
+    sleep 750
+    Send, {a down}
+    Sleep, 1000
+    Send, {a up}
+    Sleep, 300
+    Send, {f down}
+    Sleep, 300
+    Send, {f up}
+    Sleep, 125
+    Clipboard := "Heavenly Potion"
+    sleep 125
+    MouseMove, 1271, 448, 3
+    Sleep, 250
+    MouseClick, Left
+    Sleep, 250
+    Send, ^v
+    Sleep, 250
+    MouseMove, 1530, 552, 3
+    Sleep, 250
+    Click, WheelUp 80
+    sleep 250
+    MouseClick, Left
+    Sleep, 250
+    MouseMove, 769, 769, 3
+    Sleep, 250
+    MouseClick, Left
+    Sleep, 300
+    MouseMove, 954, 840, 3
+    Sleep, 250
+    MouseClick, Left
+    Sleep, 200
+    MouseClick, Left
+    sleep 125
+    Clipboard := "250"
+    sleep 125
+    Send, ^v
+    Sleep, 250
+    MouseMove, 1064, 839, 3
+    Sleep, 250
+    MouseClick, Left
+    Sleep, 200
+    MouseClick, Left
+    Sleep, 250
+    MouseMove, 1064, 910, 3
+    sleep 250
+    Mouseclick, Left
+    sleep 250
+    Mouseclick, Left
+    sleep 250
+    MouseMove, 1064, 984, 3
+    sleep 250
+    MouseClick, Left
+    sleep 250
+    MouseMove, 1885, 396, 3
+    Sleep, 250
+    MouseClick, Left
+    Sleep, 300
+}
+
+; 768p Auto Crafter
+RunAutoCrafter768p() {
+    return_to_spawn()
+
+    MouseMove, 80, 300, 3
+    Sleep, 200
+    Click, Left
+    Sleep, 200
+
+    MouseMove, 400, 250, 3
+    Sleep, 200
+    Click, Left
+    Sleep, 500
+
+    Click, WheelUp 80
+    Sleep, 500
+    Click, WheelDown 20
+    Sleep, 300
+
+    Send, {s Down}
+    Send, {a Down}
+    Sleep, 1800
+    Send, {a Up}
+    Sleep, 2000
+    Send, {d Down}
+    Sleep, 800
+    Send, {d Up}
+    Sleep, 400
+
+    Send, {a Down}
+    Send, {w Down}
+    Sleep, 200
+    Send, {a Up}
+    Send, {w Up}
+    Sleep, 100
+    Send, {Space Down}
+    Send, {s Down}
+    Sleep, 100
+    Send, {Space Up}
+    Sleep, 400
+    Send, {s Up}
+    Sleep, 100
+}
+
+RunSnowmanPathing() {
+    if (pathingMode = "Non Vip Pathing") {
+        RunSnowmanPathingNonVip()
+    } else if (pathingMode = "Abyssal Pathing") {
+        RunSnowmanPathingAbyssal()
+    } else {
+        RunSnowmanPathingVip()
+    }
+}
+
+; VIP Snowman Pathing
+RunSnowmanPathingVip() {
+    MouseGetPos, originalX, originalY
+    global res
+
+    if (res = "1080p") {
+        MouseMove, 47, 467, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 382, 126, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        Click, WheelUp 80
+        sleep 500
+        Click, WheelDown 45
+        sleep 300
+    }
+    else if (res = "1440p") {
+        MouseMove, 52, 621, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 525, 158, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 35
+		sleep 300
+    }
+    else if (res = "1366x768") {
+        MouseMove, 26, 325, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 273, 106, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 90
+		sleep 300
+    }
+
+    Send, {a Down}
+    sleep 1000
+    Send, {s Down}
+    sleep 2700
+    Send, {a Up}
+    sleep 2800
+    Send, {s Up}
+    sleep 300
+    Send, {a Down}
+    sleep 800
+    Send, {a Up}
+    sleep 300
+    Send, {d Down}
+    sleep 200
+    Send, {d Up}
+    sleep 200
+    Send, {w Down}
+    sleep 200
+    Send, {w Up}
+    sleep 300
+    Send, {space Down}
+    sleep 50
+    Send, {a Down}
+    sleep 50
+    Send, {space Up}
+    sleep 2200
+    Send, {a Up}
+    sleep 300
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+    sleep 200
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+
+    release_held_keys()
+
+    MouseMove, %originalX%, %originalY%, 0
+}
+
+; Non-VIP Snowman Pathing
+RunSnowmanPathingNonVip() {
+    MouseGetPos, originalX, originalY
+    global res
+
+    if (res = "1080p") {
+        MouseMove, 47, 467, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 382, 126, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        Click, WheelUp 80
+        sleep 500
+        Click, WheelDown 45
+        sleep 300
+    }
+    else if (res = "1440p") {
+        MouseMove, 52, 621, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 525, 158, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 35
+		sleep 300
+    }
+    else if (res = "1366x768") {
+        MouseMove, 26, 325, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 273, 106, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 90
+		sleep 300
+    }
+
+    Send, {a Down}
+    sleep 1500
+    Send, {s Down}
+    sleep 3400
+    Send, {a Up}
+    sleep 3400
+    Send, {s Up}
+    sleep 300
+    Send, {a Down}
+    sleep 800
+    Send, {a Up}
+    sleep 300
+    Send, {d Down}
+    sleep 300
+    Send, {d Up}
+    sleep 200
+    Send, {w Down}
+    sleep 200
+    Send, {w Up}
+    sleep 300
+    Send, {a Down}
+    sleep 50
+    Send, {space Down}
+    sleep 50
+    Send, {space Up}
+    sleep 2600
+    Send, {a Up}
+    sleep 300
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+    sleep 200
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+
+    release_held_keys()
+
+    MouseMove, %originalX%, %originalY%, 0
+}
+
+; Abyssal Snowman Pathing
+RunSnowmanPathingAbyssal() {
+    MouseGetPos, originalX, originalY
+    global res
+
+    if (res = "1080p") {
+        MouseMove, 47, 467, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 382, 126, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        Click, WheelUp 80
+        sleep 500
+        Click, WheelDown 45
+        sleep 300
+        MouseMove, 30, 406, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+        MouseMove, 947, 335, 3
+        sleep 200
+        MouseClick, Left
+        sleep 100
+        MouseMove, 1102, 367, 3
+        sleep 100
+        MouseClick, Left
+        sleep 100
+        Clipboard := "Abyssal Hunter"
+        sleep 100
+        Send, ^v
+        sleep 200
+        MouseMove, 819, 434, 3
+        sleep 200
+        Click, WheelUp 100
+        sleep 200
+        MouseClick, Left
+        sleep 200
+
+        ErrorLevel := 0
+        PixelSearch, px, py, 576, 626, 666, 645, 0xfc7f98, 3, Fast RGB
+        if (ErrorLevel != 0) {
+            MouseMove, 623, 634, 3
+            sleep 200
+            MouseClick, Left
+        }
+
+        sleep 200
+        MouseMove, 1412, 296, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+    }
+    else if (res = "1440p") {
+        MouseMove, 52, 621, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 525, 158, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 35
+		sleep 300
+        MouseMove, 40, 541, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+        MouseMove, 1262, 447, 3
+        sleep 200
+        MouseClick, Left
+        sleep 100
+        MouseMove, 1469, 489, 3
+        sleep 100
+        MouseClick, Left
+        sleep 100
+        ClipBoard := "Abyssal Hunter"
+        sleep 100
+        Send, ^v
+        sleep 200
+        MouseMove, 1092, 579, 3
+        sleep 200
+        Click, WheelUp 100
+        sleep 200
+        MouseClick, Left
+        sleep 200
+
+        ErrorLevel := 0
+        PixelSearch, px, py, 768, 835, 888, 860, 0xfc7f98, 3, Fast RGB
+        if (ErrorLevel != 0) {
+            MouseMove, 830, 845, 3
+            sleep 200
+            MouseClick, Left
+        }
+
+        sleep 200
+        MouseMove, 1883, 395, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+    }
+    else if (res = "1366x768") {
+        MouseMove, 26, 325, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 273, 106, 3
+        sleep 220
+        Click, Left
+        sleep 220
+		Click, WheelUp 80
+		sleep 500
+		Click, WheelDown 90
+		sleep 300
+        MouseMove, 21, 289, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+        MouseMove, 675, 239, 3
+        sleep 200
+        MouseClick, Left
+        sleep 100
+        MouseMove, 786, 261, 3
+        sleep 100
+        MouseClick, Left
+        sleep 100
+        Clipboard := "Abyssal Hunter"
+        sleep 100
+        Send, ^v
+        sleep 200
+        MouseMove, 584, 310, 3
+        sleep 200
+        Click, WheelUp 100
+        sleep 200
+        MouseClick, Left
+        sleep 200
+
+        ErrorLevel := 0
+        PixelSearch, px, py, 411, 446, 475, 460, 0xed7389, 3, Fast RGB
+        if (ErrorLevel != 0) {
+            MouseMove, 444, 452, 3
+            sleep 200
+            MouseClick, Left
+        }
+
+        sleep 200
+        MouseMove, 1007, 211, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+    }
+
+    Send, {a Down}
+    sleep 1000
+    Send, {s Down}
+    sleep 1400
+    Send, {a Up}
+    sleep 2100
+    Send, {s Up}
+    sleep 300
+    Send, {a Down}
+    sleep 600
+    Send, {a Up}
+    sleep 300
+    Send, {d Down}
+    sleep 150
+    Send, {d Up}
+    sleep 200
+    Send, {w Down}
+    sleep 150
+    Send, {w Up}
+    sleep 300
+    Send, {space Down}
+    sleep 50
+    Send, {a Down}
+    sleep 50
+    Send, {space Up}
+    sleep 1500
+    Send, {a Up}
+    sleep 300
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+    sleep 200
+    Send, {e Down}
+    sleep 50
+    Send, {e Up}
+
+    release_held_keys()
+
+    MouseMove, %originalX%, %originalY%, 0
+}
+
+RunSnowmanPathingNow:
+    global toggle, restartPathing, firstLoop, snowmanPathingLastRun, snowmanPathingInterval, snowmanPathingWebhook, res, pathingMode
+
+    return_to_spawn()
+
+    release_held_keys()
+
+    Suspend, Off
+
+    if (snowmanPathingWebhook) {
+        try SendWebhook(":snowman: Starting snowman pathing (" . pathingMode . " at " . res . ")", "16636040")
+    }
+
+    RunSnowmanPathing()
+
+    snowmanPathingLastRun := A_TickCount - snowmanPathingInterval + 60000
+
+    toggle := true
+    restartPathing := true
+    firstLoop := true
+
+    if (res = "1080p") {
+        Gosub, DoMouseMove
+    } else if (res = "1440p") {
+        Gosub, DoMouseMove2
+    } else if (res = "1366x768") {
+        Gosub, DoMouseMove3
+    }
+
+    if (savedPathingState) {
+        Suspend, On
+    }
+    return
 
 UpdatePrivateServer:
 Gui, Submit, nohide
@@ -1117,6 +1599,8 @@ LoadBiomeToggles() {
     IniRead, BiomeWindy, %iniFilePath%, "Biomes", BiomeWindy, 1
     IniRead, BiomeSnowy, %iniFilePath%, "Biomes", BiomeSnowy, 1
     IniRead, BiomeRainy, %iniFilePath%, "Biomes", BiomeRainy, 1
+    IniRead, BiomeHeaven, %iniFilePath%, "Biomes", BiomeHeaven, 1
+    IniRead, BiomeAurora, %iniFilePath%, "Biomes", BiomeAurora, 1
     IniRead, BiomePumpkinMoon, %iniFilePath%, "Biomes", BiomePumpkinMoon, 1
     IniRead, BiomeGraveyard, %iniFilePath%, "Biomes", BiomeGraveyard, 1
     IniRead, BiomeBloodRain, %iniFilePath%, "Biomes", BiomeBloodRain, 1
@@ -1130,6 +1614,8 @@ LoadBiomeToggles() {
     GuiControl,, BiomeWindy, %BiomeWindy%
     GuiControl,, BiomeSnowy, %BiomeSnowy%
     GuiControl,, BiomeRainy, %BiomeRainy%
+    GuiControl,, BiomeHeaven, %BiomeHeaven%
+    GuiControl,, BiomeAurora, %BiomeAurora%
     GuiControl,, BiomePumpkinMoon, %BiomePumpkinMoon%
     GuiControl,, BiomeGraveyard, %BiomeGraveyard%
     GuiControl,, BiomeBloodRain, %BiomeBloodRain%
@@ -1146,6 +1632,8 @@ IniWrite, %BiomeCorruption%, %iniFilePath%, "Biomes", BiomeCorruption
 IniWrite, %BiomeWindy%, %iniFilePath%, "Biomes", BiomeWindy
 IniWrite, %BiomeSnowy%, %iniFilePath%, "Biomes", BiomeSnowy
 IniWrite, %BiomeRainy%, %iniFilePath%, "Biomes", BiomeRainy
+IniWrite, %BiomeHeaven%, %iniFilePath%, "Biomes", BiomeHeaven
+IniWrite, %BiomeAurora%, %iniFilePath%, "Biomes", BiomeAurora
 IniWrite, %BiomePumpkinMoon%, %iniFilePath%, "Biomes", BiomePumpkinMoon
 IniWrite, %BiomeGraveyard%, %iniFilePath%, "Biomes", BiomeGraveyard
 IniWrite, %BiomeBloodRain%, %iniFilePath%, "Biomes", BiomeBloodRain
@@ -1158,27 +1646,25 @@ SendWebhook(title, color := "16777215") {
     if (!InStr(webhookURL, "discord")) {
         return
     }
-    try {
-        time := A_NowUTC
-        timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+    time := A_NowUTC
+    timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
 
-        json := "{"
-        . """embeds"": ["
-        . "{"
-        . "    ""title"": """ title ""","
-        . "    ""color"": " color ","
-        . "    ""footer"": {""text"": ""fishSol v1.9"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
-        . "    ""timestamp"": """ timestamp """"
-        . "  }"
-        . "],"
-        . """content"": """""
-        . "}"
+    json := "{"
+    . """embeds"": ["
+    . "{"
+    . "    ""title"": """ title ""","
+    . "    ""color"": " color ","
+    . "    ""footer"": {""text"": ""fishSol v" %version% """, ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+    . "    ""timestamp"": """ timestamp """"    ; ^ defined above
+    . "  }"
+    . "],"
+    . """content"": """""
+    . "}"
 
-        http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-        http.Open("POST", webhookURL, false)
-        http.SetRequestHeader("Content-Type", "application/json")
-        http.Send(json)
-    }
+    http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    http.Open("POST", webhookURL, false)
+    http.SetRequestHeader("Content-Type", "application/json")
+    http.Send(json)
 }
 
 
@@ -1186,7 +1672,6 @@ SendWebhook(title, color := "16777215") {
 RunStrangeController() {
     global res
     global itemWebhook
-    tryCount := 0
     ; 1080p
     if (res = "1080p") {
         sleep 300
@@ -1211,28 +1696,13 @@ RunStrangeController() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 571, 668, 571, 668, 0xf0a66f, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 3) {
-                    MouseMove, 682, 578, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 491, 711s, 749, 723, 0x457dff, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
-                MsgBox, % tryCount
                 MouseMove, 1279, 342, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 1104, 368, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Strange Controller"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 848, 479, 3
                 sleep 300
@@ -1240,6 +1710,10 @@ RunStrangeController() {
                 sleep 300
             }
         }
+        MouseMove, 682, 578, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1413, 297, 3
         sleep 300
         MouseClick, Left
@@ -1269,28 +1743,13 @@ RunStrangeController() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 735, 873, 735, 873, 0xf0a66f, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 3) {
-                    MouseMove, 920, 774, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 655, 916, 914, 929, 0x457dff, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
-                MsgBox, % tryCount
                 MouseMove, 1704, 452, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 1473, 489, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Strange Controller"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 1144, 643, 3
                 sleep 300
@@ -1298,6 +1757,10 @@ RunStrangeController() {
                 sleep 300
             }
         }
+        MouseMove, 920, 774, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1896, 403, 3
         sleep 300
         MouseClick, Left
@@ -1327,27 +1790,13 @@ RunStrangeController() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 429, 507, 429, 507, 0xeea66e, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 3) {
-                    MouseMove, 486, 413, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 427, 518, 474, 530, 0x457dff, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
                 MouseMove, 911, 242, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 785, 262, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Strange Controller"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 616, 347, 3
                 sleep 300
@@ -1355,6 +1804,10 @@ RunStrangeController() {
                 sleep 300
             }
         }
+        MouseMove, 486, 413, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1017, 214, 3
         sleep 300
         MouseClick, Left
@@ -1369,7 +1822,6 @@ RunStrangeController() {
 RunBiomeRandomizer() {
     global res
     global itemWebhook
-    tryCount := 0
     ; 1080p
     if (res = "1080p") {
         sleep 300
@@ -1394,27 +1846,13 @@ RunBiomeRandomizer() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 663, 667, 663, 667, 0x3ffe7a, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 3) {
-                    MouseMove, 682, 578, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 491, 727, 748, 739, 0x457dff, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
                 MouseMove, 1279, 342, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 1104, 368, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Biome Randomizer"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 848, 479, 3
                 sleep 300
@@ -1422,6 +1860,10 @@ RunBiomeRandomizer() {
                 sleep 300
             }
         }
+        MouseMove, 682, 578, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1413, 297, 3
         sleep 300
         MouseClick, Left
@@ -1437,7 +1879,7 @@ RunBiomeRandomizer() {
         MouseMove, 1704, 452, 3
         sleep 300
         MouseClick, Left
-        sleep 300
+		sleep 300
         MouseMove, 1473, 489, 3
         sleep 300
         MouseClick, Left
@@ -1451,27 +1893,13 @@ RunBiomeRandomizer() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 827, 856, 827, 856, 0x3ffe7a, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 2) {
-                    MouseMove, 920, 774, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 755, 916, 913, 928, 0x457dff, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
                 MouseMove, 1704, 452, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 1473, 489, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Biome Randomizer"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 1144, 643, 3
                 sleep 300
@@ -1479,6 +1907,10 @@ RunBiomeRandomizer() {
                 sleep 300
             }
         }
+        MouseMove, 920, 774, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1896, 403, 3
         sleep 300
         MouseClick, Left
@@ -1508,27 +1940,13 @@ RunBiomeRandomizer() {
         sleep 300
 
         Loop {
-            PixelSearch, Px, Py, 363, 554, 363, 554, 0x6b0700, 3, Fast RGB
-            if (!ErrorLevel || tryCount > 3) {
-                if (tryCount <= 3) {
-                    MouseMove, 486, 413, 3
-                    sleep 300
-                    MouseClick, Left
-                    sleep 300
-                }
+            PixelSearch, Px, Py, 433, 518, 480, 530, 0x8b8b8b, 3, Fast RGB
+            if (!ErrorLevel) {
                 break
             } else {
-                tryCount++
                 MouseMove, 911, 242, 3
                 sleep 300
                 MouseClick, Left
-                sleep 300
-                MouseMove, 785, 262, 3
-                sleep 300
-                MouseClick, Left
-                Clipboard := "Biome Randomizer"
-                sleep 300
-                Send, ^v
                 sleep 300
                 MouseMove, 616, 347, 3
                 sleep 300
@@ -1536,6 +1954,10 @@ RunBiomeRandomizer() {
                 sleep 300
             }
         }
+        MouseMove, 486, 413, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
         MouseMove, 1017, 214, 3
         sleep 300
         MouseClick, Left
@@ -1549,7 +1971,7 @@ RunBiomeRandomizer() {
 UpdateGUI:
 if (toggle) {
     GuiControl,, StatusText, Running
-    GuiControl, +c0x00DD00, StatusText
+    GuiControl, +%TextColorLGreen%, StatusText
     GuiControl,, ResStatusText, Active - %res%
 
     elapsed := A_TickCount - startTick
@@ -1558,14 +1980,14 @@ if (toggle) {
     seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
     timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
     GuiControl,, RuntimeText, %timeStr%
-    GuiControl, +c0x00DD00, RuntimeText
+    GuiControl, +%TextColorLGreen%, RuntimeText
     GuiControl,, CyclesText, %cycleCount%
-    GuiControl, +c0x00DD00, CyclesText
+    GuiControl, +%TextColorLGreen%, CyclesText
 
 
 } else {
     GuiControl,, StatusText, Stopped
-    GuiControl, +c0xFF4444, StatusText
+    GuiControl, +%TextColorRed%, StatusText
     GuiControl,, ResStatusText, Ready
 }
 return
@@ -1573,7 +1995,7 @@ return
 ManualGUIUpdate() {
     if (toggle) {
         GuiControl,, StatusText, Running
-        GuiControl, +c0x00DD00, StatusText
+        GuiControl, +%TextColorLGreen%, StatusText
         GuiControl,, ResStatusText, Active - %res%
 
         elapsed := A_TickCount - startTick
@@ -1582,14 +2004,14 @@ ManualGUIUpdate() {
         seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
         timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
         GuiControl,, RuntimeText, %timeStr%
-        GuiControl, +c0x00DD00, RuntimeText
+        GuiControl, +%TextColorLGreen%, RuntimeText
         GuiControl,, CyclesText, %cycleCount%
-        GuiControl, +c0x00DD00, CyclesText
+        GuiControl, +%TextColorLGreen%, CyclesText
 
 
     } else {
         GuiControl,, StatusText, Stopped
-        GuiControl, +c0xFF4444, StatusText
+        GuiControl, +%TextColorRed%, StatusText
         GuiControl,, ResStatusText, Ready
     }
 }
@@ -1608,9 +2030,12 @@ if (!toggle) {
     }
     toggle := true
     if (hasBiomesPlugin) {
-        Run, "%A_ScriptDir%\plugins\biomes.ahk"
-        biomeDetectionRunning := true
+    Run, "%A_ScriptDir%\plugins\biomes.ahk"
+    biomeDetectionRunning := true
     }
+    strangeControllerLastRun := 0
+    biomeRandomizerLastRun := 0
+    snowmanPathingLastRun := 0
     if (startTick = "") {
         startTick := A_TickCount
     }
@@ -1619,6 +2044,7 @@ if (!toggle) {
     }
     strangeControllerLastRun := 0
     biomeRandomizerLastRun := 0
+    snowmanPathingLastRun := 0
     IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
     IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
     IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
@@ -1680,6 +2106,7 @@ ExitApp
 ;1080p
 DoMouseMove:
 if (toggle) {
+
     global pathingMode
     global privateServerLink
     global globalFailsafeTimer
@@ -1695,6 +2122,7 @@ if (toggle) {
     global biomeRandomizerInterval
     global strangeControllerLastRun
     global biomeRandomizerLastRun
+    global snowmanPathingLastRun
     global startTick
     global failsafeWebhook
     global pathingWebhook
@@ -1712,6 +2140,7 @@ if (toggle) {
             break
         }
 
+
         ; SC Toggle
         if (strangeController) {
             elapsed := A_TickCount - startTick
@@ -1721,6 +2150,23 @@ if (toggle) {
             } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
                 RunStrangeController()
                 strangeControllerLastRun := elapsed
+            }
+        }
+
+        ; Snowman Pathing Toggle
+        if (snowmanPathing) {
+            elapsed := A_TickCount - startTick
+            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                return_to_spawn()
+
+                if (snowmanPathingWebhook) {
+                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                }
+                RunSnowmanPathing()
+                snowmanPathingLastRun := elapsed
+
+                restartPathing := true
+                continue
             }
         }
 
@@ -1748,19 +2194,21 @@ if (toggle) {
             }
         }
 
+        ; More snowman pathing
         loopCount++
         if (loopCount > maxLoopCount || restartPathing) {
-        restartPathing := false
-        if (pathingWebhook) {
-            try SendWebhook(":moneybag: Macro started pathing to auto-sell!", "16636040")
+            restartPathing := false
+
+            if (snowmanPathing) {
+            Sleep, 2000
+
         }
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 2600
-        if (autoUnequip) {
+
+            if (pathingWebhook) {
+                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+            }
+
+            if (autoUnequip) {
             MouseMove, 45, 412, 3
             sleep 300
             Click, Left
@@ -1789,6 +2237,8 @@ if (toggle) {
             MouseClick, Left
             sleep 300
         }
+
+        return_to_spawn()
         MouseMove, 47, 467, 3
         sleep 220
         Click, Left
@@ -1797,10 +2247,10 @@ if (toggle) {
         sleep 220
         Click, Left
         sleep 220
-		Click, WheelUp 80
-		sleep 500
-		Click, WheelDown 45
-		sleep 300
+        Click, WheelUp 80
+        sleep 500
+        Click, WheelDown 45
+        sleep 300
 
         if (pathingMode = "Non Vip Pathing") {
             ; Non VIP Pathing
@@ -1978,7 +2428,9 @@ if (toggle) {
             sleep 100
             MouseClick, Left
             sleep 100
-            Send, Abyssal Hunter
+            ClipBoard := "Abyssal Hunter"
+            sleep 100
+            Send, ^v
             sleep 200
             MouseMove, 819, 434, 3
             sleep 200
@@ -2120,11 +2572,6 @@ if (toggle) {
 
         ; Auto Rejoin Failsafe
         if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-        code := ""
-        if RegExMatch(privateServerLink, "code=([^&]+)", m)
-        {
-            code := m1
-        }
         PixelGetColor, checkColor, 1175, 837, RGB
         if (checkColor != 0xFFFFFF) {
         Process, Close, RobloxPlayerBeta.exe
@@ -2154,7 +2601,7 @@ if (toggle) {
 
         sleep 3000
         restartPathing := true
-        try SendWebhook(":repeat: Auto-Rejoin failsafe was triggered.", "3426654")
+        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
         break
         }
         }
@@ -2266,6 +2713,7 @@ Return
 ;1440p
 DoMouseMove2:
 if (toggle) {
+
     global pathingMode
     global privateServerLink
     global globalFailsafeTimer
@@ -2281,6 +2729,7 @@ if (toggle) {
     global biomeRandomizerInterval
     global strangeControllerLastRun
     global biomeRandomizerLastRun
+    global snowmanPathingLastRun
     global startTick
     global failsafeWebhook
     global pathingWebhook
@@ -2310,6 +2759,23 @@ if (toggle) {
             }
         }
 
+        ; Snowman Pathing Toggle
+        if (snowmanPathing) {
+            elapsed := A_TickCount - startTick
+            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                return_to_spawn()
+
+                if (snowmanPathingWebhook) {
+                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                }
+                RunSnowmanPathing()
+                snowmanPathingLastRun := elapsed
+
+                restartPathing := true
+                continue
+            }
+        }
+
         ; BR Toggle
         if (biomeRandomizer) {
             elapsed := A_TickCount - startTick
@@ -2334,19 +2800,21 @@ if (toggle) {
             }
         }
 
+        ; More snowman pathing
         loopCount++
         if (loopCount > maxLoopCount || restartPathing) {
-        restartPathing := false
-        if (pathingWebhook) {
-            try SendWebhook(":moneybag: Macro started pathing to auto-sell!", "16636040")
+            restartPathing := false
+
+            if (snowmanPathing) {
+            Sleep, 2000
+
         }
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 2600
-        if (autoUnequip) {
+
+            if (pathingWebhook) {
+                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+            }
+
+            if (autoUnequip) {
             MouseMove, 41, 538, 3
             sleep 300
             Click, Left
@@ -2375,6 +2843,13 @@ if (toggle) {
             MouseClick, Left
             sleep 300
         }
+        sleep 500
+        Send, {Esc}
+        sleep 650
+        Send, {r}
+        sleep 650
+        Send, {Enter}
+        sleep 2600
         MouseMove, 52, 621, 3
         sleep 220
         Click, Left
@@ -2388,6 +2863,7 @@ if (toggle) {
 		Click, WheelDown 35
 		sleep 300
 
+        ; Regular Pathing
         if (pathingMode = "Non Vip Pathing") {
             ; Non VIP Pathing
             Send, {%keyW% Down}
@@ -2564,7 +3040,9 @@ if (toggle) {
             sleep 100
             MouseClick, Left
             sleep 100
-            Send, Abyssal Hunter
+            ClipBoard := "Abyssal Hunter"
+            sleep 100
+            Send, ^v
             sleep 200
             MouseMove, 1092, 579, 3
             sleep 200
@@ -2706,11 +3184,6 @@ if (toggle) {
 
         ; Auto Rejoin Failsafe
         if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-        code := ""
-        if RegExMatch(privateServerLink, "code=([^&]+)", m)
-        {
-            code := m1
-        }
         PixelGetColor, checkColor, 1535, 1120, RGB
         if (checkColor != 0xFFFFFF) {
         Process, Close, RobloxPlayerBeta.exe
@@ -2744,7 +3217,7 @@ if (toggle) {
 
         sleep 3000
         restartPathing := true
-        try SendWebhook(":repeat: Auto-Rejoin failsafe was triggered.", "3426654")
+        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
         break
         }
         }
@@ -2858,6 +3331,7 @@ Return
 ;786p
 DoMouseMove3:
 if (toggle) {
+
     global pathingMode
     global privateServerLink
     global globalFailsafeTimer
@@ -2873,6 +3347,7 @@ if (toggle) {
     global biomeRandomizerInterval
     global strangeControllerLastRun
     global biomeRandomizerLastRun
+    global snowmanPathingLastRun
     global startTick
     global failsafeWebhook
     global pathingWebhook
@@ -2890,6 +3365,7 @@ if (toggle) {
             break
         }
 
+
         ; SC Toggle
         if (strangeController) {
             elapsed := A_TickCount - startTick
@@ -2899,6 +3375,26 @@ if (toggle) {
             } else if (strangeControllerLastRun > 0 && (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
                 RunStrangeController()
                 strangeControllerLastRun := elapsed
+            }
+        }
+
+        ; Snowman Pathing
+        if (snowmanPathing) {
+            elapsed := A_TickCount - startTick
+            if ((snowmanPathingLastRun = 0 && elapsed >= snowmanPathingTime) || (snowmanPathingLastRun > 0 && (elapsed - snowmanPathingLastRun) >= snowmanPathingInterval)) {
+                if (snowmanPathingWebhook) {
+                    try SendWebhook(":moneybag: Resetting character after snowman pathing...", "16636040")
+                }
+                return_to_spawn()
+
+                if (snowmanPathingWebhook) {
+                    try SendWebhook(":snowman: Starting snowman pathing...", "16636040")
+                }
+                RunSnowmanPathing()
+                snowmanPathingLastRun := elapsed
+
+                restartPathing := true
+                continue
             }
         }
 
@@ -2926,19 +3422,21 @@ if (toggle) {
             }
         }
 
+        ; More snowman pathing
         loopCount++
         if (loopCount > maxLoopCount || restartPathing) {
-        restartPathing := false
-        if (pathingWebhook) {
-            try SendWebhook(":moneybag: Macro started pathing to auto-sell!", "16636040")
+            restartPathing := false
+
+            if (snowmanPathing) {
+            Sleep, 2000
+
         }
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 2600
-        if (autoUnequip) {
+
+            if (pathingWebhook) {
+                try SendWebhook(":moneybag: Starting Auto-Sell Pathing...", "16636040")
+            }
+
+            if (autoUnequip) {
             MouseMove, 38, 292, 3
             sleep 300
             Click, Left
@@ -2967,6 +3465,7 @@ if (toggle) {
             MouseClick, Left
             sleep 300
         }
+        return_to_spawn()
         MouseMove, 26, 325, 3
         sleep 220
         Click, Left
@@ -3156,7 +3655,9 @@ if (toggle) {
             sleep 100
             MouseClick, Left
             sleep 100
-            Send, Abyssal Hunter
+            ClipBoard := "Abyssal Hunter"
+            sleep 100
+            Send, ^v
             sleep 200
             MouseMove, 584, 310, 3
             sleep 200
@@ -3298,43 +3799,38 @@ if (toggle) {
 
         ; Auto Rejoin Failsafe
         if (A_TickCount - globalFailsafeTimer > (autoRejoinFailsafeTime * 1000) && privateServerLink != "") {
-            code := ""
-            if RegExMatch(privateServerLink, "code=([^&]+)", m)
-            {
-                code := m1
-            }
-            PixelGetColor, checkColor, 865, 593, RGB
-            if (checkColor != 0xFFFFFF) {
-            Process, Close, RobloxPlayerBeta.exe
-            sleep 500
-            Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
-            sleep 5000
-            WinActivate, ahk_exe RobloxPlayerBeta.exe
-            sleep 7000
-            MouseMove, 683, 384, 3
-            sleep 200
-            MouseClick, Left
-            sleep 6000
+        PixelGetColor, checkColor, 865, 593, RGB
+        if (checkColor != 0xFFFFFF) {
+        Process, Close, RobloxPlayerBeta.exe
+        sleep 500
+        Run, % "powershell -NoProfile -Command ""Start-Process 'roblox://navigation/share_links?code=" code "&type=Server'"""
+        sleep 5000
+        WinActivate, ahk_exe RobloxPlayerBeta.exe
+        sleep 7000
+        MouseMove, 683, 384, 3
+        sleep 200
+        MouseClick, Left
+        sleep 6000
 
-            ; Start button
-            sleep 1000
-            Loop {
-            ErrorLevel := 0
-            PixelSearch, px, py, 160, 734, 244, 708, 0x82ff95, 5, Fast RGB
-            if (ErrorLevel = 0) {
-            sleep 1000
-            MouseMove, 200, 715, 3
-            sleep 350
-            MouseClick, Left
-            break
-            }
-            }
+        ; Start button
+        sleep 1000
+        Loop {
+        ErrorLevel := 0
+        PixelSearch, px, py, 160, 734, 244, 708, 0x82ff95, 5, Fast RGB
+        if (ErrorLevel = 0) {
+        sleep 1000
+        MouseMove, 200, 715, 3
+        sleep 350
+        MouseClick, Left
+        break
+        }
+        }
 
-            sleep 3000
-            restartPathing := true
-            try SendWebhook(":repeat: Auto-Rejoin failsafe was triggered.", "3426654")
-            break
-            }
+        sleep 3000
+        restartPathing := true
+        try SendWebhook(":repeat: Auto Rejoin failsafe was triggered.", "3426654")
+        break
+        }
         }
 
         ; Fishing Failsafe
@@ -3566,52 +4062,38 @@ IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
 pathingMode := PathingMode
 return
 
+;[DEV COMMENT] compressed and easily expandable for future releases
 Dev1NameClick:
-if (dev1_name = "cresqnt") {
-    Run, https://cresqnt.com
-}
-return
-
-Dev1LinkClick:
-if (dev1_name = "maxstellar") {
-    Run, https://www.twitch.tv/maxstellar
-} else if (dev1_name = "cresqnt") {
-    Run, https://scopedevelopment.tech
-} else if (dev1_name = "ivelchampion249") {
-    Run, https://www.youtube.com/@ivelchampion
-}
-return
-
+    global ClickIndex := 1
+    goto DoNameClick
 Dev2NameClick:
-if (dev2_name = "cresqnt") {
-    Run, https://cresqnt.com
-}
-return
-
-Dev2LinkClick:
-if (dev2_name = "maxstellar") {
-    Run, https://www.twitch.tv/maxstellar
-} else if (dev2_name = "cresqnt") {
-    Run, https://scopedevelopment.tech
-} else if (dev2_name = "ivelchampion249") {
-    Run, https://www.youtube.com/@ivelchampion
-}
-return
-
+    global ClickIndex := 2
+    goto DoNameClick
 Dev3NameClick:
-if (dev3_name = "cresqnt") {
-    Run, https://cresqnt.com
-}
+    global ClickIndex := 3
+    goto DoNameClick
+DoNameClick:
+    if strlen(dev%ClickIndex%_website) > 0
+    {
+        Run, % dev%ClickIndex%_website
+    }
 return
 
+;[DEV COMMENT] compressed and easily expandable for future releases
+Dev1LinkClick:
+    global ClickIndex := 1
+    goto DoLinkClick
+Dev2LinkClick:
+    global ClickIndex := 2
+    goto DoLinkClick
 Dev3LinkClick:
-if (dev3_name = "maxstellar") {
-    Run, https://www.twitch.tv/maxstellar
-} else if (dev3_name = "cresqnt") {
-    Run, https://scopedevelopment.tech
-} else if (dev3_name = "ivelchampion249") {
-    Run, https://www.youtube.com/@ivelchampion
-}
+    global ClickIndex := 3
+    goto DoLinkClick
+DoLinkClick:
+    if strlen(dev%ClickIndex%_link) > 0
+    {
+        Run, % dev%ClickIndex%_link
+    }
 return
 
 DonateClick:

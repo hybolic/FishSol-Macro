@@ -2,7 +2,15 @@
 #NoEnv
 #SingleInstance, Force
 #Persistent
+
+global fishSolVersion := ""
+
+global MAX_SPEED := -1 ;max speed
+global STANDARD_SPEED := A_BatchLines ;store default speed
+SetBatchLines, %MAX_SPEED% ;run as fast as possible during setup
+
 SetWorkingDir %A_ScriptDir%
+
 
 prevBiome := "None"
 prevState := "None"
@@ -11,6 +19,9 @@ biomeColors := { "NORMAL":16777215, "SAND STORM":16040572, "HELL":6033945, "STAR
 EnvGet, LocalAppData, LOCALAPPDATA
 
 if (FileExist(iniFilePath)) {
+    IniRead, tempVersion, %iniFilePath%, "Macro", "LastVersion"                            ;v if set and valid use it
+    fishSolVersion := ((tempVersion != "Error" and tempVersion ~= "1\.[2356789]\.\d)") ? tempVersion : "1.9.4")
+    ;                                   ^check if set              ^regex known versions from github    ^ last known version
     IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
     IniRead, tempPSLink, %iniFilePath%, "Biomes", "privateServerLink"
     if (tempWebhook != "ERROR" && tempPSLink != "ERROR")
@@ -26,10 +37,20 @@ if (!InStr(webhookURL, "discord")) {
     ExitApp
 }
 
-SetTimer, CheckBiome, 1000
-return
+       ; ~10 KB (adjust if needed)
+global maxReadBytes := 1024*10
+       ;  256 B (adjust if needed)
+global maxReadBytes := 256
+
+lastFileSize := 0
+
+SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
+SetTimer, CheckBiome, 1000      ;as ahk resets line speed for each thread start
+return                          
 
 ProcessExist(Name) {
+    if WinExist("ahk_exe" . Name)
+        return true ; quick check before slow check
     for process in ComObjGet("winmgmts:").ExecQuery("Select * from Win32_Process")
         if (process.Name = Name)
             return true
@@ -37,9 +58,11 @@ ProcessExist(Name) {
 }
 
 CheckBiome:
+    SetBatchLines, %MAX_SPEED% ;this will reset once thread ends
     if (!ProcessExist("RobloxPlayerBeta.exe")) {
         return
     }
+    
     logDir := LocalAppData "\Roblox\logs"
     newestTime := 0
     newestFile := ""
@@ -58,16 +81,17 @@ CheckBiome:
 
     file := FileOpen(newestFile, "r")
     if !IsObject(file)
-        return
+        return 
 
     ; Read only the last ~10 KB (adjust if needed)
     size := file.Length
-    chunkSize := 10240
+    chunkSize := max(min(size - lastFileSize, minReadBytes), maxReadBytes) ; calculate byte offset from lastFileSize and file.length, keeping it between a min and max value.
+    lastFileSize = size ; push new size to lastFileSize variable  ; if we never go below 256B or above 10KB (adjust if needed)
     if (size > chunkSize)
         file.Seek(-chunkSize, 2) ; 2 = from end of file
     content := file.Read()
     file.Close()
-
+    
     lines := StrSplit(content, "`n")
     regexLine := """state"":""((?:\\.|[^""])*)"".*?""largeImage"":\{""hoverText"":""((?:\\.|[^""])*)"""
     ; Read upward for the last BloxstrapRPC
@@ -89,8 +113,11 @@ CheckBiome:
     {
         biomeKey := "Biome" StrReplace(biome, " ", "")
         IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
+        isBiomeBypass := false
+        if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE")
+            isBiomeBypass := true  ; check once so it doesn't need to rechecked
 
-        if (isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
+        if (isBiomeEnabled = 1 || isBiomeBypass) {
             prevBiome := biome
             biome_url := StrReplace(biome, " ", "_")
             thumbnail_url := "https://maxstellar.github.io/biome_thumb/" biome_url ".png"
@@ -100,7 +127,7 @@ CheckBiome:
             time := A_NowUTC
             timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
 
-            if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
+            if (isBiomeBypass) {
                 content := "@everyone"
             } else {
                 content := ""
@@ -112,8 +139,8 @@ CheckBiome:
             . "    ""description"": ""> ### Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"","
             . "    ""color"": " color ","
             . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
-            . "    ""footer"": {""text"": ""fishSol v1.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
-            . "    ""timestamp"": """ timestamp """"
+            . "    ""footer"": {""text"": ""fishSol v" . fishSolVersion . """, ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+            . "    ""timestamp"": """ timestamp """"    ; ^ using new fishsols version found in ini file else it will default to 1.9.4
             . "  }"
             . "],"
             . """content"": """ content """"
@@ -137,8 +164,8 @@ CheckBiome:
             . """embeds"": ["
             . "  {"
             . "    ""description"": ""> ### Aura Equipped - " auraName ""","
-            . "    ""footer"": {""text"": ""fishSol v1.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
-            . "    ""timestamp"": """ timestamp """"
+            . "    ""footer"": {""text"": ""fishSol v" . fishSolVersion . """, ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+            . "    ""timestamp"": """ timestamp """"    ; ^ using new fishsols version found in ini file else it will default to 1.9.4
             . "  }"
             . "],"
             . """content"": """""
