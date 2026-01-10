@@ -177,14 +177,14 @@ Devs.Push({dev_name:"cresqnt"
          , dev_website:"https://cresqnt.com"})
 
        
-Randomised_DevOrder := ""
+Randomised_DevOrder := "1|2|3"
 
-loop % Devs.Length()
-{
-    Randomised_DevOrder .= A_Index
-    if (A_Index) < (Devs.Length())
-        Randomised_DevOrder .= "|"
-} 
+; loop % Devs.Length()
+; {
+;     Randomised_DevOrder .= A_Index
+;     if (A_Index) < (Devs.Length())
+;         Randomised_DevOrder .= "|"
+; } 
 
 Sort, Randomised_DevOrder, Random D|
 Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
@@ -578,7 +578,7 @@ if (hasSnowmanPlugin) {
     } else {
         Gui, Add, Text, x150 y245 w40 h25 vSnowmanPathingWebhookStatus BackgroundTrans %GuiColorRed%, OFF
     }
-
+    DrawHelpDonate()
 }
 
 Gui, Tab, Credits
