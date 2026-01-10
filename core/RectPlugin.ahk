@@ -78,7 +78,9 @@ class Plugin
      * @return {String|Null}
      */
     SetupTabList()
-    {}
+    {
+
+    }
 
     /**
      * @description Gui Setup done in here {@link Plugin#SetupTabList}
@@ -92,7 +94,9 @@ class Plugin
      * }
      */
     SetupGui()
-    {}
+    {
+
+    }
 
     /**
      * @description used to read variables from the ini file at startup {@link Plugin#QuickLoad:QuickLoad("variable", default)}
@@ -111,7 +115,9 @@ class Plugin
      * }
      */
     IniRead()
-    {}
+    {
+
+    }
     
 
     /**
@@ -132,7 +138,9 @@ class Plugin
      * }
      */
     GuiControlChecks()
-    {}
+    {
+        
+    }
 
     ; The Points and Rects
     LocalThings := []

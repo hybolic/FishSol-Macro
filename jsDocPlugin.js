@@ -41,6 +41,7 @@ const cl_nuke         = new RegExp("@" + CleanupWord + "nuke", "g")
 const extractRegexFromFirstQuotes   = /\"(?:\/)*(.+?)(?:\/)(\w+)*(?:\")/g
 const extractStringFromSecondQuotes = /(?<=\" \").*?(?=\")/g
 
+const fs = require("fs");
 
 const reset = "\x1b[0m"; const bright = "\x1b[1m"; const dim = "\x1b[2m"; const underscore = "\x1b[4m"; 
 const blink = "\x1b[5m"; const reverse = "\x1b[7m"; const hidden = "\x1b[8m"; 
@@ -266,7 +267,18 @@ logger.debug("in  var:         index: " + ((brackets == 0 ? brackets+1 : bracket
 			var t = new_text.replace(isAHK_SETTER,"=").replace(doubleBracket, "$2")
 			// logger.debug(t)
 			e.source = t//"/**\n * @namespace {Object} " + e.filename.replace(/[\W\w]*fishsols refactor/g, "").replace(/\\[\W]+/g,".").replace(/\.ahk/g,"") + "\n*/" + t; 
+			
 			logger.debug(e.source)
+			
+			var txtFile = require('path').dirname(e.filename).replace(/(.)fishsols refactor(.*)/g, "$1fishsols refactor$1js$2$1") + e.filename.replace(/^.*\\/g,'') + ".js";
+			
+			// logger.warn(txtFile)
+
+			fs.writeFile(txtFile, e.source, function (err) {
+				if (err) {
+					return console.error(err);
+				}
+			});
 		}
 	}
 };
