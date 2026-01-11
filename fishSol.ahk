@@ -1,11 +1,76 @@
+SetBatchLines -1
 #Requires AutoHotkey v1.1
 #NoEnv
 #SingleInstance Force
 
 global MAX_SPEED := -1 ;max speed
 global STANDARD_SPEED := A_BatchLines ;store default speed
+CoordMode, ToolTip, Screen
 
-SetBatchLines, %MAX_SPEED% ;run as fast as possible during setup
+stopBench(message,number:=1)
+{
+    global
+    local time1, time2
+    DllCall("QueryPerformanceCounter", "Int64*", TIMER_st)
+    time1 := ((TIMER_st - TIMER_s1) / TIMER_f) * 1000
+    time2 := ((TIMER_st - TIMER_s2) / TIMER_f) * 1000
+    ToolTip, % message . " took " . time1 . "ms" . " to load! (" . time2 . "ms)", 10, % (25 * number) + 30, % (number + 1)
+    TIMER_s1 := TIMER_st
+}
+
+goto pasttool
+KILL_TOOLTIP:
+    loop 20
+        ToolTip,,,,%A_Index%
+return
+pasttool:
+DllCall("QueryPerformanceFrequency", "Int64*", TIMER_f)
+DllCall("QueryPerformanceCounter", "Int64*", TIMER_s1)
+TIMER_s2 := TIMER_s1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;  RESOURCES  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+stopBench("IMAGE PRELOAD",0)
+global PNG_MAIN_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Main.png")
+global PNG_MISC_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Misc.png")
+global PNG_FAIL_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Failsafes.png")
+global PNG_BIOM_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Biomes.png")
+global PNG_CRAF_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Crafter.png")
+global PNG_WEBH_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Webhook.png")
+global PNG_SNOW_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Snowman.png")
+global PNG_CRED_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Credits.png")
+global PNG_DISCORD_ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Discord.png")
+global PNG_ROBLOX__ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Robux.png")
+global dev_maxstellar_img      := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\maxstellar.png")
+global dev_ivelchampion249_img := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\Ivel.png")
+global dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
+stopBench("IMAGE PRELOAD",0)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; GuiColors ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;define colors so they can be adjusted quickly on mass
+global GuiColorDefault      := "c" . "0x" . "CCCCCC" ; default font text color
+global GuiColorText         := "c" . "0x" . "FFFFFF" ; text color
+global GuiColorRed          := "c" . "0x" . "FF4444" ; warning status, OFF and limits
+global GuiColorLBlue        := "c" . "0x" . "00D4FF" ; fishsol version, need help text and "recommended for..." text
+global GuiColorLGreen       := "c" . "0x" . "00DD00" ; used for runtime, status text and ON text
+global GuiColorGreen        := "c" . "0x" . "00FF00" ; used for donate text
+global GuiColorLGrey        :=       "0x" . "D3D3D3" ; background color (ommit "c")
+global GuiColorLLGreen      := "c" . "0x" . "00AA00" ; start button color
+global GuiColorYellowOrange := "c" . "0x" . "FFAA00" ; pause button color
+global GuiColorOrange       := "c" . "0x" . "FF2C00" ; stop  button color
+global GuiColorDonatorBG    :=       "0x" . "2D2D2D" ; background color for donator text box (ommit "c")
+global GuiDefaultColor      :=       "0x" . "1E1E1E" ; default gui color (ommit "c")
+global GuiLinkColor         := "c" . "0x" . "0088FF" ; used for dev name and links
+global GuiSCBRColor         :=       "0x" . "696868" ; used for border box aroun "Strange Controller" and "Biome Randomizer" (ommit "c")
+global GuiColorGlitch       := "c" . "0x" . "65FF65" ; Glitched text
+global GuiColorDreamscape   := "c" . "0x" . "FF7DFF" ; Dreamspace text
+global GuiColorCyberspace   := "c" . "0x" . "00DDFF" ; Cyberspace text
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
@@ -157,38 +222,60 @@ Random, messageRand, 1, randomMessages.Length()
 
 randomMessage := randomMessages[messageRand]
 
-Devs := []
-
-Devs.Push({dev_name:"maxstellar"
+Devs := [{dev_name:"maxstellar"
          , dev_role:"Twitch"
          , dev_discord:"Lead Developer"
-         , dev_img:A_ScriptDir . "\img\maxstellar.png"
-         , dev_link:"https://www.twitch.tv/maxstellar"})
-Devs.Push({dev_name:"ivelchampion249"
+         , dev_img: dev_maxstellar_img
+         , dev_link:"https://www.twitch.tv/maxstellar"}
+        ,{dev_name:"ivelchampion249"
          , dev_role:"YouTube"
          , dev_discord:"Original Creator"
-         , dev_img:A_ScriptDir . "\img\Ivel.png"
-         , dev_link:"https://www.youtube.com/@ivelchampion"})
-Devs.Push({dev_name:"cresqnt"
+         , dev_img: dev_ivelchampion249_img
+         , dev_link:"https://www.youtube.com/@ivelchampion"}
+       ,{dev_name:"cresqnt"
          , dev_role:"Scope Development (other macros)"
          , dev_discord:"Frontend Developer"
-         , dev_img:A_ScriptDir . "\img\cresqnt.png"
+         , dev_img: dev_cresqnt_img
          , dev_link:"https://scopedevelopment.tech"
-         , dev_website:"https://cresqnt.com"})
+         , dev_website:"https://cresqnt.com"}]
 
        
-Randomised_DevOrder := "1|2|3"
 
-; loop % Devs.Length()
-; {
-;     Randomised_DevOrder .= A_Index
-;     if (A_Index) < (Devs.Length())
-;         Randomised_DevOrder .= "|"
-; } 
 
+;unrolled loop
+; Randomised_DevOrder := "1|2|3"
+; Sort, Randomised_DevOrder, Random D|
+; Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
+; dev1_name       := Devs[Randomised_DevOrder[1]].dev_name
+; dev1_role       := Devs[Randomised_DevOrder[1]].dev_role
+; dev1_discord    := Devs[Randomised_DevOrder[1]].dev_discord
+; dev1_img        := Devs[Randomised_DevOrder[1]].dev_img
+; dev1_link       := Devs[Randomised_DevOrder[1]].dev_link
+; dev1_website    := Devs[Randomised_DevOrder[1]].dev_website
+
+; dev2_name       := Devs[Randomised_DevOrder[2]].dev_name
+; dev2_role       := Devs[Randomised_DevOrder[2]].dev_role
+; dev2_discord    := Devs[Randomised_DevOrder[2]].dev_discord
+; dev2_img        := Devs[Randomised_DevOrder[2]].dev_img
+; dev2_link       := Devs[Randomised_DevOrder[2]].dev_link
+; dev2_website    := Devs[Randomised_DevOrder[2]].dev_website
+
+; dev3_name       := Devs[Randomised_DevOrder[3]].dev_name
+; dev3_role       := Devs[Randomised_DevOrder[3]].dev_role
+; dev3_discord    := Devs[Randomised_DevOrder[3]].dev_discord
+; dev3_img        := Devs[Randomised_DevOrder[3]].dev_img
+; dev3_link       := Devs[Randomised_DevOrder[3]].dev_link
+; dev3_website    := Devs[Randomised_DevOrder[3]].dev_website
+
+; loop
+loop % Devs.Length()
+{
+    Randomised_DevOrder .= A_Index
+    if (A_Index) < (Devs.Length())
+        Randomised_DevOrder .= "|"
+} 
 Sort, Randomised_DevOrder, Random D|
 Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
-
 loop % Devs.Length()
 {
     dev%A_Index%_name       := Devs[Randomised_DevOrder[A_INDEX]].dev_name
@@ -199,42 +286,13 @@ loop % Devs.Length()
     dev%A_Index%_website    := Devs[Randomised_DevOrder[A_INDEX]].dev_website
 }
 
-;define colors so they can be adjusted quickly on mass
-global GuiColorDefault      := "c" . "0x" . "CCCCCC" ; default font text color
-global GuiColorText         := "c" . "0x" . "FFFFFF" ; text color
-global GuiColorRed          := "c" . "0x" . "FF4444" ; warning status, OFF and limits
-global GuiColorLBlue        := "c" . "0x" . "00D4FF" ; fishsol version, need help text and "recommended for..." text
-global GuiColorLGreen       := "c" . "0x" . "00DD00" ; used for runtime, status text and ON text
-global GuiColorGreen        := "c" . "0x" . "00FF00" ; used for donate text
-global GuiColorLGrey        :=       "0x" . "D3D3D3" ; background color (ommit "c")
-global GuiColorLLGreen      := "c" . "0x" . "00AA00" ; start button color
-global GuiColorYellowOrange := "c" . "0x" . "FFAA00" ; pause button color
-global GuiColorOrange       := "c" . "0x" . "FF2C00" ; stop  button color
-global GuiColorDonatorBG    :=       "0x" . "2D2D2D" ; background color for donator text box (ommit "c")
-global GuiDefaultColor      :=       "0x" . "1E1E1E" ; default gui color (ommit "c")
-global GuiLinkColor         := "c" . "0x" . "0088FF" ; used for dev name and links
-global GuiSCBRColor         :=       "0x" . "696868" ; used for border box aroun "Strange Controller" and "Biome Randomizer" (ommit "c")
-global GuiColorGlitch       := "c" . "0x" . "65FF65" ; Glitched text
-global GuiColorDreamscape   := "c" . "0x" . "FF7DFF" ; Dreamspace text
-global GuiColorCyberspace   := "c" . "0x" . "00ddff" ; Cyberspace text
-
-;image resources
-global PNG_MAIN_TAB := A_ScriptDir "\gui\Main.png"
-global PNG_MISC_TAB := A_ScriptDir "\gui\Misc.png"
-global PNG_FAIL_TAB := A_ScriptDir "\gui\Failsafes.png"
-global PNG_BIOM_TAB := A_ScriptDir "\gui\Biomes.png"
-global PNG_CRAF_TAB := A_ScriptDir "\gui\Crafter.png"
-global PNG_WEBH_TAB := A_ScriptDir "\gui\Webhook.png"
-global PNG_SNOW_TAB := A_ScriptDir "\gui\Snowman.png"
-global PNG_CRED_TAB := A_ScriptDir "\gui\Credits.png"
-global PNG_DISCORD_ := A_ScriptDir "\img\Discord.png"
-global PNG_ROBLOX__ := A_ScriptDir "\img\Robux.png"
-
 Gui, Color, %GuiDefaultColor%
 Gui, Font, s17 %GuiColorText% Bold, Segoe UI
 Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %GuiColorLBlue%, fishSol v%version%
 
 Gui, Font, s9 %GuiColorText% Normal, Segoe UI
+; Gui, show
+stopBench("INITIAL",1)
 
 DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsewhere
 {
@@ -256,8 +314,10 @@ DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsew
     Gui, Add, Text, x%xOFF3% y600 w150 h38 Center BackgroundTrans %GuiColorGreen% gDonateClick, Donate!
     xOFF4 := 330 + X
     Gui, Add, Text, x%xOFF4% y600 w138 h38 Center BackgroundTrans %GuiColorLBlue% gNeedHelpClick, Need Help?
+
     Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 }
+
 DrawHelpDonate(-5)
 
 Gui, Font, s10 %GuiColorText% Normal Bold
@@ -365,6 +425,7 @@ Gui, Font, s9 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
 Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
 
+stopBench("MAIN",2)
 
 Gui, Tab, Misc
 
@@ -419,6 +480,8 @@ Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans +%GuiColo
 
 DrawHelpDonate()
 
+stopBench("MISC",3)
+
 Gui, Tab, Failsafes
 
 Gui, Add, Picture, x14 y80 w574 h590, %PNG_FAIL_TAB%
@@ -459,6 +522,8 @@ Gui, Add, Text, x320 y413 w150 h35 BackgroundTrans, Seconds:
 Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background%GuiColorLGrey% cBlack, %pathingFailsafeTime%
 
 DrawHelpDonate()
+
+stopBench("Failsafes",4)
 
 if (hasBiomesPlugin) {
     Gui, Tab, Biomes
@@ -502,6 +567,7 @@ if (hasBiomesPlugin) {
 
     DrawHelpDonate()
 }
+stopBench("Biomes",5)
 
 if (hasCrafterPlugin) {
     Gui, Tab, Crafter
@@ -523,6 +589,7 @@ if (hasCrafterPlugin) {
 
     DrawHelpDonate()
 }
+stopBench("Crafter",6)
 
 Gui, Tab, Webhook
 
@@ -548,6 +615,8 @@ Gui, Add, Button, x60 y356 w80 h25 gToggleItemWebhook vItemWebhookBtn, Toggle
 Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans +%GuiColorRed%, OFF
 
 DrawHelpDonate()
+
+stopBench("Webhook",7)
 
 if (hasSnowmanPlugin) {
     Gui, Tab, Snowman
@@ -581,6 +650,8 @@ if (hasSnowmanPlugin) {
     DrawHelpDonate()
 }
 
+stopBench("Snowman",8)
+
 Gui, Tab, Credits
 Gui, Add, Picture, x14 y80 w574 h590, %PNG_CRED_TAB%
 Gui, Font, s10 %GuiColorText% Normal
@@ -606,25 +677,19 @@ loop % Devs.Count()
     Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans %GuiLinkColor% gDev%A_Index%LinkClick, %dev_discord%
 }
 
-url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
-
-Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-Http.Open("GET", url, false)
-Http.Send()
-
-content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
-
 Gui, Font, s10 %GuiColorText% Normal Bold
 Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
 Gui, Font, s9 %GuiColorDefault% Normal
-Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background%GuiColorDonatorBG% %GuiColorDefault%, %content%
+Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background%GuiColorDonatorBG% %GuiColorDefault%, LOADING....
 
 Gui, Font, s8 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, fishSol v%version% - %randomMessage%
 
+DrawHelpDonate()
+
 Gui, Show, w600 h670, fishSol v%version%
 
-DrawHelpDonate()
+stopBench("Credits", 9)
 
 LoadBiomeToggles()
 
@@ -691,6 +756,14 @@ if (hasSnowmanPlugin) {
     GuiControl,, SnowmanIntervalInput, % (snowmanInterval / 60000)
 }
 
+stopBench("TOGGLE CHECKS",10)
+
+/*
+ * Gosub, donoList
+ */
+SetTimer, donoList, -0
+SetTimer, KILL_TOOLTIP, -30000
+stopBench("total loadtime",12)
 SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
 return                          ;as ahk resets line speed for each thread
 
@@ -719,16 +792,10 @@ return
 
 UpdateLoopCount:
     Gui, Submit, nohide
-    if MaxLoopInput is Number
-    {
-        maxLoopCount := max(MaxLoopInput, 1)
-        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-    }
-    if FishingLoopInput is Number
-    {
-        fishingLoopCount := max(FishingLoopInput, 1)
-        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
-    }
+    maxLoopCount := max(MaxLoopInput, 1)
+    IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+    fishingLoopCount := max(FishingLoopInput, 1)
+    IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
 return
 
 ToggleSellAll:
@@ -830,11 +897,8 @@ return
 UpdateAutoCrafterInterval:
     Gui, Submit, NoHide
     newInterval := AutoCrafterInterval * 60000
-    if newInterval is Number
-    {
-        autoCrafterInterval := max(newInterval, 1)
-        IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
-    }
+    autoCrafterInterval := max(newInterval, 1)
+    IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
 return
 
 ToggleAutoCrafterWebhook:
@@ -1557,38 +1621,26 @@ return
 
 UpdateFishingFailsafe:
     Gui, Submit, nohide
-    if FishingFailsafeInput is Number
-    {
-        fishingFailsafeTime := max(FishingFailsafeInput, 1)
-        IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
-    }
+    fishingFailsafeTime := max(FishingFailsafeInput, 1)
+    IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
 return
 
 UpdatePathingFailsafe:
     Gui, Submit, nohide
-    if PathingFailsafeInput is Number
-    {
-        pathingFailsafeTime := max(PathingFailsafeInput, 1)
-        IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
-    }
+    pathingFailsafeTime := max(PathingFailsafeInput, 1)
+    IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
 return
 
 UpdateAutoRejoinFailsafe:
     Gui, Submit, nohide
-    if AutoRejoinFailsafeInput is Number
-    {
-        autoRejoinFailsafeTime := max(AutoRejoinFailsafeInput, 1)
-        IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-    }
+    autoRejoinFailsafeTime := max(AutoRejoinFailsafeInput, 1)
+    IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
 return
 
 UpdateAdvancedThreshold:
     Gui, Submit, nohide
-    ; try max(min(AdvancedThresholdInput, 40),0) to lock variable to a range
-    if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
-        advancedFishingThreshold := max(min(AdvancedThresholdInput, 40), 0)
-        IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
-    }
+    advancedFishingThreshold := max(min(AdvancedThresholdInput, 40), 0)
+    IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
 return
 
 UpdateWebhook:
@@ -2036,15 +2088,9 @@ F1::
     }
     if (!toggle) {
         Gui, Submit, nohide
-        if MaxLoopInput is Number
-        {
-            maxLoopCount := max(MaxLoopInput, 1)
-        }
-
-        if FishingLoopInput is Number
-        {
-            fishingLoopCount := max(FishingLoopInput, 1)
-        }
+        
+        maxLoopCount := max(MaxLoopInput, 1)
+        fishingLoopCount := max(FishingLoopInput, 1)
 
         toggle := true
         if (hasBiomesPlugin) {
@@ -3924,15 +3970,9 @@ Return
 StartScript:
     if (!toggle) {
         Gui, Submit, nohide
-        if MaxLoopInput is Number
-        {
-            maxLoopCount := max(MaxLoopInput, 1)
-        }
 
-        if FishingLoopInput is Number
-        {
-            fishingLoopCount := max(FishingLoopInput, 1)
-        }
+        maxLoopCount := max(MaxLoopInput, 1)
+        fishingLoopCount := max(FishingLoopInput, 1)
 
         toggle := true
         if (hasBiomesPlugin) {
@@ -3969,15 +4009,9 @@ return
 StartScript(res) {
     if (!toggle) {
         Gui, Submit, nohide
-        if MaxLoopInput is Number
-        {
-            maxLoopCount := max(MaxLoopInput, 1)
-        }
 
-        if FishingLoopInput is Number
-        {
-            fishingLoopCount := max(FishingLoopInput, 1)
-        }
+        maxLoopCount := max(MaxLoopInput, 1)
+        fishingLoopCount := max(FishingLoopInput, 1)
 
         toggle := true
         if (hasBiomesPlugin) {
@@ -4107,4 +4141,14 @@ return
 
 OpenPluginsFolder:
     Run, %A_ScriptDir%\plugins
+return
+
+donoList:
+    url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
+    Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    Http.Open("GET", url, false)
+    Http.Send()
+    content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
+    GuiControl, , DonatorsList, %content%
+stopBench("HTTP",11)
 return
