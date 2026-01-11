@@ -1,5 +1,5 @@
 /*
- * recompile.js (requires node.js) can be used to rebuild "fishSol.ahk" into a slightly faster
+ * recompile.js (requires node:fs) can be used to rebuild "fishSol.ahk" into a slightly faster
  * loading script by unwrapping some functions and replacing development variable names with their
  * direct variables with some exclusions ie precached images
  */
