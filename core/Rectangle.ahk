@@ -684,7 +684,7 @@ class ScaledPoint extends Point
     {
         _X2 := 0
         _Y2 := 0
-            
+        
         XFixed     :=  this.AnchorLocation &  0x1
         YFixed     := (this.AnchorLocation & (0x1 << 1)) >> 1
         shrink     := (this.AnchorLocation & (0x1 << 2)) >> 2
@@ -692,35 +692,67 @@ class ScaledPoint extends Point
         add_X      := (this.AnchorLocation & (0x1 << 4)) >> 4
         flag_Y     := (this.AnchorLocation & (0x1 << 5)) >> 5
         add_Y      := (this.AnchorLocation & (0x1 << 6)) >> 6
-
-        S_X := (this.X * (this.LastScale ? this.LastScale : 1))
-        S_Y := (this.Y * (this.LastScale ? this.LastScale : 1))
+        LEFT       := (this.AnchorLocation & (0x1 << 7)) >> 7
+        RIGHT      := (this.AnchorLocation & (0x1 << 8)) >> 8
+        TOP        := (this.AnchorLocation & (0x1 << 9)) >> 9
+        BOTTOM     := (this.AnchorLocation & (0x1 << 10)) >> 10
+        parent_W_my_W := (this.AnchorLocation & (0x1 << 11)) >> 11
+        parent_H_my_H := (this.AnchorLocation & (0x1 << 12)) >> 12
+        parent_SW     := (this.AnchorLocation & (0x1 << 13)) >> 13
+        parent_SH     := (this.AnchorLocation & (0x1 << 14)) >> 14
             
         PWidth  := RobloxWindow.State.Screen.Width ? RobloxWindow.State.Screen.Width : 2560
-        PHeight := RobloxWindow.State.Screen.Height? RobloxWindow.State.Screen.Height : 1440
-
+        PHeight := RobloxWindow.State.Screen.Height? RobloxWindow.State.Screen.Height : 1440 ; - (TOP ? 0  : (BOTTOM ? w3 : (w3/2)))
+        ; PCW := 
+        ; PCH := 
         if Parent.Label != "Roblox"
         {
             _X3 := Parent.T_X - _X 
             _Y3 := Parent.T_Y - _Y
             
             
-            smaller_scale := min(PWidth/2560, PHeight/1440)
+            smaller_scale := max(PWidth/2560, PHeight/1440)
+            shrinker := (shrink ? smaller_scale : Parent.LastScale)
+            if Parent.MinWidth != ""
+            {
+                psw := parent_W_my_W ? (max((Parent.FWidth  ? Parent.FWidth  : Parent.CWidth ), Parent.MinWidth) / (this.MinWidth ? max(this.FWidth, this.MinWidth) : this.FWidth) ) * this.LastScale * this.Parent.LastScale : this.LastScale
+                PWidth  := max((Parent.FWidth  ? Parent.FWidth  : Parent.CWidth ), Parent.MinWidth)
+            }
+            Else
+            {
+                psw := parent_W_my_W ? ((Parent.FWidth  ? Parent.FWidth  : Parent.CWidth ) / this.FWidth ) * this.LastScale * this.Parent.LastScale : this.LastScale
+                PWidth  := (Parent.FWidth  ? Parent.FWidth  : Parent.CWidth ) * (shrink ? smaller_scale : Parent.LastScale)
+            }
+            if Parent.MinHeight != ""
+            {
+                psh := parent_H_my_H ? (max((Parent.FHeight ? Parent.FHeight : Parent.CHeight), Parent.MinHeight) / (this.MinHeight ? max(this.FHeight, this.MinHeight) : this.FHeight)) * this.LastScale * this.Parent.LastScale : this.LastScale
+                PHeight := max((Parent.FHeight ? Parent.FHeight : Parent.CHeight), Parent.MinHeight)
+            }
+            Else
+            {
+                psh := parent_H_my_H ? ((Parent.FHeight ? Parent.FHeight : Parent.CHeight) / this.FHeight) * this.Parent.LastScale : this.LastScale
+                PHeight := (Parent.FHeight ? Parent.FHeight : Parent.CHeight) * (shrink ? smaller_scale : Parent.LastScale)
+            }
+            FWidth  := PWidth  * (parent_SW ? min(Parent.CWidth  / Parent.Width ) : shrinker)
+            FHeight := PHeight * (parent_SH ? min(Parent.CHeight / Parent.Height) : shrinker)
+            S_X := (this.X * psw)
+            S_Y := (this.Y * psh)
 
-            FWidth  := (Parent.FWidth  ? Parent.FWidth  : Parent.CWidth ) * (shrink ? smaller_scale : Parent.LastScale)
-            FHeight := (Parent.FHeight ? Parent.FHeight : Parent.CHeight) * (shrink ? smaller_scale : Parent.LastScale)
-
+            ; if LEFT or RIGHT
+            ;     _X3 += ( LEFT ? 0 : ( RIGHT  ? ( FWidth  / 2 )  : 0 ) )
+            ; if TOP or BOTTOM
+            ;     _Y3 += ( TOP  ? 0 : ( BOTTOM ? ( FHeight  / 2 ) : 0 ) )
             if (not (this.LowX = this.HighX))
             {
                 if XFixed
-                    _X2 += _X + _X3 + lerp(FWidth * this.LowX, FWidth * this.HighX, ((flag_X ? ((Parent.FWidth?Parent.FWidth:Parent.CWidth) * (add_X ? min(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440) : max(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440))) : FWidth) * Parent.LastScale))
+                    _X2 += _X + _X3 + lerp(FWidth * this.LowX, FWidth * this.HighX, ((flag_X ? (PWidth * (add_X ? psw : max(psw, psh))) : FWidth) * Parent.LastScale))
                 Else
                     _X2 += _X + S_X
             }
             else
             {
                 if XFixed
-                    _X2 += _X + _X3 + ((flag_X ? ((Parent.FWidth?Parent.FWidth:Parent.CWidth) * (add_X ? min(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440) : max(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440))) : FWidth) * this.X)
+                    _X2 += _X + _X3 + ((flag_X ? (PWidth * (add_X ? psw : max(psw, psh))) : FWidth) * this.X)
                 Else
                     _X2 += _X + _X3 + S_X
             }
@@ -728,20 +760,23 @@ class ScaledPoint extends Point
             if (not (this.LowY = this.HighY))
             {
                 if YFixed
-                    _Y2 := _Y + _Y3 + lerp(FHeight * this.LowY, FHeight * this.HighY, ((flag_Y ? ((Parent.FHeight?Parent.FHeight:Parent.CHeight) * (add_Y ? min(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440) : max(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440))) : FHeight) * Parent.LastScale))
+                    _Y2 := _Y + _Y3 + lerp(FHeight * this.LowY, FHeight * this.HighY, ((flag_Y ? (PHeight * (add_Y ? psh : max(psw, psh))) : FHeight) * Parent.LastScale))
                 else
                     _Y2 := _Y + _Y3 + S_Y
             }
             else
             {
                 if YFixed
-                    _Y2 := _Y + _Y3 + ((flag_Y ? ((Parent.FWidth?Parent.FWidth:Parent.CWidth) * (add_Y ? min(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440) : max(RobloxWindow.State.Screen.Width/2560, RobloxWindow.State.Screen.Height/1440))) : FHeight) * this.Y)
+                    _Y2 := _Y + _Y3 + ((flag_Y ? (PHeight * (add_Y ? psh : max(psw, psh))) : FHeight) * this.Y)
                 else
                     _Y2 := _Y + _Y3 + S_Y
             }
         }
         else
         {
+            S_X := (this.X * this.LastScale)
+            S_Y := (this.Y * this.LastScale)
+
             if (not (this.LowX = this.HighX))
             {
                 if XFixed
@@ -775,6 +810,139 @@ class ScaledPoint extends Point
         this.T_Set(_X2, _Y2)
         this.Move(_X, _Y)
     }
+    
+    MakeGui()
+    {
+        global
+        local w1, h1, x1, x2, y1, y2, n1, n2, n3, color1, text_, text_W, text_H, text_X, text_Y, font_size
+        this.hasGui := true
+        
+        color1 := SubStr(Format("{:p}", this.Color), 11,6)
+        
+        this.GUI_WINDOW_HANDLE := "MOVEABLE_" . this.WindowKey
+        this.GUI_TEXT_HANDLE   := "HANDLE_" this.GUI_WINDOW_HANDLE "_TEXT"
+        
+        n1 := this.GUI_WINDOW_HANDLE
+        n2 := this.GUI_TEXT_HANDLE
+
+        w1 := Format("{:d}",this.Width) + 0
+        h1 := Format("{:d}",this.Height) + 0
+        if this.IsAnchor()
+        {
+            w1 := 3
+            h1 := 3
+        }
+
+        x1 := Format("{:d}",this.T_X - (w1/2)) + 0
+        x2 := min(max(Format("{:d}",this.T_X + w1 + 10) + 0, 10), 2560)
+
+        y1 := Format("{:d}",this.T_Y - (h1/2)) + 0
+        y2 := min(max(Format("{:d}",this.T_Y) + 0, 10), 1430)
+
+        Gui, OVERLAY:Add, Progress, w%w1% h%h1% x%x1% y%y1% v%n1% BackgroundTrans c%color1% +Border Disabled, 100
+        font_size := "s" . (this.IsAnchor() ? 6 : 9)
+        GUI, OVERLAY:Font, %font_size%
+        Gui, OVERLAY:Add, Text, x%x2% y%y2% v%n1%_TEXT cFFFFFF BackgroundTrans +hwndHANDLE_%n1%_TEXT, % (Debugger.Visual_ShowObjectKey ? this.WindowKey ":" : "") this.Label
+
+        n3 := %n2%
+        GuiControlGet, text_, Pos, %n3%
+        this.GUI_TEXT_W := text_W
+        this.GUI_TEXT_H := text_H
+    }
+
+    AddSecondarySize(W, H)
+    {
+        global
+        local w3, h3, x3, y3, n3, color1
+        this.FWidth          := W
+        this.FHeight         := H
+        this.GUI_RECT_HANDLE := L
+        this.GUI_RECT_HANDLE := "HANDLE_MOVEABLE_" . this.WindowKey "_RECT"
+        color1 := SubStr(Format("{:p}", this.Color), 11,6)
+        w3 := Format("{:d}", this.FWidth  ) + 0
+        h3 := Format("{:d}", this.FHeight ) + 0
+        x3 := Format("{:d}", this.T_X - (w3/2)) + 0
+        y3 := Format("{:d}", this.T_Y - (h3/2)) + 0
+        n3 := % this.GUI_RECT_HANDLE
+        Gui, OVERLAY:Add, Progress, w%w3% h%h3% x%x3% y%y3% v%n3% BackgroundTrans c%color1% +Border Disabled +hwndHANDLE_%n3%, 0
+    }
+
+    T_SetScale(W,H)
+    {
+        this.CWidth  := format("{:d}", W) + 0
+        this.CHeight := format("{:d}", H) + 0
+        if this.MinHeight != "" and this.CHeight < this.MinHeight
+                this.CHeight := this.MinHeight+0
+        if this.MinWidth != "" and this.CWidth < this.MinWidth
+                this.CWidth := this.MinWidth+0
+    }
+    
+    MoveGui()
+    {
+        global
+        local w1, h1, x1, x2, y1, y2, n1, n2, w3, h3, x3, y3, n3, PWidth, PHeight, smaller_scale
+
+        w1 := Format("{:d}",this.Width) + 0
+        h1 := Format("{:d}",this.Height) + 0
+        if this.IsAnchor()
+        {
+            w1 := 3
+            h1 := 3
+        }
+        
+        x1 := Format("{:d}",this.T_X - (w1/2)) + 0
+        if Debugger.ForceHideLabels or not this.Visible or Debugger.ForceHideViews
+            x2 := -10000
+        else
+            x2 := min(max(Format("{:d}",this.T_X + w1) + (this.IsAnchor() ? 10 : 0), 10), 2550-this.GUI_TEXT_W)
+        y1 := Format("{:d}",this.T_Y - (h1/2)) + 0
+        y2 := min(max(Format("{:d}",y1 - (this.IsAnchor() ? this.GUI_TEXT_H / 2 : 0 )) + 0, this.GUI_TEXT_H), 1440-this.GUI_TEXT_H)
+
+        n1 := this.GUI_WINDOW_HANDLE
+        n2 := this.GUI_TEXT_HANDLE
+
+        if this.GUI_RECT_HANDLE != "" and this.FWidth != "" and this.FHeight != ""
+        {
+            XFixed        :=  this.AnchorLocation &  0x1
+            YFixed        := (this.AnchorLocation & (0x1 << 1)) >> 1
+            shrink        := (this.AnchorLocation & (0x1 << 2)) >> 2
+            flag_X        := (this.AnchorLocation & (0x1 << 3)) >> 3
+            add_X         := (this.AnchorLocation & (0x1 << 4)) >> 4
+            flag_Y        := (this.AnchorLocation & (0x1 << 5)) >> 5
+            add_Y         := (this.AnchorLocation & (0x1 << 6)) >> 6
+            LEFT          := (this.AnchorLocation & (0x1 << 7)) >> 7
+            RIGHT         := (this.AnchorLocation & (0x1 << 8)) >> 8
+            TOP           := (this.AnchorLocation & (0x1 << 9)) >> 9
+            BOTTOM        := (this.AnchorLocation & (0x1 << 10)) >> 10
+            parent_W_my_W := (this.AnchorLocation & (0x1 << 11)) >> 11
+            parent_H_my_H := (this.AnchorLocation & (0x1 << 12)) >> 12
+            
+            psw := parent_W_my_W ? (this.Parent.CWidth  / this.FWidth ) * this.LastScale : RobloxWindow.State.Screen.Width/2560
+            psh := parent_H_my_H ? (this.Parent.CHeight / this.FHeight) * this.LastScale : RobloxWindow.State.Screen.Height/1440
+
+            n3 := this.GUI_RECT_HANDLE
+            w3 := Format("{:d}", this.FWidth  * (flag_X ? (add_X ? psw : min(psw, psh)) : this.LastScale * (Parent.LastScale ? Parent.LastScale : 1 ))) + 0
+            h3 := Format("{:d}", this.FHeight * (flag_Y ? (add_Y ? psh : min(psw, psh)) : this.LastScale * (Parent.LastScale ? Parent.LastScale : 1 ))) + 0
+            if this.MinHeight != "" and h3 < this.MinHeight
+                h3 := this.MinHeight
+            if this.MinWidth != "" and w3 < this.MinWidth
+                w3 := this.MinWidth
+            x3 := Format("{:d}", this.T_X - (LEFT ? 0 : (RIGHT ? w3 : (w3/2)))) + 0
+            if Debugger.ForceHideLabels or not this.Visible or Debugger.ForceHideViews
+                x3 := -10000
+            y3 := Format("{:d}", this.T_Y - (TOP ? 0 : (BOTTOM ? h3 : (h3/2)))) + 0 
+            GuiControl, OVERLAY:Move, %n3%, w%w3% h%h3% x%x3% y%y3%
+             WinSet, Bottom,, % "ahk_id " . HANDLE_%n3%
+             WinSet, Bottom,, % "ahk_id " . %n3%
+        }
+
+        if Debugger.ForceHideViews or not this.Visible
+            y1 := -10000
+        GuiControl, OVERLAY:Move, %n1%, x%x1% y%y1% w%w1% h%h1%
+        GuiControl, OVERLAY:MoveDraw, %n1%_TEXT, x%x2% y%y2%
+        WinSet, TOP,, % "ahk_id " . %n2%
+    }
+
 }
 
 ; class MirroredPoint extends Point
@@ -1665,6 +1833,7 @@ class ProtoRect
         for _, Win in RectangleBuilder.AllWindows
             Win.removeChild(child)
         this.Children.push(child)
+        child.Parent := this
     }
     
     removeChild(child)
@@ -1931,9 +2100,9 @@ class Rectangle extends SaveableProtoRect
         H2 := (this.Height * scale)
 
         this.LastScale := scale
-        
-        this.CWidth  := W2
-        this.CHeight := H2
+        this.T_SetScale(W2,H2)
+        ; this.CWidth  := W2
+        ; this.CHeight := H2
         
         this.Scale(ScreenWidth, ScreenHeight)
     }

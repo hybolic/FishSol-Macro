@@ -75,16 +75,19 @@ CoordMode, Pixel, Screen
         Menu, Tray, Icon, %iconFilePath%
     }
 
-    global DiscordPNG        := A_ScriptDir . "\img\Discord.png"
-    global RobloxPNG         := A_ScriptDir . "\img\Robux.png"
-    global Gui_Main_Png      := A_ScriptDir . "\gui\Main.png"
-    global Gui_Misc_Png      := A_ScriptDir . "\gui\Misc.png"
-    global Gui_Failsafe_Png  := A_ScriptDir . "\gui\Failsafes.png"
-    global Gui_Webhook_Png   := A_ScriptDir . "\gui\Webhook.png"
-    global Gui_Credits_Png   := A_ScriptDir . "\gui\Credits.png"
+    global DiscordPNG        := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Discord.png")
+    global RobloxPNG         := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Robux.png")
+    global Gui_Main_Png      := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Main.png")
+    global Gui_Misc_Png      := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Misc.png")
+    global Gui_Failsafe_Png  := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Failsafes.png")
+    global Gui_Webhook_Png   := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Webhook.png")
+    global Gui_Credits_Png   := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Credits.png")
+    global dev_maxstellar_img      := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\maxstellar.png")
+    global dev_ivelchampion249_img := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\Ivel.png")
+    global dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
 ;end
 
-global version  := "fishSol v1.9.4 2601-AltF.1"
+global version  := "fishSol v1.9.4 2601-AltH"
 
 ;WEB RESOURCES
     global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
@@ -162,7 +165,6 @@ startBench()
 ;Randimised the Devs
     Random,, A_TickCount ;[DEV COMMENT] is this needed?
     
-    ;[DEV COMMENT] only random number needed is for the random message lol
     Random, messageRand, 1, 10
 
     randomMessages := ["Go catch some fish IRL sometime!"
@@ -175,83 +177,50 @@ startBench()
                      , "Now with 100% more fishing!"
                      , "Gone fishing"
                      , "No fish were harmed in the making of this macro"]
-    ;
+
+    ;[DEV COMMENT] only random number needed is for the random message lol
+    Random, messageRand, 1, randomMessages.Length()
     randomMessage := randomMessages[messageRand]
 
-    ;[DEV COMMENT] Here to make adding and randomising devs easier
-    class DeveloperDetails
-    {
-        dev_name    := "", dev_role    := "", dev_discord := ""
-        dev_img     := "", dev_website := "", dev_link    := ""
 
-        __New(Name, Role, Discord, Image, Link, NameLink:="")
-        {
-            this.dev_name    := Name
-            this.dev_role    := Role
-            this.dev_discord := Discord
-            this.dev_img     := Image
-            this.dev_link    := Link
-            this.dev_website := NameLink
-        }
-        
-        click_link(index)
-        {
-            if strlen(dev%index%_link) > 0
-            {
-                Run, % dev%index%_link
-            }
-        }
+    Devs := [{   dev_name:"maxstellar"
+                , dev_role:"Twitch"
+                , dev_discord:"Lead Developer"
+                , dev_img: dev_maxstellar_img
+                , dev_link:"https://www.twitch.tv/maxstellar"}
 
-        click_website(index)
-        {
-            if strlen(dev%index%_website) > 0
-            {
-                Run, % dev%index%_website
-            }
-        }
-    }
+            ,{    dev_name:"ivelchampion249"
+                , dev_role:"YouTube"
+                , dev_discord:"Original Creator"
+                , dev_img: dev_ivelchampion249_img
+                , dev_link:"https://www.youtube.com/@ivelchampion"}
 
-    Devs := []
-    ;[DEV COMMENT]        | this was marked as role?                  i am very confused about the 
-    ;                     |       | and this was marked as discord?   variables names and im going to need 
-    ;                     V       v                                   some clarification on this later sorry
-    ;             name, thing?, role, image file, link, opt link
-    Devs.Push(new DeveloperDetails("maxstellar"
-                                 , "Twitch"
-                                 , "Lead Developer"
-                                 , A_ScriptDir . "\img\maxstellar.png"
-                                 , "https://www.twitch.tv/maxstellar"))
-
-    Devs.Push(new DeveloperDetails("ivelchampion249"
-                                 , "YouTube"
-                                 , "Original Creator"
-                                 , A_ScriptDir . "\img\Ivel.png"
-                                 , "https://www.youtube.com/@ivelchampion"))
-
-    Devs.Push(new DeveloperDetails("cresqnt"
-                                 , "Scope Development (other macros)"
-                                 , "Frontend Developer"
-                                 , A_ScriptDir . "\img\cresqnt.png"
-                                 , "https://scopedevelopment.tech"
-                                 , "https://cresqnt.com"))
-
-
+            ,{    dev_name:"cresqnt"
+                , dev_role:"Scope Development (other macros)"
+                , dev_discord:"Frontend Developer"
+                , dev_img: dev_cresqnt_img
+                , dev_link:"https://scopedevelopment.tech"
+                , dev_website:"https://cresqnt.com"}]
     Randomised_DevOrder := ""
+    devCount := Devs.Length()
+
     ;[DEV COMMENT] Build the number list that will soon be randomised
-    loop % Devs.Length()
+    loop % devCount
     {
         Randomised_DevOrder .= A_Index
-        if (A_Index) < (Devs.Length())
+        if (A_Index) < (devCount)
             Randomised_DevOrder .= "|"
     }
+    
     ;[DEV COMMENT] randomise that number list
     Sort, Randomised_DevOrder, Random D|
+
     ;[DEV COMMENT] split the list into individual numbers to make incrementing easier
     Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
     
     ;[DEV COMMENT] loops over the devs list and asigns them to global variables
     ; or just set to 3 if the list never grows
-    loop % Devs.Length()
+    loop % devCount
     {
         dev%A_Index%_name       := Devs[Randomised_DevOrder[A_INDEX]].dev_name
         dev%A_Index%_role       := Devs[Randomised_DevOrder[A_INDEX]].dev_role
@@ -379,7 +348,6 @@ Loading_Times.Data  := "" ; set to be garbage collected
 Loading_Times       := "" ; set to be garbage collected
 FullAppTimer.Data   := "" ; set to be garbage collected
 FullAppTimer        := "" ; set to be garbage collected
-
 return
 ;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;END OF STARTUP;;;;;;;;;;;;;;;;;;;;;;;
@@ -678,9 +646,9 @@ DoMouseMove2:
         global autoCrafterLastCheck
         global autoCrafterCheckInterval
         global fishingFailsafeRan := false
-        loopCount := 0
         global keyW := azertyPathing ? "z" : "w"
         global keyA := azertyPathing ? "q" : "a"
+        loopCount := 0
         restartPathing := false
         Top_Loop:
         Loop {
@@ -927,94 +895,154 @@ class CorePlugin extends Plugin
     {
         ; global
         ; local
+        this.Zero := this.RegisterScaledPoint(0.5,0.5,0xA7,"Zero")
+        this.Zero.Visible          := false
+        ;;;;;;;;;;;;;;;ROBLOX MENUS;;;;;;;;;;;;;;;
+        this.BurgerMenu                := this.RegisterFixedPoint(96 , 38  , this.S_LEFT  , "BurgerMenu")
+        this.RB_Menu                   := this.RegisterFixedPoint(40 , 38  , this.S_LEFT  , "RobloxMenu")
+        this.Respawn                   := this.RegisterFixedPoint(96 , 370  , this.S_LEFT  , "Respawn")
+        this.CloseChat                 := this.RegisterFixedPoint(140 , 38  , this.S_LEFT  , "CloseChat")
+        this.GeneralChat               := this.RegisterFixedPoint(140 , 80  , this.S_LEFT  , "GeneralChat")
+        this.ServerChat                := this.RegisterFixedPoint(270 , 80  , this.S_LEFT  , "ServerChat")
 
+        ;;;;;;;;;;;;;;;RIGHT MENU;;;;;;;;;;;;;;;
+        this.LS_1                  := this.RegisterScaledPoint(0, 0.5, 0xA7, "LS_1")
+        this.LS_1.AddSecondarySize(1800, 1440)
+        this.LS_1.Visible          := false
+        this.LS_2                  := this.RegisterScaledPoint(0, 0, 0xA7 - (0x1 << 6), "LS_2")
+        this.LS_2.AddSecondarySize(1800, 1440)
+        this.LS_2.Visible          := false
+        this.MENU_BOXES            := this.RegisterScaledPoint(0, 0, 0x7 + (0x1 << 7) + (0x3 << 11), "MENU_BOXES")
+        this.MENU_BOXES.AddSecondarySize(80, 400)
+        this.MENU_BOXES.MinHeight  := 220
+        this.MENU_BOXES.MinWidth   := 27.5
+        ; this.MENU_BOXES.Visible    := false
+        this.AURAS                 := this.RegisterScaledPoint(.5, -0.45 , 0x1 + (0x1 << 1) + (0x3 << 11), "AURAS")
+        this.AuraCatalog           := this.RegisterScaledPoint(.5, -0.275, 0x1 + (0x1 << 1) + (0x3 << 11), "AuraCatalog")
+        this.Inventory             := this.RegisterScaledPoint(.5, -0.1  , 0x1 + (0x1 << 1) + (0x3 << 11), "Inventory")
+        this.Quests                := this.RegisterScaledPoint(.5,  0.1  , 0x1 + (0x1 << 1) + (0x3 << 11), "Quests")
+        this.DailyQuests           := this.RegisterScaledPoint(.5,  0.275, 0x1 + (0x1 << 1) + (0x3 << 11), "DailyQuests")
+        this.MenuButton            := this.RegisterScaledPoint(.5,  0.45 , 0x1 + (0x1 << 1) + (0x3 << 11), "MenuButton")
+        this.LS_1.addChild(this.LS_2)
+        this.LS_2.addChild(this.MENU_BOXES)
+        this.MENU_BOXES.addChild(this.AURAS)
+        this.MENU_BOXES.addChild(this.AuraCatalog)
+        this.MENU_BOXES.addChild(this.Inventory)
+        this.MENU_BOXES.addChild(this.Quests)
+        this.MENU_BOXES.addChild(this.DailyQuests)
+        this.MENU_BOXES.addChild(this.MenuButton)
+
+        
+        ; this.Center_2by1           := this.RegisterScaledPoint(0.5, 0.5, 0x3 + (0x1 << 3) + (0x1 << 4) + (0x1 << 5) + (0x1 << 6), "2by1")
+        ; this.Center_2by1.AddSecondarySize(2280, 1440) 0 1 2 5 7
+        ; this.Center_16by9           := this.RegisterScaledPoint(0.0, 0, 0x2F, "16:9")
+        ; this.Zero.addChild(this.Center_16by9)
+        ; this.Center_16by9.Visible   := false
+        ; this.Center_16by9.AddSecondarySize(2560, 1440)
+        
+        ; this.AuraMenu              := this.RegisterScaledPoint(0.0, 0.0, 0x2B+(0x3 << 13), "AuraMenu")
+        ; this.AuraMenu.AddSecondarySize(1300, 710)
+        ; this.AuraMenu.MinWidth   := 412
+        ; this.AuraMenu.MinHeight  := 710*(412/1300)
+        ; this.AuraMenu.Visible   := false
+        ; this.Center_16by9.addChild(this.AuraMenu)
+
+
+        ; this.AuraMenu_CLOSE         := this.RegisterScaledPoint(0.5, -0.5, 0x1 + (0x1 << 1) + (0x3 << 11), "CloseMenu")
+        ; this.AuraMenu_CLOSE.Visible       := true
+        ; this.AuraMenu.addChild(this.AuraMenu_CLOSE)
         ;RegisterPoint\((\d+) *, +(\d+) *, +this\.\w+ *, +("\w+")\)
         ;RegisterScaledPoint(($1/2560), ($2/1440) , 0x7, $3)
 
         ;FIXED X AND Y POSITION ON WINDOW. Roblox ingame ui is a fixed size and position anchored to the top left or 0,0 of the window
         ;[DONE]                                                ;140   32
-        this.CloseChat               := this.RegisterFixedPoint(151 , 38  , this.S_LEFT  , "CloseChat")
 
-        ;SCALES WITH WIDTH OF WINDOW
-        ;[DONE]                                                            ;0x1+0x2 flag tells Scaled to do both H and V Scaling
-        this.ExitCollection          := this.RegisterScaledPoint(525 , 158, 0x3, "ExitCollection")
-        this.ExitCollection.HighOffset(0.2 ,0.103) ;do not compensate for horizontal offset
-        this.ExitCollection .LowOffset(0.2 ,0.163) ;just vertical, thanks game o7
+        ; ;SCALES WITH WIDTH OF WINDOW
+        ; ;[DONE]                                                            ;0x1+0x2 flag tells Scaled to do both H and V Scaling
+        ; this.ExitCollection          := this.RegisterScaledPoint(525 , 158, 0x3, "ExitCollection")
+        ; this.ExitCollection.HighOffset(0.2 ,0.103) ;do not compensate for horizontal offset
+        ; this.ExitCollection .LowOffset(0.2 ,0.163) ;just vertical, thanks game o7
         
-        ;Is the Anchor for top of fish mechant window          ;1308, 1073 
-        this.TempMerchantBoxTop      := this.RegisterScaledPoint(0.5,0.625, 0x3, "AnchorMerchant")
-        ; this.ExitCollection.HighOffset(0 ,0.625)
-        ; this.ExitCollection .LowOffset(0 ,0.625)
-        this.TempMerchantBoxTop.FWidth  := 1200    ;width doesn't matter
-        this.TempMerchantBoxTop.FHeight := 400     ;but height does
-        this.TempMerchantBoxTop._isAnchor := true  ;makes visualiser smaller, basically dev only setting, not actually anchor
+        ; ;Is the Anchor for top of fish mechant window          ;1308, 1073 
+        ; this.TempMerchantBoxTop      := this.RegisterScaledPoint(0.5,0.625, 0x3, "AnchorMerchant")
+        ; ; this.ExitCollection.HighOffset(0 ,0.625)
+        ; ; this.ExitCollection .LowOffset(0 ,0.625)
+        ; this.TempMerchantBoxTop.AddSecondarySize(1200, 400) ;..FWidth  := 1200    ;width doesn't matter
+        ; ;this.TempMerchantBoxTop.FHeight := 400     ;but height does
+        ; this.TempMerchantBoxTop._isAnchor := true  ;makes visualiser smaller, basically dev only setting, not actually anchor
 
-        ;[DONE]                                                         ;0x4 tells Scaled to use the alternative scaling (ie not largest)
-        this.MerchantTextBox         := this.RegisterScaledPoint(0  ,0.5, 0x7, "MerchantTextBox")
-        ; this.MerchantTextBox.HighOffset(0 ,0.5)
-        ; this.MerchantTextBox .LowOffset(0 ,0.5)
-        this.MerchantTextBox._isAnchor := true
-        this.TempMerchantBoxTop.addChild(this.MerchantTextBox)
+        ; ;[DONE]                                                         ;0x4 tells Scaled to use the alternative scaling (ie not largest)
+        ; this.MerchantTextBox         := this.RegisterScaledPoint(0  ,0.5, 0x7, "MerchantTextBox")
+        ; ; this.MerchantTextBox.HighOffset(0 ,0.5)
+        ; ; this.MerchantTextBox .LowOffset(0 ,0.5)
+        ; this.MerchantTextBox._isAnchor := true
+        ; this.TempMerchantBoxTop.addChild(this.MerchantTextBox)
 
-        ;[DONE]                                                 ;1289, 1264
-        this.SellFish                := this.RegisterScaledPoint(0  ,0.95, 0x7, "MerchantSellFish")
-        ; this.SellFish.HighOffset(0 ,0.95)
-        ; this.SellFish .LowOffset(0 ,0.95)
-        this.SellFish._isAnchor := true
-        this.TempMerchantBoxTop.addChild(this.SellFish)
+        ; ;[DONE]                                                 ;1289, 1264
+        ; this.SellFish                := this.RegisterScaledPoint(0  ,0.95, 0x7, "MerchantSellFish")
+        ; ; this.SellFish.HighOffset(0 ,0.95)
+        ; ; this.SellFish .LowOffset(0 ,0.95)
+        ; this.SellFish._isAnchor := true
+        ; this.TempMerchantBoxTop.addChild(this.SellFish)
 
-        ; [DONE]
-        ; SCALES WITH WIDTH AND HEIGHT OF WINDOW
-        this.Slot1Fish               := this.RegisterScaledPoint((1117/2560), (550/1440) , 0x7, "Slot1Fish")
-        this.Slot1Fish .HighOffset(0 ,0.335)
-        this.Slot1Fish .LowOffset(0 ,0.41)
+        ; ; [DONE]
+        ; ; SCALES WITH WIDTH AND HEIGHT OF WINDOW
+        ; this.Slot1Fish               := this.RegisterScaledPoint((1117/2560), (550/1440) , 0x7, "Slot1Fish")
+        ; this.Slot1Fish .HighOffset(0 ,0.335)
+        ; this.Slot1Fish .LowOffset(0 ,0.41)
 
-        ; [DONE]
-        this.SubMenuSell             := this.RegisterScaledPoint((1002/2560), (831/1440) , 0x7, "SubMenuSell")
+        ; ; [DONE]
+        ; this.SubMenuSell             := this.RegisterScaledPoint((1002/2560), (831/1440) , 0x7, "SubMenuSell")
 
-        ; [QUESTIONABLE]
-        this.CloseFishSell           := this.RegisterScaledPoint((1958/2560), (361/1440) , 0x7, "CloseFishSell")
+        ; ; [QUESTIONABLE]
+        ; this.CloseFishSell           := this.RegisterScaledPoint((1958/2560), (361/1440) , 0x7, "CloseFishSell")
+        ; ; [DONE]
+        ; this.SellAll                 := this.RegisterScaledPoint((904/2560), (1080/1440) , 0x7, "SellAll")
 
-        ; [DONE]
-        this.SellAll                 := this.RegisterScaledPoint((904/2560), (1080/1440) , 0x7, "SellAll")
+        ; ; [DONE]
+        ; this.SellOne                 := this.RegisterScaledPoint((700/2560), (1078/1440) , 0x7, "SellOne")
 
-        ; [DONE]
-        this.SellOne                 := this.RegisterScaledPoint((700/2560), (1078/1440) , 0x7, "SellOne")
+        ; ; [QUESTIONABLE]
+        ; ; FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
+        ; ;#FFFFFF
+        ; this.AuraStorageBox            := this.RegisterScaledPoint(0.5, 0.5, 0x7, "AuraStorageBox")
+        ; this.AuraStorageBox.AddSecondarySize(1282, 700)
+        ; this.CloseGui                 := this.RegisterScaledPoint(0.49, -0.472 , 0x7, "CloseGui")
+        ; this.AuraTabOne               := this.RegisterScaledPoint(-0.1,  -0.42, 0x7, "AuraTabOne")
+        ; ;[NOTE] change to area search
+        ; this.AbysPatPixSearchClick    := this.RegisterScaledPoint(-0.35, 0.20, 0x7, "Equip **change to zone for pixel search and click on pixel**") ;[DEV COMMENT] Possible duplicate but keeping it just in case
+        ; this.SearchBox                := this.RegisterScaledPoint(0, -0.35 , 0x7, "SearchBox")
+        ; this.Slot1                    := this.RegisterScaledPoint(-0.15, -0.2, 0x7, "Slot1")
 
-        ; [QUESTIONABLE]
-        ; FIXED POSTION AND SCALE DOES NOT NEED TO BE FIXED
-        this.AuraStorageBox            := this.RegisterScaledPoint(0.5, 0.5, 0x7, "AuraStorageBox")
-        this.AuraStorageBox.FWidth     := 1282
-        this.AuraStorageBox.FHeight    := 700
-        this.CloseGui                 := this.RegisterScaledPoint(0.49, -0.472 , 0x7, "CloseGui")
-        this.AuraTabOne               := this.RegisterScaledPoint(-0.1,  -0.42, 0x7, "AuraTabOne")
-        ;[NOTE] change to area search
-        this.AbysPatPixSearchClick    := this.RegisterScaledPoint(-0.35, 0.20, 0x7, "Equip **change to zone for pixel search and click on pixel**") ;[DEV COMMENT] Possible duplicate but keeping it just in case
-        this.SearchBox                := this.RegisterScaledPoint(0, -0.35 , 0x7, "SearchBox")
-        this.Slot1                    := this.RegisterScaledPoint(-0.15, -0.2, 0x7, "Slot1")
+        ; this.AuraStorageBox.addChild(this.CloseGui)
+        ; this.AuraStorageBox.addChild(this.AuraTabOne)
+        ; this.AuraStorageBox.addChild(this.AbysPatPixSearchClick)
+        ; this.AuraStorageBox.addChild(this.SearchBox)
+        ; this.AuraStorageBox.addChild(this.Slot1)
 
-        this.AuraStorageBox.addChild(this.CloseGui)
-        this.AuraStorageBox.addChild(this.AuraTabOne)
-        this.AuraStorageBox.addChild(this.AbysPatPixSearchClick)
-        this.AuraStorageBox.addChild(this.SearchBox)
-        this.AuraStorageBox.addChild(this.Slot1)
+        ; ; ; ; ; ; ; ; ; ; ; this.CloseGui                := this.RegisterScaledPoint((1882/2560), (395/1440) , 0x7, "CloseGui")
+        ; ; ; ; ; ; ; ; ; ; ; this.AuraTabOne              := this.RegisterScaledPoint((1262/2560), (447/1440) , 0x7, "AuraTabOne")
+        ; ; ; ; ; ; ; ; ; ; ; this.AbysPatPixSearchClick   := this.RegisterScaledPoint((830 /2560), (845/1440) , 0x7, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
+        ; ; ; ; ; ; ; ; ; ; ; this.SearchBox               := this.RegisterScaledPoint((1469/2560), (489/1440) , 0x7, "SearchBox")
+        ; ; ; ; ; ; ; ; ; ; ; this.Slot1                   := this.RegisterScaledPoint((1089/2560), (575/1440) , 0x7, "Slot1")
 
-        ; ; ; ; ; ; ; ; ; ; this.CloseGui                := this.RegisterScaledPoint((1882/2560), (395/1440) , 0x7, "CloseGui")
-        ; ; ; ; ; ; ; ; ; ; this.AuraTabOne              := this.RegisterScaledPoint((1262/2560), (447/1440) , 0x7, "AuraTabOne")
-        ; ; ; ; ; ; ; ; ; ; this.AbysPatPixSearchClick   := this.RegisterScaledPoint((830 /2560), (845/1440) , 0x7, "AbysPatPixSearchClick") ;[DEV COMMENT] Possible duplicate but keeping it just in case
-        ; ; ; ; ; ; ; ; ; ; this.SearchBox               := this.RegisterScaledPoint((1469/2560), (489/1440) , 0x7, "SearchBox")
-        ; ; ; ; ; ; ; ; ; ; this.Slot1                   := this.RegisterScaledPoint((1089/2560), (575/1440) , 0x7, "Slot1")
 
-        ;POSTIONS MAY DRIFT SLIGHTLY WITH SIZE? MIGHT NEED TO COMPENSATE
-        ;[DONE]
-        this.Auras                   := this.RegisterScaledPoint((52/2560), (538/1440) , 0x1 + (0x1 << 1)+(0x1 << 2)+(0x1 << 5), "Auras")
-        this.Auras.HighOffset(0, 0.3736)
-        this.Auras .LowOffset(0, 0.36)
 
+        ; this.MENUSPoint := this.RegisterScaledPoint(0, 0.5, 0x3, "MENUS")
+        ; this.MENUSPoint.AddSecondarySize(100, 400)
+
+        ; ; this.MENUS := this.RegisterScaledPoint(0, 0.5, 0x3, "MENUS")
+
+        ; ;POSTIONS MAY DRIFT SLIGHTLY WITH SIZE? MIGHT NEED TO COMPENSATE
         ; ;[DONE]
-        this.AuraCollection          := this.RegisterScaledPoint((52/2560), (621/1440) , 0x7, "AuraCollection")
-        this.AuraCollection.HighOffset(0, 0.4312)
-        this.AuraCollection .LowOffset(0, 0.4176)
+        ; this.Auras                   := this.RegisterScaledPoint((52/2560), (538/1440) , 0x1 + (0x1 << 1) + (0x1 << 2) + (0x1 << 5) + (0x1 << 6), "Auras")
+        ; ; this.Auras.HighOffset(0, 0.3736)
+        ; ; this.Auras .LowOffset(0, 0.36)
+
+        ; ; ;[DONE]
+        ; this.AuraCollection          := this.RegisterScaledPoint((52/2560), (621/1440) , 0x7, "AuraCollection")
+        ; this.AuraCollection.HighOffset(0, 0.4312)
+        ; this.AuraCollection .LowOffset(0, 0.4176)
 
         ; ;[    ]
         ; this.Unequip                 := this.RegisterScaledPoint((835/2560), (845/1440) , 0x7, "Unequip")
@@ -1073,7 +1101,7 @@ class CorePlugin extends Plugin
         ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
         SetupGui()
         {
-            global
+            global 
             local yFULL_OFFSET, yoff1, yoff2, yoff3, yoff4, dev_img, dev_name, dev_role, dev_discord 
             SetBatchLines, %MAX_SPEED%
 
@@ -1401,38 +1429,27 @@ class CorePlugin extends Plugin
                         yoff2 := 135 + yFULL_OFFSET
                         yoff3 := 155 + yFULL_OFFSET
                         yoff4 := 170 + yFULL_OFFSET
-                        dev_img     := "dev" A_INDEX "_img"
-                        dev_name    := "dev" A_INDEX "_name" ;[DEV COMMENT] check the <DeveloperDetails> class above to find these variables
-                        dev_role    := "dev" A_INDEX "_role"
-                        dev_discord := "dev" A_INDEX "_discord"
-                        dev_img     := %dev_img%
-                        dev_name    := %dev_name%
-                        dev_role    := %dev_role%
-                        dev_discord := %dev_discord%
-                        Gui, Font, s11 cWhite Normal Bold
-                        Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
 
-                        Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, %dev_name%
+                        Gui, Font, s11 cWhite Normal Bold
+                        Gui, Add, Picture, x50 y%yoff1% w50 h50, % dev%A_INDEX%_img
+
+                        Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, % dev%A_INDEX%_name
 
                         Gui, Font, s9 c0xCCCCCC Normal
-                        Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, %dev_role%
+                        Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, % dev%A_INDEX%_role
                         Gui, Font, s9 c0xCCCCCC Normal Underline
-                        Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, %dev_discord%
+                        Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, % dev%A_INDEX%_discord
                     }
                 ;end
-
-                ;[DEV COMMENT] Grab donor's txt from github?
-                Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                Http.Open("GET", DonorURL, false)
-                Http.Send()
-                ;[DEV COMMENT] remove last \r\n from the response text if its there
-                ;                      just makes the Edit look a little cleaner
-                content := RTrim(Http.ResponseText, "`r`n")
+                
+                ;move http request to its own thread
+                DonoHTTP := ObjBindMethod(this, "DonoHTTP")
+                SetTimer, %DonoHTTP%, -100
 
                 Gui, Font, s10 cWhite Normal Bold
                 Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
                 Gui, Font, s9 c0xCCCCCC Normal
-                Gui, Add, Edit, x50 y370 w480 h125 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, %content%
+                Gui, Add, Edit, x50 y370 w480 h125 +HwndHandleDonatorsList vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, LOADING....
 
                 Gui, Font, s8 c0xCCCCCC Normal
                 Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, %version% - %randomMessage%
@@ -1448,7 +1465,18 @@ class CorePlugin extends Plugin
                 Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
             ;end
         }
-        
+
+        DonoHTTP()
+        {
+            global DonorURL, HandleDonatorsList
+            SetBatchLines, %MAX_SPEED%
+            Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+            Http.Open("GET", DonorURL, false)
+            Http.Send()
+            content := RTrim(Http.ResponseText, " `t`n`r")
+            GuiControl, Text, %HandleDonatorsList%, %content%
+        }
+
         ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
         IniRead()
         {
@@ -2146,7 +2174,6 @@ class CorePlugin extends Plugin
         }
     }
 }
-
 
 class CoreProto extends Plugin
 {

@@ -1,5 +1,4 @@
 //jsdoc .\ -c jsdoc.json --verbose --debug > jsdoc_Output.log
-const { lookup } = require('dns');
 const logger = require('jsdoc/util/logger');
 logger.info("Nadir's jsDocPlugin is running!!");
 const commentPattern = /\/\*\*[\s\S]+?\*\//g
