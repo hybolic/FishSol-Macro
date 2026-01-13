@@ -87,7 +87,7 @@ CoordMode, Pixel, Screen
     global dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
 ;end
 
-global version  := "fishSol v1.9.4 2601-AltH"
+global version  := "fishSol v1.9.4 2601-AltH.1"
 
 ;WEB RESOURCES
     global DonorURL := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
@@ -888,41 +888,62 @@ class CorePlugin extends Plugin
     {
         Return true
     }
-    /*
-    * JUST DISCOVERED SOLS RNG USES A ASPECT RATION OF 2:1
-    */
+    
     PluginSetup()
     {
         ; global
         ; local
-        this.Zero := this.RegisterScaledPoint(0.5,0.5,0xA7,"Zero")
+        ; this.Zero := this.RegisterScaledPoint(0.5,0.5,0xA7,"Zero") ;switch back to this
+        this.Zero := this.RegisterScaledPoint(0,0,0x0,"Zero")
         this.Zero.Visible          := false
+
         ;;;;;;;;;;;;;;;ROBLOX MENUS;;;;;;;;;;;;;;;
         this.BurgerMenu                := this.RegisterFixedPoint(96 , 38  , this.S_LEFT  , "BurgerMenu")
-        this.RB_Menu                   := this.RegisterFixedPoint(40 , 38  , this.S_LEFT  , "RobloxMenu")
-        this.Respawn                   := this.RegisterFixedPoint(96 , 370  , this.S_LEFT  , "Respawn")
-        this.CloseChat                 := this.RegisterFixedPoint(140 , 38  , this.S_LEFT  , "CloseChat")
-        this.GeneralChat               := this.RegisterFixedPoint(140 , 80  , this.S_LEFT  , "GeneralChat")
-        this.ServerChat                := this.RegisterFixedPoint(270 , 80  , this.S_LEFT  , "ServerChat")
+        this.BurgerMenu._isAnchor := true ;make visuals smaller
 
-        ;;;;;;;;;;;;;;;RIGHT MENU;;;;;;;;;;;;;;;
-        this.LS_1                  := this.RegisterScaledPoint(0, 0.5, 0xA7, "LS_1")
+        this.RB_Menu                   := this.RegisterFixedPoint(40 , 38  , this.S_LEFT  , "RobloxMenu")
+        this.RB_Menu._isAnchor := true
+
+        this.Respawn                   := this.RegisterFixedPoint(96 , 370  , this.S_LEFT  , "Respawn")
+        this.Respawn._isAnchor := true
+
+        this.CloseChat                 := this.RegisterFixedPoint(140 , 38  , this.S_LEFT  , "CloseChat")
+        this.CloseChat._isAnchor := true
+
+        this.GeneralChat               := this.RegisterFixedPoint(140 , 80  , this.S_LEFT  , "GeneralChat")
+        this.GeneralChat._isAnchor := true
+
+        this.ServerChat                := this.RegisterFixedPoint(270 , 80  , this.S_LEFT  , "ServerChat")
+        this.ServerChat._isAnchor := true
+
+        ;;;;;;;;;;;;;;;LEFT MENU;;;;;;;;;;;;;;;
+        FxA7 := QF(1,1,1,0,0,1,0,1) ;switch back to this
+        num  := QF(0,0,0,0,0,0,0,1,0,1,1,0,0,1,1)
+        this.LS_1                  := this.RegisterScaledPoint(0, 0.5, num, "LS_1")
         this.LS_1.AddSecondarySize(1800, 1440)
         this.LS_1.Visible          := false
-        this.LS_2                  := this.RegisterScaledPoint(0, 0, 0xA7 - (0x1 << 6), "LS_2")
+        this.Zero.addChild(this.LS_1)
+                
+        Fx87 := QF(1,1,1,0,0,0,0,1) ;switch back to this
+        num2 := QF(1,1,0,1,0,1,0,0,0,0,0,0,0,1,1)
+        this.LS_2                  := this.RegisterScaledPoint(0, 0, num2, "LS_2")
         this.LS_2.AddSecondarySize(1800, 1440)
         this.LS_2.Visible          := false
-        this.MENU_BOXES            := this.RegisterScaledPoint(0, 0, 0x7 + (0x1 << 7) + (0x3 << 11), "MENU_BOXES")
+        
+        Fx1887 := QF(1,1,1,0,0,0,0,1,0,0,0,1,1)
+        this.MENU_BOXES            := this.RegisterScaledPoint(0, 0, Fx1887, "MENU_BOXES")
         this.MENU_BOXES.AddSecondarySize(80, 400)
         this.MENU_BOXES.MinHeight  := 220
         this.MENU_BOXES.MinWidth   := 27.5
-        ; this.MENU_BOXES.Visible    := false
-        this.AURAS                 := this.RegisterScaledPoint(.5, -0.45 , 0x1 + (0x1 << 1) + (0x3 << 11), "AURAS")
-        this.AuraCatalog           := this.RegisterScaledPoint(.5, -0.275, 0x1 + (0x1 << 1) + (0x3 << 11), "AuraCatalog")
-        this.Inventory             := this.RegisterScaledPoint(.5, -0.1  , 0x1 + (0x1 << 1) + (0x3 << 11), "Inventory")
-        this.Quests                := this.RegisterScaledPoint(.5,  0.1  , 0x1 + (0x1 << 1) + (0x3 << 11), "Quests")
-        this.DailyQuests           := this.RegisterScaledPoint(.5,  0.275, 0x1 + (0x1 << 1) + (0x3 << 11), "DailyQuests")
-        this.MenuButton            := this.RegisterScaledPoint(.5,  0.45 , 0x1 + (0x1 << 1) + (0x3 << 11), "MenuButton")
+        this.MENU_BOXES.Visible    := false
+
+        Fx1803 := QF(1,1,0,0,0,0,0,0,0,0,0,1,1)
+        this.AURAS                 := this.RegisterScaledPoint(.5, -0.45 , Fx1803, "AURAS")
+        this.AuraCatalog           := this.RegisterScaledPoint(.5, -0.275, Fx1803, "AuraCatalog")
+        this.Inventory             := this.RegisterScaledPoint(.5, -0.1  , Fx1803, "Inventory")
+        this.Quests                := this.RegisterScaledPoint(.5,  0.1  , Fx1803, "Quests")
+        this.DailyQuests           := this.RegisterScaledPoint(.5,  0.275, Fx1803, "DailyQuests")
+        this.MenuButton            := this.RegisterScaledPoint(.5,  0.45 , Fx1803, "MenuButton")
         this.LS_1.addChild(this.LS_2)
         this.LS_2.addChild(this.MENU_BOXES)
         this.MENU_BOXES.addChild(this.AURAS)
@@ -932,23 +953,28 @@ class CorePlugin extends Plugin
         this.MENU_BOXES.addChild(this.DailyQuests)
         this.MENU_BOXES.addChild(this.MenuButton)
 
+        ;;;;;;;;;;;;;;;Aura Inventory;;;;;;;;;;;;;;;
+        Fx7B := QF(1,1,0,1,1,1,1)
+        this.Center_2by1           := this.RegisterScaledPoint(0.5, 0.5, Fx7B, "2by1")
+        this.Center_2by1.AddSecondarySize(2280, 1440)
+        this.Center_2by1.Visible    := false
+
+        Fx2F := QF(1,1,1,1,0,1)
+        this.Center_16by9           := this.RegisterScaledPoint(0.0, 0, Fx2F, "16:9")
+        this.Zero.addChild(this.Center_16by9)
+        this.Center_16by9.Visible   := false
+        this.Center_16by9.AddSecondarySize(2560, 1440)
         
-        ; this.Center_2by1           := this.RegisterScaledPoint(0.5, 0.5, 0x3 + (0x1 << 3) + (0x1 << 4) + (0x1 << 5) + (0x1 << 6), "2by1")
-        ; this.Center_2by1.AddSecondarySize(2280, 1440) 0 1 2 5 7
-        ; this.Center_16by9           := this.RegisterScaledPoint(0.0, 0, 0x2F, "16:9")
-        ; this.Zero.addChild(this.Center_16by9)
-        ; this.Center_16by9.Visible   := false
-        ; this.Center_16by9.AddSecondarySize(2560, 1440)
-        
-        ; this.AuraMenu              := this.RegisterScaledPoint(0.0, 0.0, 0x2B+(0x3 << 13), "AuraMenu")
-        ; this.AuraMenu.AddSecondarySize(1300, 710)
-        ; this.AuraMenu.MinWidth   := 412
-        ; this.AuraMenu.MinHeight  := 710*(412/1300)
-        ; this.AuraMenu.Visible   := false
-        ; this.Center_16by9.addChild(this.AuraMenu)
+        Fx602B := QF(1,1,0,1,0,1,0,0,0,0,0,0,0,1,1)
+        this.AuraMenu              := this.RegisterScaledPoint(0.0, 0.0, Fx602B, "AuraMenu")
+        this.AuraMenu.AddSecondarySize(1300, 710)
+        this.AuraMenu.MinWidth   := 412
+        this.AuraMenu.MinHeight  := 710*(412/1300)
+        this.AuraMenu.Visible   := false
+        this.Center_16by9.addChild(this.AuraMenu)
 
 
-        ; this.AuraMenu_CLOSE         := this.RegisterScaledPoint(0.5, -0.5, 0x1 + (0x1 << 1) + (0x3 << 11), "CloseMenu")
+        ; this.AuraMenu_CLOSE         := this.RegisterScaledPoint(0.5, -0.5, Fx1803, "CloseMenu")
         ; this.AuraMenu_CLOSE.Visible       := true
         ; this.AuraMenu.addChild(this.AuraMenu_CLOSE)
         ;RegisterPoint\((\d+) *, +(\d+) *, +this\.\w+ *, +("\w+")\)

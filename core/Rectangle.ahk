@@ -2,6 +2,23 @@
 ;@cleanupregex "/{.*}/g" "new Object()"
 global allVisible := False
 global QuickRegex := {True_False:"(?i)(true|false|0|1)", Num_Int:"^[\d]*$", Num_Float:"^[\d]*\.{0,1}[\d]*$", Num_Hex:"([0-9A-Fa-f]{6,6})|(0x[0-9A-Fa-f]{6,6})", JsonQuick:"{.*}", JsonValid:"((?<o>{((?<s>([\s\n\r]*)[\s\n\r]*\""""([^\0-\x1F\""""\\]|\\[\""""\\\/bfnrt]|\\u[0-9a-fA-F]{4})*\""""[\s\n\r]*)[\s\n\r]*:[\s\n\r]*(?<v>\g<s>|(?<n>-?(0|[1-9]\d*)(.\d+)?([eE][+-]?\d+)?)[\s\n\r]*|\g<o>|\g<a>|true|false|null))?\s*((?<c>,[\s\n\r]*)\g<s>(?<d>:[\s\n\r]*)\g<v>)*[\s\n\r]*})|(?<a>\[\g<v>?(\g<c>\g<v>)*\])[\s\n\r]*)", ForceEnd:"(?(?<!$)(*THEN)(*COMMIT)(*FAIL)|(*ACCEPT))"}
+binToNum(param*)
+{
+    number := 0
+    loop % param.Length()
+    {
+        if param[A_Index]
+            number += 0x1 << (A_Index - 1)
+    }
+    ; num := format("{:#X}", number)
+    return number
+}
+
+QF(XFixed, YFixed := 0 , shrink := 0 , flag_X := 0 , add_X := 0 , flag_Y := 0 , add_Y := 0 , LEFT := 0 , RIGHT := 0 , TOP := 0 , BOTTOM := 0 , parent_W_my_W := 0 , parent_H_my_H := 0 , parent_SW := 0 , parent_SH := 0 )
+{
+    return binToNum(XFixed, YFixed, shrink, flag_X, add_X, flag_Y, add_Y, LEFT, RIGHT, TOP, BOTTOM, parent_W_my_W, parent_H_my_H, parent_SW, parent_SH)
+}
+
 
 class RectangleBuilder
 {
@@ -466,6 +483,43 @@ class RectangleBuilder
     }
 }
 
+getflags(AnchorLocation)
+{
+    flags := []
+    if(AnchorLocation &  0x1)
+        flags.Push("XFixed")
+    if((AnchorLocation & (0x1 << 1)) >> 1)
+        flags.Push("YFixed")
+    if((AnchorLocation & (0x1 << 2)) >> 2)
+        flags.Push("shrink")
+    if((AnchorLocation & (0x1 << 3)) >> 3)
+        flags.Push("flag_X")
+    if((AnchorLocation & (0x1 << 4)) >> 4)
+        flags.Push("add_X")
+    if((AnchorLocation & (0x1 << 5)) >> 5)
+        flags.Push("flag_Y")
+    if((AnchorLocation & (0x1 << 6)) >> 6)
+        flags.Push("add_Y")
+    if((AnchorLocation & (0x1 << 7)) >> 7)
+        flags.Push("LEFT")
+    if((AnchorLocation & (0x1 << 8)) >> 8)
+        flags.Push("RIGHT")
+    if((AnchorLocation & (0x1 << 9)) >> 9)
+        flags.Push("TOP")
+    if((AnchorLocation & (0x1 << 10)) >> 10)
+        flags.Push("BOTTOM")
+    if((AnchorLocation & (0x1 << 11)) >> 11)
+        flags.Push("parent_W_my_W")
+    if((AnchorLocation & (0x1 << 12)) >> 12)
+        flags.Push("parent_H_my_H")
+    if((AnchorLocation & (0x1 << 13)) >> 13)
+        flags.Push("parent_SW")
+    if((AnchorLocation & (0x1 << 14)) >> 14)
+        flags.Push("parent_SH")
+    if flags.Length() = 0
+        flags.Push("No Flags!")
+    return flags
+}
 
 class Anchors
 {
@@ -680,11 +734,60 @@ class ScaledPoint extends Point
         this.AnchorLocation := anchor
     }
 
+
+    ScaleByParent(ScreenCWidth, ScreenCHeight, Parent)
+    {
+        shrink     := (this.AnchorLocation & (0x1 << 2)) >> 2
+        flag_X     := (this.AnchorLocation & (0x1 << 3)) >> 3
+        flag_Y     := (this.AnchorLocation & (0x1 << 5)) >> 5
+        parent_W_my_W := (this.AnchorLocation & (0x1 << 11)) >> 11
+        parent_H_my_H := (this.AnchorLocation & (0x1 << 12)) >> 12
+        parent_SW     := (this.AnchorLocation & (0x1 << 13)) >> 13
+        parent_SH     := (this.AnchorLocation & (0x1 << 14)) >> 14
+        flags := getflags(this.AnchorLocation)
+        ScreenWidth := 2560
+        ScreenHeight := 1440
+
+        ParentWidth  := ( Parent.FWidth  ? Parent.FWidth  : Parent.Width  )
+        ParentHeight := ( Parent.FHeight ? Parent.FHeight : Parent.Height )
+        
+        bigger_scalePX  := max(Parent.CWidth, (Parent.MinWidth ? Parent.MinWidth : 0 )) / ParentWidth
+        bigger_scalePCX := max(( this.FWidth ? this.FWidth : this.CWidth ),   (this.MinWidth   ? this.MinWidth   : 0 )) / ( this.FWidth ? this.FWidth : this.Width )
+        bigger_scaleSX  := ScreenCWidth/ScreenWidth
+
+        bigger_scalePY   := max(Parent.CHeight, (Parent.MinHeight ? Parent.MinHeight : 0 )) / ParentHeight
+        bigger_scalePCY  := max(( this.FHeight ? this.FHeight : this.CHeight ),   (this.MinHeight   ? this.MinHeight   : 0 )) / ( this.FHeight ? this.FHeight : this.Height )
+        bigger_scaleSY  := ScreenCHeight/ScreenHeight
+        
+        bigger_scaleP := min(bigger_scalePX, bigger_scalePY)
+        bigger_scaleS := Min(bigger_scaleSX, bigger_scaleSY)
+        
+        ;no scale just use normal
+        scale := (shrink ? bigger_scaleP : bigger_scaleS)
+
+        bigger_scaleX := (parent_SW ? bigger_scalePX : bigger_scaleSX)
+        bigger_scaleY := (parent_SH ? bigger_scalePY : bigger_scaleSY)
+
+        bigger_scaleX := (parent_W_my_W ? bigger_scalePCX * bigger_scalePX : bigger_scaleSX)
+        bigger_scaleY := (parent_H_my_H ? bigger_scalePCY * bigger_scalePY : bigger_scaleSY)
+
+        W2 := (( this.FWidth  ? this.FWidth  : this.Width  ) * (flag_X ? bigger_scaleX : scale ))
+        H2 := (( this.FHeight ? this.FHeight : this.Height ) * (flag_Y ? bigger_scaleY : scale ))
+
+        this.LastScaleW := (flag_X ? bigger_scaleX : scale )
+        this.LastScaleH := (flag_Y ? bigger_scaleY : scale )
+
+        this.LastScale := min(this.LastScaleW, this.LastScaleH)
+        this.T_SetScale(W2,H2)
+        
+        this.Scale(ScreenCWidth, ScreenCHeight)
+    }
+    
     MoveByAnchor(_X,_Y,Parent)
     {
         _X2 := 0
         _Y2 := 0
-        
+
         XFixed     :=  this.AnchorLocation &  0x1
         YFixed     := (this.AnchorLocation & (0x1 << 1)) >> 1
         shrink     := (this.AnchorLocation & (0x1 << 2)) >> 2
@@ -700,6 +803,7 @@ class ScaledPoint extends Point
         parent_H_my_H := (this.AnchorLocation & (0x1 << 12)) >> 12
         parent_SW     := (this.AnchorLocation & (0x1 << 13)) >> 13
         parent_SH     := (this.AnchorLocation & (0x1 << 14)) >> 14
+        flags := getflags(this.AnchorLocation)
             
         PWidth  := RobloxWindow.State.Screen.Width ? RobloxWindow.State.Screen.Width : 2560
         PHeight := RobloxWindow.State.Screen.Height? RobloxWindow.State.Screen.Height : 1440 ; - (TOP ? 0  : (BOTTOM ? w3 : (w3/2)))
@@ -711,7 +815,7 @@ class ScaledPoint extends Point
             _Y3 := Parent.T_Y - _Y
             
             
-            smaller_scale := max(PWidth/2560, PHeight/1440)
+            smaller_scale := min(PWidth/2560, PHeight/1440)
             shrinker := (shrink ? smaller_scale : Parent.LastScale)
             if Parent.MinWidth != ""
             {
@@ -742,6 +846,10 @@ class ScaledPoint extends Point
             ;     _X3 += ( LEFT ? 0 : ( RIGHT  ? ( FWidth  / 2 )  : 0 ) )
             ; if TOP or BOTTOM
             ;     _Y3 += ( TOP  ? 0 : ( BOTTOM ? ( FHeight  / 2 ) : 0 ) )
+            ; if LEFT or RIGHT
+            ;     _X3 -= ( LEFT ? ( RIGHT  ? ( (this.CWidth  )  / 2 ) : (FWidth  / 2 ) ) : ( RIGHT  ? this.CWidth  : 0 ) )
+            ; if TOP or BOTTOM
+            ;     _Y3 -= ( TOP  ? ( BOTTOM ? ( (this.CHeight -   ) / 2 ) : (FHeight / 2 ) ) : ( BOTTOM ? this.CHeight : 0 ) )
             if (not (this.LowX = this.HighX))
             {
                 if XFixed
@@ -762,14 +870,14 @@ class ScaledPoint extends Point
                 if YFixed
                     _Y2 := _Y + _Y3 + lerp(FHeight * this.LowY, FHeight * this.HighY, ((flag_Y ? (PHeight * (add_Y ? psh : max(psw, psh))) : FHeight) * Parent.LastScale))
                 else
-                    _Y2 := _Y + _Y3 + S_Y
+            _Y2 := _Y + _Y3 + S_Y
             }
             else
             {
                 if YFixed
                     _Y2 := _Y + _Y3 + ((flag_Y ? (PHeight * (add_Y ? psh : max(psw, psh))) : FHeight) * this.Y)
                 else
-                    _Y2 := _Y + _Y3 + S_Y
+                    _Y2 := _Y + (RobloxWindow.State.Screen.Height * this.Y)
             }
         }
         else
@@ -903,13 +1011,6 @@ class ScaledPoint extends Point
 
         if this.GUI_RECT_HANDLE != "" and this.FWidth != "" and this.FHeight != ""
         {
-            XFixed        :=  this.AnchorLocation &  0x1
-            YFixed        := (this.AnchorLocation & (0x1 << 1)) >> 1
-            shrink        := (this.AnchorLocation & (0x1 << 2)) >> 2
-            flag_X        := (this.AnchorLocation & (0x1 << 3)) >> 3
-            add_X         := (this.AnchorLocation & (0x1 << 4)) >> 4
-            flag_Y        := (this.AnchorLocation & (0x1 << 5)) >> 5
-            add_Y         := (this.AnchorLocation & (0x1 << 6)) >> 6
             LEFT          := (this.AnchorLocation & (0x1 << 7)) >> 7
             RIGHT         := (this.AnchorLocation & (0x1 << 8)) >> 8
             TOP           := (this.AnchorLocation & (0x1 << 9)) >> 9
@@ -921,19 +1022,15 @@ class ScaledPoint extends Point
             psh := parent_H_my_H ? (this.Parent.CHeight / this.FHeight) * this.LastScale : RobloxWindow.State.Screen.Height/1440
 
             n3 := this.GUI_RECT_HANDLE
-            w3 := Format("{:d}", this.FWidth  * (flag_X ? (add_X ? psw : min(psw, psh)) : this.LastScale * (Parent.LastScale ? Parent.LastScale : 1 ))) + 0
-            h3 := Format("{:d}", this.FHeight * (flag_Y ? (add_Y ? psh : min(psw, psh)) : this.LastScale * (Parent.LastScale ? Parent.LastScale : 1 ))) + 0
-            if this.MinHeight != "" and h3 < this.MinHeight
-                h3 := this.MinHeight
-            if this.MinWidth != "" and w3 < this.MinWidth
-                w3 := this.MinWidth
-            x3 := Format("{:d}", this.T_X - (LEFT ? 0 : (RIGHT ? w3 : (w3/2)))) + 0
+            w3 := Format("{:d}", this.CWidth) + 0
+            h3 := Format("{:d}", this.CHeight) + 0
+            x3 := Format("{:d}", this.T_X) - ( LEFT ? ( RIGHT  ? ( this.CWidth  / 2 ) : 0 ) : ( RIGHT  ? this.CWidth  : 0 ) )
             if Debugger.ForceHideLabels or not this.Visible or Debugger.ForceHideViews
                 x3 := -10000
-            y3 := Format("{:d}", this.T_Y - (TOP ? 0 : (BOTTOM ? h3 : (h3/2)))) + 0 
+            y3 := Format("{:d}", this.T_Y) - ( TOP  ? ( BOTTOM ? ( this.CHeight / 2 ) : 0 ) : ( BOTTOM ? this.CHeight : 0 ) )
             GuiControl, OVERLAY:Move, %n3%, w%w3% h%h3% x%x3% y%y3%
              WinSet, Bottom,, % "ahk_id " . HANDLE_%n3%
-             WinSet, Bottom,, % "ahk_id " . %n3%
+            ;  WinSet, Bottom,, % "ahk_id " . %n3%
         }
 
         if Debugger.ForceHideViews or not this.Visible
@@ -1759,8 +1856,8 @@ class ProtoRect
     {
         if not skip_warnings
         {
-            if not anchor is Number
-                Log.Error(this.Label . " Tried to set " . anchor " as its anchor!")
+            ; if not anchor is Number
+            ;     Log.Error(this.Label . " Tried to set " . anchor " as its anchor!")
         }
         
         ; Anchors.get_anchor(this.AnchorRef).removeChild(this)
@@ -2067,26 +2164,26 @@ class Rectangle extends SaveableProtoRect
     {
         Saved_Size := Anchors.MainWindow
 
-        PH2 := ScreenHeight
-        PW2 := ScreenWidth
+        ScreenCHeight := ScreenHeight
+        ScreenCWidth := ScreenWidth
         
-        PW3 := 2560
-        PH3 := 1440
+        ScreenWidth := 2560
+        ScreenHeight := 1440
         
 
-        smaller_scale := max(PW2/PW3, PH2/PH3)
+        smaller_scale := max(ScreenCWidth/ScreenWidth, ScreenCHeight/ScreenHeight)
         
         if (this.AnchorLocation = 4) or (this.AnchorLocation = 2)
         {
-            bigger_scale  := PW2/PW3
+            bigger_scale  := ScreenCWidth/ScreenWidth
         }
         else if (this.AnchorLocation = 3) or (this.AnchorLocation = 1)
         {
-            bigger_scale  := PH2/PH3
+            bigger_scale  := ScreenCHeight/ScreenHeight
         }
         else
         {
-            bigger_scale := Min(PW2/PW3, PH2/PH3)
+            bigger_scale := Min(ScreenCWidth/ScreenWidth, ScreenCHeight/ScreenHeight)
         }
         
 

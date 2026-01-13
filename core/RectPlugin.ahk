@@ -168,7 +168,7 @@ class Plugin
         if Name != ""
             PointObject.set_Name(Name)
         PointObject.SetVisibility(true,true)
-        PointObject.set_Anchor(Side, false)
+        PointObject.set_Anchor(Side, true)
         PointObject.SnapAdjustToResolution(this.Width, this.Height)
         PointObject.set_Color(this.getRandomColor())
         this.LocalThings.Push(PointObject)
