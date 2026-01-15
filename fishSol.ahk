@@ -1,5 +1,5 @@
 SetBatchLines -1
-#Requires AutoHotkey v1.1
+;#Requires AutoHotkey v1.1
 #NoEnv
 #SingleInstance Force
 
@@ -14,7 +14,7 @@ stopBench(message,number:=1)
     DllCall("QueryPerformanceCounter", "Int64*", TIMER_st)
     time1 := ((TIMER_st - TIMER_s1) / TIMER_f) * 1000
     time2 := ((TIMER_st - TIMER_s2) / TIMER_f) * 1000
-    ToolTip, % message . " took " . time1 . "ms" . " to load! (" . time2 . "ms)", 10, % (25 * number) + 30, % (number + 1)
+    ToolTip, % message . " took " . time1 . "ms" . " to load! (" . time2 . "ms)", 10, % (25 * number) + 5, % (number + 1)
     TIMER_s1 := TIMER_st
 }
 
@@ -31,21 +31,45 @@ TIMER_s2 := TIMER_s1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  RESOURCES  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-stopBench("IMAGE PRELOAD",0)
-global PNG_MAIN_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Main.png")
-global PNG_MISC_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Misc.png")
-global PNG_FAIL_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Failsafes.png")
-global PNG_BIOM_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Biomes.png")
-global PNG_CRAF_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Crafter.png")
-global PNG_WEBH_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Webhook.png")
-global PNG_SNOW_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Snowman.png")
-global PNG_CRED_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Credits.png")
-global PNG_DISCORD_ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Discord.png")
-global PNG_ROBLOX__ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Robux.png")
-global dev_maxstellar_img      := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\maxstellar.png")
-global dev_ivelchampion249_img := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\Ivel.png")
-global dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
-stopBench("IMAGE PRELOAD",0)
+IMAGE_LOAD()
+{
+    global
+    stopBench("IMAGE PRELOAD",14)
+    
+    PNG_MAIN_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Main.png")
+    PNG_MISC_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Misc.png")
+    PNG_FAIL_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Failsafes.png")
+    PNG_BIOM_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Biomes.png")
+    PNG_CRAF_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Crafter.png")
+    PNG_WEBH_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Webhook.png")
+    PNG_SNOW_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Snowman.png")
+    PNG_CRED_TAB := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Credits.png")
+    PNG_DISCORD_ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Discord.png")
+    PNG_ROBLOX__ := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Robux.png")
+    dev_maxstellar_img      := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\maxstellar.png")
+    dev_ivelchampion249_img := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\Ivel.png")
+    dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
+
+    GuiControl, , IMAGE_HANDLE_PNG_MAIN_TAB, %PNG_MAIN_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_MISC_TAB, %PNG_MISC_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_FAIL_TAB, %PNG_FAIL_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_BIOM_TAB, %PNG_BIOM_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_CRAF_TAB, %PNG_CRAF_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_WEBH_TAB, %PNG_WEBH_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_SNOW_TAB, %PNG_SNOW_TAB%
+    GuiControl, , IMAGE_HANDLE_PNG_CRED_TAB, %PNG_CRED_TAB%
+
+    GuiControl, , IMAGE_HANDLE_DEV_IMG_1, % (%dev1_img%) ;% < tells the line that its to use contents of variables as text
+    GuiControl, , IMAGE_HANDLE_DEV_IMG_2, % (%dev2_img%) ;% (%var%) <use variable text as variable call, basically string lookup of variable name
+    GuiControl, , IMAGE_HANDLE_DEV_IMG_3, % (%dev3_img%)
+    
+    loop %dhd%
+    {
+        GuiControl, , IMAGE_HANDLE_PNG_DISCORD_%A_Index%, %PNG_DISCORD_%
+        GuiControl, , IMAGE_HANDLE_PNG_ROBLOX__%A_Index%, %PNG_ROBLOX__%
+    }
+    stopBench("IMAGE LOAD",14)
+}
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; GuiColors ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -225,17 +249,17 @@ randomMessage := randomMessages[messageRand]
 Devs := [{dev_name:"maxstellar"
          , dev_role:"Twitch"
          , dev_discord:"Lead Developer"
-         , dev_img: dev_maxstellar_img
+         , dev_img: "dev_maxstellar_img"
          , dev_link:"https://www.twitch.tv/maxstellar"}
         ,{dev_name:"ivelchampion249"
          , dev_role:"YouTube"
          , dev_discord:"Original Creator"
-         , dev_img: dev_ivelchampion249_img
+         , dev_img: "dev_ivelchampion249_img"
          , dev_link:"https://www.youtube.com/@ivelchampion"}
        ,{dev_name:"cresqnt"
          , dev_role:"Scope Development (other macros)"
          , dev_discord:"Frontend Developer"
-         , dev_img: dev_cresqnt_img
+         , dev_img: "dev_cresqnt_img"
          , dev_link:"https://scopedevelopment.tech"
          , dev_website:"https://cresqnt.com"}]
 
@@ -292,8 +316,8 @@ Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %GuiColorLBlue%, fishSol 
 
 Gui, Font, s9 %GuiColorText% Normal, Segoe UI
 ; Gui, show
-stopBench("INITIAL",1)
-
+stopBench("INITIAL",0)
+global dhd := 0
 DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsewhere
 {
     global
@@ -302,11 +326,11 @@ DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsew
     Gui, Font, s10 %GuiColorText% Normal Bold
     
     Gui, Color, %GuiDefaultColor%
-    
+    dhd++
     xOFF1 := 445 + X
-    Gui, Add, Picture, x%xOFF1% y600 w27 h19, %PNG_DISCORD_%
+    Gui, Add, Picture, x%xOFF1% y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_%dhd% ;, %PNG_DISCORD_%
     xOFF2 := 538 + X
-    Gui, Add, Picture, x%xOFF2% y601 w18 h19, %PNG_ROBLOX__%
+    Gui, Add, Picture, x%xOFF2% y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX__%dhd% ;, %PNG_ROBLOX__%
 
     Gui, Font, s11 %GuiColorText% Bold Underline, Segoe UI
     
@@ -336,7 +360,7 @@ Gui, Add, Tab3, x15 y55 w570 h600 vMainTabs gTabChange cWhite, %tabList%
 
 Gui, Tab, Main
 
-Gui, Add, Picture, x14 y60 w574 h590, %PNG_MAIN_TAB%
+Gui, Add, Picture, x14 y60 w574 h590 vIMAGE_HANDLE_PNG_MAIN_TAB
 
 DrawHelpDonate(-5)
 
@@ -425,11 +449,11 @@ Gui, Font, s9 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
 Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
 
-stopBench("MAIN",2)
+stopBench("MAIN",1)
 
 Gui, Tab, Misc
 
-Gui, Add, Picture, x14 y80 w574 h590, %PNG_MISC_TAB%
+Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_MISC_TAB ;, %PNG_MISC_TAB%
 
 Gui, Font, s10 %GuiColorText% Bold, Segoe UI
 Gui, Font, s9 %GuiColorText% Normal
@@ -480,11 +504,11 @@ Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans +%GuiColo
 
 DrawHelpDonate()
 
-stopBench("MISC",3)
+stopBench("MISC",2)
 
 Gui, Tab, Failsafes
 
-Gui, Add, Picture, x14 y80 w574 h590, %PNG_FAIL_TAB%
+Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_FAIL_TAB ;, %PNG_FAIL_TAB%
 
 Gui, Font, s10 %GuiColorText% Normal
 Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans %GuiColorDefault%, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
@@ -523,12 +547,12 @@ Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe 
 
 DrawHelpDonate()
 
-stopBench("Failsafes",4)
+stopBench("Failsafes",3)
 
 if (hasBiomesPlugin) {
     Gui, Tab, Biomes
 
-    Gui, Add, Picture, x14 y80 w574 h590, %PNG_BIOM_TAB%
+    Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_BIOM_TAB ;, %PNG_BIOM_TAB%
 
     Gui, Font, s9 %GuiColorText% Normal, Segoe UI
     Gui, Add, Text, x50 y299 w500 h20 BackgroundTrans %GuiColorDefault%, Choose which biomes are sent to Discord:
@@ -567,12 +591,12 @@ if (hasBiomesPlugin) {
 
     DrawHelpDonate()
 }
-stopBench("Biomes",5)
+stopBench("Biomes",4)
 
 if (hasCrafterPlugin) {
     Gui, Tab, Crafter
 
-    Gui, Add, Picture, x14 y80 w574 h590, %PNG_CRAF_TAB%
+    Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_CRAF_TAB ;, %PNG_CRAF_TAB%
 
     Gui, Font, s11 %GuiColorText% Bold, Segoe UI
     Gui, Add, Text, x45 y135 w200 h25 BackgroundTrans, example text:
@@ -589,11 +613,11 @@ if (hasCrafterPlugin) {
 
     DrawHelpDonate()
 }
-stopBench("Crafter",6)
+stopBench("Crafter",5)
 
 Gui, Tab, Webhook
 
-Gui, Add, Picture, x14 y80 w574 h590, %PNG_WEBH_TAB%
+Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_WEBH_TAB ;, %PNG_WEBH_TAB%
 
 Gui, Font, s10 %GuiColorText% Normal Bold
 Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
@@ -616,11 +640,11 @@ Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans +%GuiColorR
 
 DrawHelpDonate()
 
-stopBench("Webhook",7)
+stopBench("Webhook",6)
 
 if (hasSnowmanPlugin) {
     Gui, Tab, Snowman
-    Gui, Add, Picture, x14 y80 w574 h590, %PNG_SNOW_TAB%
+    Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_SNOW_TAB ;, %PNG_SNOW_TAB%
 
     Gui, Font, s10 %GuiColorDefault% Normal
     Gui, Add, Text, x60 y190 w500 h50 BackgroundTrans, When toggled, The macro will automatically collect snowflakes every 2 hours and 5 minutes from the snowman located near Lime.
@@ -650,10 +674,10 @@ if (hasSnowmanPlugin) {
     DrawHelpDonate()
 }
 
-stopBench("Snowman",8)
+stopBench("Snowman",7)
 
 Gui, Tab, Credits
-Gui, Add, Picture, x14 y80 w574 h590, %PNG_CRED_TAB%
+Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB ;, %PNG_CRED_TAB%
 Gui, Font, s10 %GuiColorText% Normal
 loop % Devs.Count()
 {
@@ -667,7 +691,7 @@ loop % Devs.Count()
     dev_role    := dev%A_INDEX%_role
     dev_discord := dev%A_INDEX%_discord
     Gui, Font, s11 %GuiColorText% Normal Bold
-    Gui, Add, Picture, x50 y%yoff1% w50 h50, %dev_img%
+    Gui, Add, Picture, x50 y%yoff1% w50 h50 vIMAGE_HANDLE_DEV_IMG_%A_Index% ;, %dev_img%
 
     Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans %GuiLinkColor% gDev%A_Index%NameClick, %dev_name%
 
@@ -689,7 +713,7 @@ DrawHelpDonate()
 
 Gui, Show, w600 h670, fishSol v%version%
 
-stopBench("Credits", 9)
+stopBench("Credits", 8)
 
 LoadBiomeToggles()
 
@@ -756,14 +780,18 @@ if (hasSnowmanPlugin) {
     GuiControl,, SnowmanIntervalInput, % (snowmanInterval / 60000)
 }
 
-stopBench("TOGGLE CHECKS",10)
-
-/*
- * Gosub, donoList
- */
-SetTimer, donoList, -0
+stopBench("TOGGLE CHECKS",9)
 SetTimer, KILL_TOOLTIP, -30000
-stopBench("total loadtime",12)
+stopBench("total loadtime",10)
+
+ToolTip, % "GUI SHOWN => DOING ASYNC OPERATIONS", 10, 300, 12
+;load donations list from http link asnyc
+SetTimer, donoList, -0
+
+;load images from file asnyc
+IMAGE_LOAD := Func("IMAGE_LOAD")
+SetTimer, %IMAGE_LOAD%, -0
+
 SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
 return                          ;as ahk resets line speed for each thread
 
@@ -4150,5 +4178,5 @@ donoList:
     Http.Send()
     content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
     GuiControl, , DonatorsList, %content%
-stopBench("HTTP",11)
+stopBench("HTTP",13)
 return
