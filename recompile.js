@@ -20,13 +20,18 @@ const READSETTING_BOOLEAN_REGEX = /( *)ReadSetting\((\w+?), *("\w+?"), *("\w+?")
 const READSETTING_NUMBER_REGEX_ = /( *)ReadSetting\((\w+?), *("\w+?"), *("\w+?"), *(\d+?), *(\d+?)\)/g
 const VERSION_REGEX = /^global version := "(.+?)"/gm
 const find_color = /global (\w+) +:=((?:.+?)|(?: +\"c\" +\. +))\"(0x)\" +\. +\"([0-9A-Fa-f]{6})\"/g
+const replace_ini_write1 = /IniWrite, % (.+), %iniFilePath%, % ("\w+"), % ("\w+")/g
+const replace_ini_write2 = /IniWrite, %(\w+)%, %iniFilePath%, % ("\w+"), % ("\w+")/g
+const replace_ini_write_val = "INI_WRITE( $1, $2, $3)"
 
 // find and replace original function
-const READSETTING_FUNCTION_REGEX= /ReadSetting\(byref var, catagory, name, isBoolOrMin.+?max.+?\)(?:(?:.|\r\n)+?(?=\{)){2}(?:(?:.|\r\n)+?(?=\})){2}\}\r\n/gm
+const READSETTING_FUNCTION_REGEX= /ReadSetting\(byref var, catagory, name, isBoolOrMin.+?max.+?\)(?:(?:.|\r\n)+?(?=\{)){2}(?:(?:.|\r\n)+?(?=\})){4}\}\r\n/gm
 const CHECKTOGGLE_FUNCTION_REGEX= /\ncheckToggle\(byref toggle, byref status\)\s+\{\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+.*\s+\}\s\s/g
 const DrawHelpDonate_FUNCTION_REGEX= /DrawHelpDonate\(X:=0\) ;(.*\s+)+?\}/g
+const ReplaceGCONTROL = / +loop %pushDrawHelpDonate_index%\s+\{\s+GuiControl, , IMAGE_HANDLE_PNG_DISCORD_%A_Index%, %PNG_DISCORD_%\s+GuiControl, , IMAGE_HANDLE_PNG_ROBLOX__%A_Index%, %PNG_ROBLOX__%\s+\}/g
 
 replace_dev_colors = []
+var pushDrawHelpDonate_index = 0
 
 file_data = file_data.replace(READSETTING_FUNCTION_REGEX,'')     //remove ReadSetting function
                      .replace(CHECKTOGGLE_FUNCTION_REGEX, '')    //remove checkToggle function
@@ -107,6 +112,8 @@ for (i in second_round)
     final_output += line + "\n"
 }
 
+final_output = final_output.replace(ReplaceGCONTROL, replacepsdhd_i())
+
 final_output = final_output.replace(/(?<!:)\/\//g,'/') //KEEP AT ALL COST, FIXES DOUBLE SLASHES FROM DIVIDES
 //everything else below is optional
 // final_output = final_output.replace(/(\n){2,}/g, '\n')    //compact new lines
@@ -165,18 +172,17 @@ function PushNumberLimitINI(space, var_name, catagory, name, min, max)
          + space + space/* + space */+ var_name + " := max(min(" + temp_var + ", " + max + "), " + min + ") \n"
         //  + space + "}\n"
 }
-
 function pushDrawHelpDonate(X, space)
 {
     xOFF1 = 445 + Number(X)
     xOFF2 = 538 + Number(X)
     xOFF3 = 430 + Number(X)
     xOFF4 = 330 + Number(X)
-    
+    pushDrawHelpDonate_index++
     return space + "Gui, Font, s10 %GuiColorText% Normal Bold\n"
          + space + "Gui, Color, %GuiDefaultColor%\n"
-         + space + "Gui, Add, Picture, x" + xOFF1 + " y600 w27 h19, %PNG_DISCORD_%\n"
-         + space + "Gui, Add, Picture, x" + xOFF2 + " y601 w18 h19, %PNG_ROBLOX__%\n"
+         + space + "Gui, Add, Picture, x" + xOFF1 + " y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_" + pushDrawHelpDonate_index + " \n"
+         + space + "Gui, Add, Picture, x" + xOFF2 + " y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX__" + pushDrawHelpDonate_index + " \n"
          + space + "Gui, Font, s11 %GuiColorText% Bold Underline, Segoe UI\n"
          + space + "Gui, Add, Text, x" + xOFF3 + " y600 w150 h38 Center BackgroundTrans %GuiColorGreen% gDonateClick, Donate!\n"
          + space + "Gui, Add, Text, x" + xOFF4 + " y600 w138 h38 Center BackgroundTrans %GuiColorLBlue% gNeedHelpClick, Need Help?\n"
@@ -187,16 +193,26 @@ function pushCheckToggle(vars)
 {
     spacer = vars[1]
     toggle = vars[2]
-    status = vars[3]
+    variable = vars[3]
     return spacer + "if (" + toggle + ") {\n"
-         + spacer + "    GuiControl,, " + status + ", ON\n"
-         + spacer + "    GuiControl, +%GuiColorLGreen%, " + status + "\n"
+         + spacer + "    GuiControl,, " + variable + ", ON\n"
+         + spacer + "    GuiControl, +%GuiColorLGreen%, " + variable + "\n"
          + spacer + "} else {\n"
-         + spacer + "    GuiControl,, " + status + ", OFF\n"
-         + spacer + "    GuiControl, +%GuiColorRed%, " + status + "\n"
+         + spacer + "    GuiControl,, " + variable + ", OFF\n"
+         + spacer + "    GuiControl, +%GuiColorRed%, " + variable + "\n"
          + spacer + "}\n"
-    // return spacer + "GuiControl,, " + status + ", % (" + toggle + " ? \"ON\" : \"OFF\" )\n"
+    // return spacer + "GuiControl,, " + variable + ", % (" + toggle + " ? \"ON\" : \"OFF\" )\n"
     //      + spacer + "GuiControl, % (" + toggle + " ? \"+%GuiColorLGreen%\" : \"+%GuiColorRed%\" ), " + status + "\n"
+}
+
+function replacepsdhd_i()
+{
+    logger.info("replacepsdhd_i count is " + pushDrawHelpDonate_index)
+    str = ""
+    for(i = 1; i <= pushDrawHelpDonate_index; i++)
+        str += "    GuiControl, , IMAGE_HANDLE_PNG_DISCORD_" + i + ", %PNG_DISCORD_%\n    GuiControl, , IMAGE_HANDLE_PNG_ROBLOX__" + i + ", %PNG_ROBLOX__%\n"
+    logger.info(str)
+    return str
 }
 
 

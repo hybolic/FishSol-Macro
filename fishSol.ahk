@@ -1,4 +1,7 @@
 SetBatchLines -1
+DllCall("QueryPerformanceCounter", "Int64*", TIMER_START)
+TIMER_s1 := TIMER_START
+DllCall("QueryPerformanceFrequency", "Int64*", TIMER_f)
 ;#Requires AutoHotkey v1.1
 #NoEnv
 #SingleInstance Force
@@ -6,16 +9,27 @@ SetBatchLines -1
 global MAX_SPEED := -1 ;max speed
 global STANDARD_SPEED := A_BatchLines ;store default speed
 CoordMode, ToolTip, Screen
-
+global list_of_times := []
 stopBench(message,number:=1)
 {
     global
-    local time1, time2
     DllCall("QueryPerformanceCounter", "Int64*", TIMER_st)
-    time1 := ((TIMER_st - TIMER_s1) / TIMER_f) * 1000
-    time2 := ((TIMER_st - TIMER_s2) / TIMER_f) * 1000
-    ToolTip, % message . " took " . time1 . "ms" . " to load! (" . time2 . "ms)", 10, % (25 * number) + 5, % (number + 1)
+    list_of_times.push({ stop:TIMER_st, start:TIMER_s1, toolnum:number, msg:message })
+    DllCall("QueryPerformanceCounter", "Int64*", TIMER_st)
     TIMER_s1 := TIMER_st
+}
+
+calc_time()
+{
+    global list_of_times, TIMER_f, TIMER_s2, TIMER_st, TIMER_START, TIMER_DONE
+
+    ToolTip, % "GUI SHOW!" . " IT TOOK " .  ((TIMER_DONE - TIMER_START) / TIMER_f) * 1000 . "ms!", 10, % (250) + 5, 11
+    ToolTip, % "GUI SHOWN => DOING ASYNC OPERATIONS", 10, 300, 12
+
+    for _, time in list_of_times
+    {
+        ToolTip, % time.msg . " took " . ((time.stop - time.start) / TIMER_f) * 1000 . "ms" . " to load! (" . ((time.stop - TIMER_START) / TIMER_f) * 1000 . "ms)", 10, % (25 * time.toolnum) + 5, % (time.toolnum + 1)
+    }
 }
 
 goto pasttool
@@ -24,13 +38,88 @@ KILL_TOOLTIP:
         ToolTip,,,,%A_Index%
 return
 pasttool:
-DllCall("QueryPerformanceFrequency", "Int64*", TIMER_f)
-DllCall("QueryPerformanceCounter", "Int64*", TIMER_s1)
-TIMER_s2 := TIMER_s1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;  RESOURCES  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+global INI_FILE := {}
+global sec := []
+INI_LOAD()
+{
+    global
+    local file, curline, last_catagory, last_name
+    stopBench("INI PRELOAD",0)
+    file := FileOpen(iniFilePath, "r")
+    while not file.AtEOF
+    {
+        curline := file.ReadLine()
+        Number := Ord(curline)
+        if Ord(curline) = 91
+        {
+            RegExMatch(curline, "\[(.*)\]", cat)
+            if strlen(last_name) != 0
+            {
+                sec[last_name] := "___" (INI_FILE.Count() + 1) "___" last_name
+                INI_FILE["___" (INI_FILE.Count() + 1) "___" . last_name] := last_catagory
+            }
+            last_name := StrReplace(cat1, """", "") ;remove quotes
+            last_catagory := {} ;start new catagory
+        }
+        Else
+        {
+            pairs := StrSplit(curline, "=", "`r`n")
+            last_catagory[pairs[1]] := pairs[2]
+        }
+    }
+    sec[last_name] := "___" (INI_FILE.Count() + 1) "___" last_name
+    INI_FILE["___" (INI_FILE.Count() + 1) "___" . last_name] := last_catagory
+    stopBench("INI LOAD", 0)
+    file.Close()
+}
+
+Section_to_Numbered_Section(Section)
+{
+    global
+    return sec[Section]
+}
+
+; reduce file IO
+INI_READ(byref Value, Section, Key, WriteDefault := "")
+{ ; this function assumes you aren't being stupid with varibles and naming the legal names
+    global
+    if WriteDefault != ""                         ; check if write default is a value
+        if not INI_FILE[sec[Section]].HasKey(Key)      ;  check if key doesn't exist
+            INI_WRITE(WriteDefault, Section, Key) ;   key doesn't exist write default value
+    Value := INI_FILE[sec[Section]][Key]               ;retrieve value
+}
+INI_WRITE(Value, Section, Key)
+{
+    global
+    if not INI_FILE[sec[StrReplace(Section, """", "")]]                              ; if section does not exist
+        INI_FILE[sec[StrReplace(Section, """", "")]] := {}                           ;  make empty section
+    INI_FILE[sec[StrReplace(Section, """", "")]][StrReplace(Key, """", "")] := Value ; write value to key in section
+
+    SetTimer, %INI_WRITE_FILE_FUNC%, -60000 ; after 60 seconds
+}
+INI_WRITE_FILE_FUNC := Func("INI_WRITE_FILE")
+INI_WRITE_FILE()
+{
+    global
+    local file, test_f
+    test_f := iniFilePath
+    file := FileOpen(test_f, "w")
+    file.Position := 0
+    for section_name, Section in INI_FILE
+    {
+        if strlen(section_name) = 0 or Section.Count() = 0
+            Continue
+        file.WriteLine("[" . RegExReplace(section_name, "___\d+___", "") . "]")
+        for key, value in Section
+            file.WriteLine(key . "=" . value)
+    }
+    file.Close()
+}
+
 IMAGE_LOAD()
 {
     global
@@ -63,7 +152,7 @@ IMAGE_LOAD()
     GuiControl, , IMAGE_HANDLE_DEV_IMG_2, % (%dev2_img%) ;% (%var%) <use variable text as variable call, basically string lookup of variable name
     GuiControl, , IMAGE_HANDLE_DEV_IMG_3, % (%dev3_img%)
     
-    loop %dhd%
+    loop %pushDrawHelpDonate_index%
     {
         GuiControl, , IMAGE_HANDLE_PNG_DISCORD_%A_Index%, %PNG_DISCORD_%
         GuiControl, , IMAGE_HANDLE_PNG_ROBLOX__%A_Index%, %PNG_ROBLOX__%
@@ -106,9 +195,11 @@ if (FileExist(iconFilePath)) {
 }
 
 global version := "1.9.4" ;EASIER VERSION MANAGEMENT
-IniRead, lastVersion, %iniFilePath%, "Macro", "LastVersion" ;check if version number is saved to ini
+IniRead, lastVersion, %iniFilePath%, % "Macro", % "LastVersion" ;check if version number is saved to ini
 if lastVersion != %version%
-    IniWrite, %version%, %iniFilePath%, "Macro", "LastVersion" ;write version to file for plugins to pull
+    IniWrite, version, %iniFilePath%, % "Macro", % "LastVersion" ;write version to file for plugins to pull
+
+INI_LOAD()
 
 res := "1080p"
 maxLoopCount := 15
@@ -139,6 +230,7 @@ if (FileExist(iniFilePath)) {
     ReadSetting(autoCrafter, "Macro", "autoCrafter", true)
     ReadSetting(autoCrafterWebhook, "Macro", "autoCrafterWebhook")
 }
+
 strangeControllerTime := 0
 biomeRandomizerTime := 360000
 snowmanPathingTime := 7500000
@@ -167,15 +259,28 @@ auroraDetection := false ; defined but never used
 ReadSetting(byref var, catagory, name, isBoolOrMin:=false, max:="")
 {
     global
-    IniRead, temp_var, %iniFilePath%, % """" . catagory . """", % """" . name . """"
-    if (temp_var != "ERROR")
+    val := INI_FILE[sec[catagory]][name]
+    if val
     {
-        if max is Number ; and max != ""
-            var := max(min(temp_var, max), isBoolOrMin)
+        if max is Number
+            var := max(min(val, max), isBoolOrMin)
         else if isBoolOrMin
-            var := (temp_var = "true" || temp_var = "1")
+            var := (val = "true" || val = "1")
         else
-            var := temp_var
+            var := val
+    }
+    else
+    {
+        IniRead, temp_var, %iniFilePath%, % catagory, % name
+        if (temp_var != "ERROR")
+        {
+            if max is Number
+                var := max(min(temp_var, max), isBoolOrMin)
+            else if isBoolOrMin
+                var := (temp_var = "true" || temp_var = "1")
+            else
+                var := temp_var
+        }
     }
 }
 
@@ -316,8 +421,8 @@ Gui, Add, Text, x0 y10 w600 h45 Center BackgroundTrans %GuiColorLBlue%, fishSol 
 
 Gui, Font, s9 %GuiColorText% Normal, Segoe UI
 ; Gui, show
-stopBench("INITIAL",0)
-global dhd := 0
+stopBench("INITIAL",1)
+global pushDrawHelpDonate_index := 0
 DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsewhere
 {
     global
@@ -326,11 +431,11 @@ DrawHelpDonate(X:=0) ; define DrawHelpDonate() function to reuse same code elsew
     Gui, Font, s10 %GuiColorText% Normal Bold
     
     Gui, Color, %GuiDefaultColor%
-    dhd++
+    pushDrawHelpDonate_index++
     xOFF1 := 445 + X
-    Gui, Add, Picture, x%xOFF1% y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_%dhd% ;, %PNG_DISCORD_%
+    Gui, Add, Picture, x%xOFF1% y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_%pushDrawHelpDonate_index% ;, %PNG_DISCORD_%
     xOFF2 := 538 + X
-    Gui, Add, Picture, x%xOFF2% y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX__%dhd% ;, %PNG_ROBLOX__%
+    Gui, Add, Picture, x%xOFF2% y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX__%pushDrawHelpDonate_index% ;, %PNG_ROBLOX__%
 
     Gui, Font, s11 %GuiColorText% Bold Underline, Segoe UI
     
@@ -449,7 +554,7 @@ Gui, Font, s9 %GuiColorDefault% Normal
 Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
 Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
 
-stopBench("MAIN",1)
+stopBench("MAIN",2)
 
 Gui, Tab, Misc
 
@@ -504,7 +609,7 @@ Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans +%GuiColo
 
 DrawHelpDonate()
 
-stopBench("MISC",2)
+stopBench("MISC",3)
 
 Gui, Tab, Failsafes
 
@@ -547,7 +652,7 @@ Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe 
 
 DrawHelpDonate()
 
-stopBench("Failsafes",3)
+stopBench("Failsafes",4)
 
 if (hasBiomesPlugin) {
     Gui, Tab, Biomes
@@ -591,7 +696,7 @@ if (hasBiomesPlugin) {
 
     DrawHelpDonate()
 }
-stopBench("Biomes",4)
+stopBench("Biomes",5)
 
 if (hasCrafterPlugin) {
     Gui, Tab, Crafter
@@ -613,7 +718,7 @@ if (hasCrafterPlugin) {
 
     DrawHelpDonate()
 }
-stopBench("Crafter",5)
+stopBench("Crafter",6)
 
 Gui, Tab, Webhook
 
@@ -640,7 +745,7 @@ Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans +%GuiColorR
 
 DrawHelpDonate()
 
-stopBench("Webhook",6)
+stopBench("Webhook",7)
 
 if (hasSnowmanPlugin) {
     Gui, Tab, Snowman
@@ -674,7 +779,7 @@ if (hasSnowmanPlugin) {
     DrawHelpDonate()
 }
 
-stopBench("Snowman",7)
+stopBench("Snowman",8)
 
 Gui, Tab, Credits
 Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB ;, %PNG_CRED_TAB%
@@ -713,9 +818,11 @@ DrawHelpDonate()
 
 Gui, Show, w600 h670, fishSol v%version%
 
-stopBench("Credits", 8)
+stopBench("Credits", 9)
 
 LoadBiomeToggles()
+
+DllCall("QueryPerformanceCounter", "Int64*", TIMER_DONE)
 
 switch res
 {
@@ -780,11 +887,9 @@ if (hasSnowmanPlugin) {
     GuiControl,, SnowmanIntervalInput, % (snowmanInterval / 60000)
 }
 
-stopBench("TOGGLE CHECKS",9)
+stopBench("TOGGLE CHECKS",10)
 SetTimer, KILL_TOOLTIP, -30000
-stopBench("total loadtime",10)
 
-ToolTip, % "GUI SHOWN => DOING ASYNC OPERATIONS", 10, 300, 12
 ;load donations list from http link asnyc
 SetTimer, donoList, -0
 
@@ -792,10 +897,16 @@ SetTimer, donoList, -0
 IMAGE_LOAD := Func("IMAGE_LOAD")
 SetTimer, %IMAGE_LOAD%, -0
 
+;print timer stuff to screen
+calc_time := Func("calc_time")
+SetTimer, %calc_time%, -350
+
 SetBatchLines, %STANDARD_SPEED% ;set speed back to normal shouldn't be needed
 return                          ;as ahk resets line speed for each thread
 
 GuiClose:
+    SetTimer, %INI_WRITE_FILE_FUNC%, Off
+    INI_WRITE_FILE()
     if (biomeDetectionRunning) {
         DetectHiddenWindows, On
         SetTitleMatchMode, 2
@@ -821,76 +932,76 @@ return
 UpdateLoopCount:
     Gui, Submit, nohide
     maxLoopCount := max(MaxLoopInput, 1)
-    IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+    INI_WRITE( maxLoopCount, "Macro", "maxLoopCount")
     fishingLoopCount := max(FishingLoopInput, 1)
-    IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+    INI_WRITE( fishingLoopCount, "Macro", "fishingLoopCount")
 return
 
 ToggleSellAll:
     sellAllToggle := !sellAllToggle
     checkToggle(sellAllToggle, "SellAllStatus")
-    IniWrite, (sellAllToggle ? true : false), %iniFilePath%, "Macro", "sellAllToggle
+    INI_WRITE( (sellAllToggle ? "true" : "false" ), "Macro", "sellAllToggle")
 return
 
 ToggleAdvancedFishingDetection:
     advancedFishingDetection := !advancedFishingDetection
     checkToggle(advancedFishingDetection, "AdvancedFishingDetectionStatus")
-    IniWrite, (advancedFishingDetection ? true : false), %iniFilePath%, "Macro", "advancedFishingDetection
+    INI_WRITE( (advancedFishingDetection ? "true" : "false" ), "Macro", "advancedFishingDetection")
 return
 
 ToggleAzertyPathing:
     azertyPathing := !azertyPathing
     checkToggle(azertyPathing, "AzertyPathingStatus")
-    IniWrite, (azertyPathing ? true : false), %iniFilePath%, "Macro", "azertyPathing
+    INI_WRITE( (azertyPathing ? "true" : "false" ), "Macro", "azertyPathing")
 return
 
 ToggleAutoUnequip:
     autoUnequip := !autoUnequip
     checkToggle(autoUnequip, "AutoUnequipStatus")
-    IniWrite, (autoUnequip ? true : false), %iniFilePath%, "Macro", "autoUnequip
+    INI_WRITE( (autoUnequip ? "true" : "false" ), "Macro", "autoUnequip")
 return
 
 ToggleAutoCloseChat:
     autoCloseChat := !autoCloseChat
     checkToggle(autoCloseChat, "AutoCloseChatStatus")
-    IniWrite, (autoCloseChat ? true : false), %iniFilePath%, "Macro", "autoCloseChat
+    INI_WRITE( (autoCloseChat ? "true" : "false" ), "Macro", "autoCloseChat")
 return
 
 ToggleStrangeController:
     strangeController := !strangeController
     checkToggle(strangeController, "StrangeControllerStatus")
-    IniWrite, (strangeController ? true : false), %iniFilePath%, "Macro", "strangeController"
+    INI_WRITE( (strangeController ? "true" : "false" ), "Macro", "strangeController")
 return
 
 ToggleBiomeRandomizer:
     biomeRandomizer := !biomeRandomizer
     checkToggle(biomeRandomizer, "BiomeRandomizerStatus")
-    IniWrite, (biomeRandomizer ? true : false), %iniFilePath%, "Macro", "biomeRandomizer"
+    INI_WRITE( (biomeRandomizer ? "true" : "false" ), "Macro", "biomeRandomizer")
 return
 
 ToggleFailsafeWebhook:
     failsafeWebhook := !failsafeWebhook
     checkToggle(failsafeWebhook, "failsafeWebhookStatus")
-    IniWrite, (failsafeWebhook ? true : false), %iniFilePath%, "Macro", "failsafeWebhook"
+    INI_WRITE( (failsafeWebhook ? "true" : "false" ), "Macro", "failsafeWebhook")
 return
 
 TogglePathingWebhook:
     pathingWebhook := !pathingWebhook
     checkToggle(pathingWebhook, "pathingWebhookStatus")
-    IniWrite, (pathingWebhook ? true : false), %iniFilePath%, "Macro", "pathingWebhook"
+    INI_WRITE( (pathingWebhook ? "true" : "false" ), "Macro", "pathingWebhook")
 return
 
 ToggleItemWebhook:
     itemWebhook := !itemWebhook
     checkToggle(itemWebhook, "itemWebhookStatus")
-    IniWrite, (itemWebhook ? true : false), %iniFilePath%, "Macro", "itemWebhook"
+    INI_WRITE( (itemWebhook ? "true" : "false" ), "Macro", "itemWebhook")
 return
 
 ToggleCrafter:
     crafterToggle := !crafterToggle
     checkToggle(crafterToggle, "CrafterStatus")
-    IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "crafterToggle"
-    IniWrite, (crafterToggle ? true : false), %iniFilePath%, "Macro", "autoCrafterDetection"
+    INI_WRITE( (crafterToggle ? "true" : "false" ), "Macro", "crafterToggle")
+    INI_WRITE( (crafterToggle ? "true" : "false" ), "Macro", "autoCrafterDetection")
     if (crafterToggle)
     {
         autoCrafterDetection := true
@@ -901,38 +1012,38 @@ return
 ToggleSnowmanPathing:
     snowmanPathing := !snowmanPathing
     checkToggle(snowmanPathing, "SnowmanPathingStatus")
-    IniWrite, (snowmanPathing ? true : false), %iniFilePath%, "Macro", "snowmanPathing"
+    INI_WRITE( (snowmanPathing ? "true" : "false" ), "Macro", "snowmanPathing")
 
     checkToggle(autoCrafter, "AutoCrafterStatus")
-    IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+    INI_WRITE( (autoCrafter ? "true" : "false" ), "Macro", "autoCrafter")
 
     checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
-    IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+    INI_WRITE( (autoCrafterWebhook ? "true" : "false" ), "Macro", "autoCrafterWebhook")
 return
 
 ToggleSnowmanPathingWebhook:
     snowmanPathingWebhook := !snowmanPathingWebhook
     checkToggle(snowmanPathingWebhook, "SnowmanPathingWebhookStatus")
-    IniWrite, (snowmanPathingWebhook ? true : false), %iniFilePath%, "Macro", "snowmanPathingWebhook"
+    INI_WRITE( (snowmanPathingWebhook ? "true" : "false" ), "Macro", "snowmanPathingWebhook")
 return
 
 ToggleAutoCrafter:
     autoCrafter := !autoCrafter
     checkToggle(autoCrafter, "AutoCrafterStatus")
-    IniWrite, (autoCrafter ? true : false), %iniFilePath%, "Macro", "autoCrafter"
+    INI_WRITE( (autoCrafter ? "true" : "false" ), "Macro", "autoCrafter")
 return
 
 UpdateAutoCrafterInterval:
     Gui, Submit, NoHide
     newInterval := AutoCrafterInterval * 60000
     autoCrafterInterval := max(newInterval, 1)
-    IniWrite, %autoCrafterInterval%, %iniFilePath%, "Macro", "autoCrafterInterval"
+    INI_WRITE( autoCrafterInterval, "Macro", "autoCrafterInterval")
 return
 
 ToggleAutoCrafterWebhook:
     autoCrafterWebhook := !autoCrafterWebhook
     checkToggle(autoCrafterWebhook, "AutoCrafterWebhookStatus")
-    IniWrite, (autoCrafterWebhook ? true : false), %iniFilePath%, "Macro", "autoCrafterWebhook"
+    INI_WRITE( (autoCrafterWebhook ? "true" : "false" ), "Macro", "autoCrafterWebhook")
 return
 
 RunAutoCrafter() {
@@ -1644,95 +1755,146 @@ return
 UpdatePrivateServer:
     Gui, Submit, nohide
     privateServerLink := PrivateServerInput
-    IniWrite, %privateServerLink%, %iniFilePath%, "Macro", "privateServerLink"
+    INI_WRITE( privateServerLink, "Macro", "privateServerLink")
 return
 
 UpdateFishingFailsafe:
     Gui, Submit, nohide
     fishingFailsafeTime := max(FishingFailsafeInput, 1)
-    IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
+    INI_WRITE( fishingFailsafeTime, "Macro", "fishingFailsafeTime")
 return
 
 UpdatePathingFailsafe:
     Gui, Submit, nohide
     pathingFailsafeTime := max(PathingFailsafeInput, 1)
-    IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
+    INI_WRITE( pathingFailsafeTime, "Macro", "pathingFailsafeTime")
 return
 
 UpdateAutoRejoinFailsafe:
     Gui, Submit, nohide
     autoRejoinFailsafeTime := max(AutoRejoinFailsafeInput, 1)
-    IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+    INI_WRITE( autoRejoinFailsafeTime, "Macro", "autoRejoinFailsafeTime")
 return
 
 UpdateAdvancedThreshold:
     Gui, Submit, nohide
     advancedFishingThreshold := max(min(AdvancedThresholdInput, 40), 0)
-    IniWrite, %advancedFishingThreshold%, %iniFilePath%, "Macro", "advancedFishingThreshold"
+    INI_WRITE( advancedFishingThreshold, "Macro", "advancedFishingThreshold")
 return
 
 UpdateWebhook:
     Gui, Submit, nohide
     webhookURL := WebhookInput
-    IniWrite, %webhookURL%, %iniFilePath%, "Macro", "webhookURL"
+    INI_WRITE( webhookURL, "Macro", "webhookURL")
 return
 
 UpdateBiomesPrivateServer:
     Gui, Submit, nohide
     biomesPrivateServerLink := BiomesPrivateServerInput
-    IniWrite, %biomesPrivateServerLink%, %iniFilePath%, "Biomes", "privateServerLink"
+    INI_WRITE( biomesPrivateServerLink, "Biomes", "privateServerLink")
 return
 
 LoadBiomeToggles() {
     global
-    IniRead, BiomeNormal, %iniFilePath%, "Biomes", BiomeNormal, 1
-    IniRead, BiomeSandStorm, %iniFilePath%, "Biomes", BiomeSandStorm, 1
-    IniRead, BiomeHell, %iniFilePath%, "Biomes", BiomeHell, 1
-    IniRead, BiomeStarfall, %iniFilePath%, "Biomes", BiomeStarfall, 1
-    IniRead, BiomeCorruption, %iniFilePath%, "Biomes", BiomeCorruption, 1
-    IniRead, BiomeWindy, %iniFilePath%, "Biomes", BiomeWindy, 1
-    IniRead, BiomeSnowy, %iniFilePath%, "Biomes", BiomeSnowy, 1
-    IniRead, BiomeRainy, %iniFilePath%, "Biomes", BiomeRainy, 1
-    IniRead, BiomeHeaven, %iniFilePath%, "Biomes", BiomeHeaven, 1
-    IniRead, BiomeAurora, %iniFilePath%, "Biomes", BiomeAurora, 1
-    IniRead, BiomePumpkinMoon, %iniFilePath%, "Biomes", BiomePumpkinMoon, 1
-    IniRead, BiomeGraveyard, %iniFilePath%, "Biomes", BiomeGraveyard, 1
-    IniRead, BiomeBloodRain, %iniFilePath%, "Biomes", BiomeBloodRain, 1
-    IniRead, BiomeNull, %iniFilePath%, "Biomes", BiomeNull, 1
+    Ini_Read(temp_BiomeNormal,      "Biomes", "BiomeNormal",      "true")
+    Ini_Read(temp_BiomeSandStorm,   "Biomes", "BiomeSandStorm",   "true")
+    Ini_Read(temp_BiomeHell,        "Biomes", "BiomeHell",        "true")
+    Ini_Read(temp_BiomeStarfall,    "Biomes", "BiomeStarfall",    "true")
+    Ini_Read(temp_BiomeCorruption,  "Biomes", "BiomeCorruption",  "true")
+    Ini_Read(temp_BiomeWindy,       "Biomes", "BiomeWindy",       "true")
+    Ini_Read(temp_BiomeSnowy,       "Biomes", "BiomeSnowy",       "true")
+    Ini_Read(temp_BiomeRainy,       "Biomes", "BiomeRainy",       "true")
+    Ini_Read(temp_BiomeHeaven,      "Biomes", "BiomeHeaven",      "true")
+    Ini_Read(temp_BiomeAurora,      "Biomes", "BiomeAurora",      "true")
+    Ini_Read(temp_BiomePumpkinMoon, "Biomes", "BiomePumpkinMoon", "true")
+    Ini_Read(temp_BiomeGraveyard,   "Biomes", "BiomeGraveyard",   "true")
+    Ini_Read(temp_BiomeBloodRain,   "Biomes", "BiomeBloodRain",   "true")
+    Ini_Read(temp_BiomeNull,        "Biomes", "BiomeNull",        "true")
 
-    GuiControl,, BiomeNormal, %BiomeNormal%
-    GuiControl,, BiomeSandStorm, %BiomeSandStorm%
-    GuiControl,, BiomeHell, %BiomeHell%
-    GuiControl,, BiomeStarfall, %BiomeStarfall%
-    GuiControl,, BiomeCorruption, %BiomeCorruption%
-    GuiControl,, BiomeWindy, %BiomeWindy%
-    GuiControl,, BiomeSnowy, %BiomeSnowy%
-    GuiControl,, BiomeRainy, %BiomeRainy%
-    GuiControl,, BiomeHeaven, %BiomeHeaven%
-    GuiControl,, BiomeAurora, %BiomeAurora%
-    GuiControl,, BiomePumpkinMoon, %BiomePumpkinMoon%
-    GuiControl,, BiomeGraveyard, %BiomeGraveyard%
-    GuiControl,, BiomeBloodRain, %BiomeBloodRain%
-    GuiControl,, BiomeNull, %BiomeNull%
+    GuiControl,, BiomeNormal,      % (temp_BiomeNormal      = 1 || temp_BiomeNormal      = "true" ? true : false)
+    GuiControl,, BiomeSandStorm,   % (temp_BiomeSandStorm   = 1 || temp_BiomeSandStorm   = "true" ? true : false)
+    GuiControl,, BiomeHell,        % (temp_BiomeHell        = 1 || temp_BiomeHell        = "true" ? true : false)
+    GuiControl,, BiomeStarfall,    % (temp_BiomeStarfall    = 1 || temp_BiomeStarfall    = "true" ? true : false)
+    GuiControl,, BiomeCorruption,  % (temp_BiomeCorruption  = 1 || temp_BiomeCorruption  = "true" ? true : false)
+    GuiControl,, BiomeWindy,       % (temp_BiomeWindy       = 1 || temp_BiomeWindy       = "true" ? true : false)
+    GuiControl,, BiomeSnowy,       % (temp_BiomeSnowy       = 1 || temp_BiomeSnowy       = "true" ? true : false)
+    GuiControl,, BiomeRainy,       % (temp_BiomeRainy       = 1 || temp_BiomeRainy       = "true" ? true : false)
+    GuiControl,, BiomeHeaven,      % (temp_BiomeHeaven      = 1 || temp_BiomeHeaven      = "true" ? true : false)
+    GuiControl,, BiomeAurora,      % (temp_BiomeAurora      = 1 || temp_BiomeAurora      = "true" ? true : false)
+    GuiControl,, BiomePumpkinMoon, % (temp_BiomePumpkinMoon = 1 || temp_BiomePumpkinMoon = "true" ? true : false)
+    GuiControl,, BiomeGraveyard,   % (temp_BiomeGraveyard   = 1 || temp_BiomeGraveyard   = "true" ? true : false)
+    GuiControl,, BiomeBloodRain,   % (temp_BiomeBloodRain   = 1 || temp_BiomeBloodRain   = "true" ? true : false)
+    GuiControl,, BiomeNull,        % (temp_BiomeNull        = 1 || temp_BiomeNull        = "true" ? true : false)
 }
 
 SaveBiomeToggles:
     Gui, Submit, NoHide
-    IniWrite, %BiomeNormal%, %iniFilePath%, "Biomes", BiomeNormal
-    IniWrite, %BiomeSandStorm%, %iniFilePath%, "Biomes", BiomeSandStorm
-    IniWrite, %BiomeHell%, %iniFilePath%, "Biomes", BiomeHell
-    IniWrite, %BiomeStarfall%, %iniFilePath%, "Biomes", BiomeStarfall
-    IniWrite, %BiomeCorruption%, %iniFilePath%, "Biomes", BiomeCorruption
-    IniWrite, %BiomeWindy%, %iniFilePath%, "Biomes", BiomeWindy
-    IniWrite, %BiomeSnowy%, %iniFilePath%, "Biomes", BiomeSnowy
-    IniWrite, %BiomeRainy%, %iniFilePath%, "Biomes", BiomeRainy
-    IniWrite, %BiomeHeaven%, %iniFilePath%, "Biomes", BiomeHeaven
-    IniWrite, %BiomeAurora%, %iniFilePath%, "Biomes", BiomeAurora
-    IniWrite, %BiomePumpkinMoon%, %iniFilePath%, "Biomes", BiomePumpkinMoon
-    IniWrite, %BiomeGraveyard%, %iniFilePath%, "Biomes", BiomeGraveyard
-    IniWrite, %BiomeBloodRain%, %iniFilePath%, "Biomes", BiomeBloodRain
-    IniWrite, %BiomeNull%, %iniFilePath%, "Biomes", BiomeNull
+    Ini_Write(BiomeNormal      = 1 ? "true" : "false", "Biomes", "BiomeNormal"      )
+    Ini_Write(BiomeSandStorm   = 1 ? "true" : "false", "Biomes", "BiomeSandStorm"   )
+    Ini_Write(BiomeHell        = 1 ? "true" : "false", "Biomes", "BiomeHell"        )
+    Ini_Write(BiomeStarfall    = 1 ? "true" : "false", "Biomes", "BiomeStarfall"    )
+    Ini_Write(BiomeCorruption  = 1 ? "true" : "false", "Biomes", "BiomeCorruption"  )
+    Ini_Write(BiomeWindy       = 1 ? "true" : "false", "Biomes", "BiomeWindy"       )
+    Ini_Write(BiomeSnowy       = 1 ? "true" : "false", "Biomes", "BiomeSnowy"       )
+    Ini_Write(BiomeRainy       = 1 ? "true" : "false", "Biomes", "BiomeRainy"       )
+    Ini_Write(BiomeHeaven      = 1 ? "true" : "false", "Biomes", "BiomeHeaven"      )
+    Ini_Write(BiomeAurora      = 1 ? "true" : "false", "Biomes", "BiomeAurora"      )
+    Ini_Write(BiomePumpkinMoon = 1 ? "true" : "false", "Biomes", "BiomePumpkinMoon" )
+    Ini_Write(BiomeGraveyard   = 1 ? "true" : "false", "Biomes", "BiomeGraveyard"   )
+    Ini_Write(BiomeBloodRain   = 1 ? "true" : "false", "Biomes", "BiomeBloodRain"   )
+    Ini_Write(BiomeNull        = 1 ? "true" : "false", "Biomes", "BiomeNull"        )
 return
+
+; LoadBiomeToggles() {
+;     global
+;     IniRead, temp_BiomeNormal,      %iniFilePath%, % "Biomes", BiomeNormal,      "true"
+;     IniRead, temp_BiomeSandStorm,   %iniFilePath%, % "Biomes", BiomeSandStorm,   "true"
+;     IniRead, temp_BiomeHell,        %iniFilePath%, % "Biomes", BiomeHell,        "true"
+;     IniRead, temp_BiomeStarfall,    %iniFilePath%, % "Biomes", BiomeStarfall,    "true"
+;     IniRead, temp_BiomeCorruption,  %iniFilePath%, % "Biomes", BiomeCorruption,  "true"
+;     IniRead, temp_BiomeWindy,       %iniFilePath%, % "Biomes", BiomeWindy,       "true"
+;     IniRead, temp_BiomeSnowy,       %iniFilePath%, % "Biomes", BiomeSnowy,       "true"
+;     IniRead, temp_BiomeRainy,       %iniFilePath%, % "Biomes", BiomeRainy,       "true"
+;     IniRead, temp_BiomeHeaven,      %iniFilePath%, % "Biomes", BiomeHeaven,      "true"
+;     IniRead, temp_BiomeAurora,      %iniFilePath%, % "Biomes", BiomeAurora,      "true"
+;     IniRead, temp_BiomePumpkinMoon, %iniFilePath%, % "Biomes", BiomePumpkinMoon, "true"
+;     IniRead, temp_BiomeGraveyard,   %iniFilePath%, % "Biomes", BiomeGraveyard,   "true"
+;     IniRead, temp_BiomeBloodRain,   %iniFilePath%, % "Biomes", BiomeBloodRain,   "true"
+;     IniRead, temp_BiomeNull,        %iniFilePath%, % "Biomes", BiomeNull,        "true"
+
+;     GuiControl,, BiomeNormal,      % (temp_BiomeNormal      = 1 || temp_BiomeNormal      = "true" ? true : false)
+;     GuiControl,, BiomeSandStorm,   % (temp_BiomeSandStorm   = 1 || temp_BiomeSandStorm   = "true" ? true : false)
+;     GuiControl,, BiomeHell,        % (temp_BiomeHell        = 1 || temp_BiomeHell        = "true" ? true : false)
+;     GuiControl,, BiomeStarfall,    % (temp_BiomeStarfall    = 1 || temp_BiomeStarfall    = "true" ? true : false)
+;     GuiControl,, BiomeCorruption,  % (temp_BiomeCorruption  = 1 || temp_BiomeCorruption  = "true" ? true : false)
+;     GuiControl,, BiomeWindy,       % (temp_BiomeWindy       = 1 || temp_BiomeWindy       = "true" ? true : false)
+;     GuiControl,, BiomeSnowy,       % (temp_BiomeSnowy       = 1 || temp_BiomeSnowy       = "true" ? true : false)
+;     GuiControl,, BiomeRainy,       % (temp_BiomeRainy       = 1 || temp_BiomeRainy       = "true" ? true : false)
+;     GuiControl,, BiomeHeaven,      % (temp_BiomeHeaven      = 1 || temp_BiomeHeaven      = "true" ? true : false)
+;     GuiControl,, BiomeAurora,      % (temp_BiomeAurora      = 1 || temp_BiomeAurora      = "true" ? true : false)
+;     GuiControl,, BiomePumpkinMoon, % (temp_BiomePumpkinMoon = 1 || temp_BiomePumpkinMoon = "true" ? true : false)
+;     GuiControl,, BiomeGraveyard,   % (temp_BiomeGraveyard   = 1 || temp_BiomeGraveyard   = "true" ? true : false)
+;     GuiControl,, BiomeBloodRain,   % (temp_BiomeBloodRain   = 1 || temp_BiomeBloodRain   = "true" ? true : false)
+;     GuiControl,, BiomeNull,        % (temp_BiomeNull        = 1 || temp_BiomeNull        = "true" ? true : false)
+; }
+
+; SaveBiomeToggles:
+;     Gui, Submit, NoHide
+;     IniWrite, % (BiomeNormal      = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeNormal
+;     IniWrite, % (BiomeSandStorm   = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeSandStorm
+;     IniWrite, % (BiomeHell        = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeHell
+;     IniWrite, % (BiomeStarfall    = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeStarfall
+;     IniWrite, % (BiomeCorruption  = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeCorruption
+;     IniWrite, % (BiomeWindy       = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeWindy
+;     IniWrite, % (BiomeSnowy       = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeSnowy
+;     IniWrite, % (BiomeRainy       = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeRainy
+;     IniWrite, % (BiomeHeaven      = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeHeaven
+;     IniWrite, % (BiomeAurora      = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeAurora
+;     IniWrite, % (BiomePumpkinMoon = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomePumpkinMoon
+;     IniWrite, % (BiomeGraveyard   = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeGraveyard
+;     IniWrite, % (BiomeBloodRain   = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeBloodRain
+;     IniWrite, % (BiomeNull        = 1 ? "true" : "false"), %iniFilePath%, % "Biomes", BiomeNull
+; return
 
 ; webhooks!
 SendWebhook(title, color := "16777215") {
@@ -2140,9 +2302,9 @@ F1::
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
         snowmanPathingLastRun := 0
-        IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-        IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-        IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+        INI_WRITE( res, "Macro", "resolution")
+        INI_WRITE( maxLoopCount, "Macro", "maxLoopCount")
+        INI_WRITE( fishingLoopCount, "Macro", "fishingLoopCount")
 
         WinActivate, ahk_exe RobloxPlayerBeta.exe
         ManualGUIUpdate()
@@ -4117,13 +4279,13 @@ ExitApp
 SelectRes:
     Gui, Submit, nohide
     res := Resolution
-    IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
+    INI_WRITE( res, "Macro", "resolution")
     ManualGUIUpdate()
 return
 
 SelectPathing:
     Gui, Submit, nohide
-    IniWrite, %PathingMode%, %iniFilePath%, "Macro", "pathingMode"
+    INI_WRITE( PathingMode, "Macro", "pathingMode")
     pathingMode := PathingMode
 return
 
@@ -4178,5 +4340,5 @@ donoList:
     Http.Send()
     content := RTrim(Http.ResponseText, " `t`n`r") ; remove trailing spaces, new lines and carriage returns
     GuiControl, , DonatorsList, %content%
-stopBench("HTTP",13)
+    stopBench("HTTP",13)
 return
