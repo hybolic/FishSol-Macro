@@ -61,7 +61,7 @@ exports.handlers = {
 							    .replace(replaceMistakenVariableFunctionWithNewWord, fixThatMistake) //catchall fix incase someone like me is dumb enough to name a variable or function "function"
 								.replace(/(?<=(?::=|=).+) \. /g, " + ") //replace string appened with add sign
 								.replace(/\w+\s+(?::=|=)\s+new\s+\w+(?!.*\()/g, "$&()")
-								.replace(/ not /g, " ! ")
+								.replace(/(?<!(?:\*|\/).*) not /g, " ! ")
 								.replace(/(?<="+.*)""(?!\s)/g,"\\\"")
 			var el = temp.split(CleanupRegex);
 			var cleanup_list = []
