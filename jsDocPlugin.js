@@ -13,7 +13,7 @@ const brackets_char  = /\{|\}/g
 const quoted_brackets= /\".*?(?:\{|\}).*?\"/g
 const has_open       = /^ *\{/g
 const has_closed     = /^ *\}/g //unsused but here for reference
-const comment        = /^ *((\/\*\*)|\*|(\*\/)|\;)/g
+const comment        = /^ *((\/\*)|(\/\*\*)|\*|(\*\/)|\;)/g
 const newLineRegex   = /\r|\n/g
 const newLine        = "\r\n"
 const isIf           = / *if +/g
@@ -59,7 +59,10 @@ exports.handlers = {
 			var temp = e.source.replace(AHK__NewInClass, AHK__NewInClass_REPLACE)
 								.replace(AHK_AttemptToRemoveInvalidThingsFromBraces,'')
 							    .replace(replaceMistakenVariableFunctionWithNewWord, fixThatMistake) //catchall fix incase someone like me is dumb enough to name a variable or function "function"
-
+								.replace(/(?<=(?::=|=).+) \. /g, " + ") //replace string appened with add sign
+								.replace(/\w+\s+(?::=|=)\s+new\s+\w+(?!.*\()/g, "$&()")
+								.replace(/ not /g, " ! ")
+								.replace(/(?<="+.*)""(?!\s)/g,"\\\"")
 			var el = temp.split(CleanupRegex);
 			var cleanup_list = []
 			var cleaned = ""
@@ -250,7 +253,7 @@ logger.debug("in  var:         index: " + ((brackets == 0 ? brackets+1 : bracket
 					is_var = true
 					var outline = current_line.replace(emptyArray, "$&;")
 					if (class_brackets.length == 0)
-						outline = outline.replace(isglobal, 'var').replace(isStatic, 'var')
+						outline = outline.replace(isglobal, 'var ').replace(isStatic, 'var ')
 					else
 						outline = outline.replace(isglobal, '').replace(isStatic, '')
 					new_text += outline + "  //V~" + line_number + ":" + brackets + newLine 

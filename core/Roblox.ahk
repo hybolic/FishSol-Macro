@@ -4,7 +4,8 @@
 #include core\RectPlugin.ahk
 
 ;abstraction class
-class Window{
+class Window
+{
     
      /**
      * @class Window
@@ -12,7 +13,8 @@ class Window{
      * @param {String} winExe - the window EXE this class is monitoring
      * @constructor
      */ 
-    __New(winExe) {
+    __New(winExe)
+    {
         Window.lastInstance := this
         this.WindowID := winExe
 
@@ -128,7 +130,8 @@ class Window{
      * @param {Number} wParam
      * @param {Number} lParam
      */
-    DpiChange( wParam, lParam) {
+    DpiChange( wParam, lParam)
+    {
         DPI_AWARENESS_CONTEXT := DllCall("User32.dll\GetThreadDpiAwarenessContext", "ptr")
         DllCall("SetThreadDpiAwarenessContext", "ptr", -3, "ptr")
         SysGet, monNum, MonitorPrimary
@@ -142,7 +145,8 @@ class Window{
      *              {@link https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-enumdisplaymonitors|User32\EnumDisplayMonitors}
      * @function
      */
-    EnumMonitors() {
+    EnumMonitors()
+    {
         global EnumProc := RegisterCallback("Window.MonitorEnumProc")
         global Monitors := []
         return DllCall("User32\EnumDisplayMonitors", "Ptr", 0, "Ptr", 0, "Ptr", EnumProc, "Ptr", &Monitors, "Int") ? Monitors : false
@@ -158,7 +162,8 @@ class Window{
      * @param {?LPARAM} ObjectAddr
      * @return {Boolean} true
      */
-    MonitorEnumProc(hMonitor, hDC, pRECT, ObjectAddr) {
+    MonitorEnumProc(hMonitor, hDC, pRECT, ObjectAddr)
+    {
         global Monitors := Object(ObjectAddr)
         Monitors.Push(hMonitor)
         return true

@@ -1,9 +1,10 @@
-﻿/*
-{ClassName: SnowmanPathingPlugin
-Width: 1,
-Height: 1
-}
-*/
+﻿
+/*
+ * //{ClassName: SnowmanPathingPlugin
+ * //Width: 1,
+ * //Height: 1
+ * //}
+ */
 class SnowmanPathingPlugin extends Plugin
 {
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be

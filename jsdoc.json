@@ -4,7 +4,7 @@
     "source": {
         "includePattern": ".+\\.ahk?$",
         "include": ["./core", "./plugins", "./"],
-        "excludePattern": "(.+1\\.9\\.[234])|(.+\\-v0\\.[0-9])|(Example)|Copy|docs|JSON.ahk"
+        "excludePattern": "(.+1\\.9\\.[234])|(.+\\-v0\\.[0-9])|(Example)|Copy|docs|JSON.ahk|Roblo__xWindow.ahk|CapturePoints.ahk"
     },
     "sourceType": "module",
     "tags": {

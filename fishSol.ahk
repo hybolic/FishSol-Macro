@@ -56,9 +56,9 @@ stopBench(message,micro:=false)
 Gui, Default
 
 ;Core of the Fish Sols macro
-CORE_PLUGIN0 := new CorePlugin(2560,1440)
-CORE_PLUGIN1 := new CorePlugin_BiomeRandomizer(2560,1440)
-CORE_PLUGIN2 := new CorePlugin_StrangeController(2560,1440)
+global CORE_PLUGIN0 := new CorePlugin(2560,1440)
+global CORE_PLUGIN1 := new CorePlugin_BiomeRandomizer(2560,1440)
+global CORE_PLUGIN2 := new CorePlugin_StrangeController(2560,1440)
 
 #include plugins\PluginManager.ahk
 
@@ -68,23 +68,23 @@ CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
 
 ;SYSTEM RESOURCES
-    iniFilePath := A_ScriptDir . "\settings.ini"
-    iconFilePath := A_ScriptDir . "\img\icon.ico"
+    global iniFilePath := A_ScriptDir . "\settings.ini"
+    global iconFilePath := A_ScriptDir . "\img\icon.ico"
 
     if (FileExist(iconFilePath)) {
         Menu, Tray, Icon, %iconFilePath%
     }
 
-    global DiscordPNG        := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Discord.png")
-    global RobloxPNG         := "HBITMAP:*" LoadPicture(A_ScriptDir "\img\Robux.png")
-    global Gui_Main_Png      := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Main.png")
-    global Gui_Misc_Png      := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Misc.png")
-    global Gui_Failsafe_Png  := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Failsafes.png")
-    global Gui_Webhook_Png   := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Webhook.png")
-    global Gui_Credits_Png   := "HBITMAP:*" LoadPicture(A_ScriptDir "\gui\Credits.png")
-    global dev_maxstellar_img      := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\maxstellar.png")
-    global dev_ivelchampion249_img := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\Ivel.png")
-    global dev_cresqnt_img         := "HBITMAP:*" LoadPicture(A_ScriptDir . "\img\cresqnt.png")
+    global DiscordPNG        := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\img\Discord.png")
+    global RobloxPNG         := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\img\Robux.png")
+    global Gui_Main_Png      := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\gui\Main.png")
+    global Gui_Misc_Png      := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\gui\Misc.png")
+    global Gui_Failsafe_Png  := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\gui\Failsafes.png")
+    global Gui_Webhook_Png   := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\gui\Webhook.png")
+    global Gui_Credits_Png   := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\gui\Credits.png")
+    global dev_maxstellar_img      := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\img\maxstellar.png")
+    global dev_ivelchampion249_img := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\img\Ivel.png")
+    global dev_cresqnt_img         := "HBITMAP:*" . LoadPicture(A_ScriptDir . "\img\cresqnt.png")
 ;end
 
 global version  := "fishSol v1.9.4 2601-AltH.1"
@@ -167,40 +167,14 @@ startBench()
     
     Random, messageRand, 1, 10
 
-    randomMessages := ["Go catch some fish IRL sometime!"
-                     , "Also try FishScope!"
-                     , "Also try maxstellar's Biome Macro!"
-                     , "Also try MultiScope!"
-                     , "Patch notes: Fixed a Geneva Convention violation"
-                     , "Patch notes: Removed Herobrine"
-                     , "oof"
-                     , "Now with 100% more fishing!"
-                     , "Gone fishing"
-                     , "No fish were harmed in the making of this macro"]
+    randomMessages := ["Go catch some fish IRL sometime!", "Also try FishScope!", "Also try maxstellar's Biome Macro!", "Also try MultiScope!", "Patch notes: Fixed a Geneva Convention violation", "Patch notes: Removed Herobrine", "oof", "Now with 100% more fishing!", "Gone fishing", "No fish were harmed in the making of this macro"]
 
     ;[DEV COMMENT] only random number needed is for the random message lol
     Random, messageRand, 1, randomMessages.Length()
     randomMessage := randomMessages[messageRand]
 
 
-    Devs := [{   dev_name:"maxstellar"
-                , dev_role:"Twitch"
-                , dev_discord:"Lead Developer"
-                , dev_img: dev_maxstellar_img
-                , dev_link:"https://www.twitch.tv/maxstellar"}
-
-            ,{    dev_name:"ivelchampion249"
-                , dev_role:"YouTube"
-                , dev_discord:"Original Creator"
-                , dev_img: dev_ivelchampion249_img
-                , dev_link:"https://www.youtube.com/@ivelchampion"}
-
-            ,{    dev_name:"cresqnt"
-                , dev_role:"Scope Development (other macros)"
-                , dev_discord:"Frontend Developer"
-                , dev_img: dev_cresqnt_img
-                , dev_link:"https://scopedevelopment.tech"
-                , dev_website:"https://cresqnt.com"}]
+    Devs := [{   dev_name:"maxstellar", dev_role:"Twitch", dev_discord:"Lead Developer", dev_img: dev_maxstellar_img, dev_link:"https://www.twitch.tv/maxstellar"},{    dev_name:"ivelchampion249", dev_role:"YouTube", dev_discord:"Original Creator", dev_img: dev_ivelchampion249_img, dev_link:"https://www.youtube.com/@ivelchampion"},{    dev_name:"cresqnt", dev_role:"Scope Development (other macros)", dev_discord:"Frontend Developer", dev_img: dev_cresqnt_img, dev_link:"https://scopedevelopment.tech", dev_website:"https://cresqnt.com"}]
     Randomised_DevOrder := ""
     devCount := Devs.Length()
 
@@ -358,8 +332,8 @@ return
 
 
 
-;;;;;;;;;;;;;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
- 
+;@cleanupnuke;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
+
  HideLabels:
     Debugger.ForceHideLabels := not Debugger.ForceHideLabels
  return
@@ -374,7 +348,7 @@ return
     Debugger.DoSendKeystrokes := not Debugger.DoSendKeystrokes
  return
  
-;;;;;;;;;;;;;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
+;@cleanupend;;;;;;;;TEMP DEBBUGING STUFF;;;;;;;;;;;;;;;;;;;;
 
 #Include, core\IniSettings.ahk
 
@@ -390,7 +364,8 @@ getTimeNow()
 }
 
 ; webhooks!
-SendWebhook(title, color := "16777215") {
+SendWebhook(title, color := "16777215")
+{
 
     global ;just assume global
     local json, timestamp, http
@@ -680,9 +655,9 @@ DoMouseMove2:
             loopCount++
             RunOutput := CORE_PLUGIN0.RunLoop(loopCount, restartPathing)
             ;[DEV COMMENT] Will not work inside a switch statement because of <Return> just being the end of block statement for <Case #:>
-            if RunOutput = 2                                                    ;atleast the documentation makes it seem like it is
+            if (RunOutput = 2)                                                  ;atleast the documentation makes it seem like it is
                 Return                                                          ; upon further reading i may have been wrong and switch
-            else if RunOutput = 1                                               ; switch might be possible to use
+            else if (RunOutput = 1)                                             ; switch might be possible to use
                 Continue
         }
     }
@@ -874,8 +849,8 @@ F9::
     PX := RobloxWindow.State.Screen.X
     PY := RobloxWindow.State.Screen.Y
     Clipboard := (PX - pos_this_x) . " " . (PY - pos_this_y) . " : " . PWidth . " " . PHeight
-    msgbox % "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
-    Clipboard := "X: " ((PX - pos_this_x) / PWidth) " Y:" ((PY - pos_this_y) / PHeight)
+    msgbox % "X: " . ((PX - pos_this_x) / PWidth) . " Y:" . ((PY - pos_this_y) / PHeight)
+    Clipboard := "X: " . ((PX - pos_this_x) / PWidth) . " Y:" . ((PY - pos_this_y) / PHeight)
 return
 
 #include core/Math.ahk
@@ -1116,646 +1091,646 @@ class CorePlugin extends Plugin
         ; this.PixelGetColor04 := this.RegisterScaledPoint((0/2560), (1033/1440) , 0x7, "MovingPixelGetColor04")
     }
 
-    ;temp hiding in ide
-        ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
-        SetupTabList()
-        {
-            ret := "Main|Misc|Failsafes|Webhook"
-            return "" ; i'm not sure this will ever be called first so for now im doing this manually
-        }
-
-        ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
-        SetupGui()
-        {
-            global 
-            local yFULL_OFFSET, yoff1, yoff2, yoff3, yoff4, dev_img, dev_name, dev_role, dev_discord 
-            SetBatchLines, %MAX_SPEED%
-
-            ;Main Tab
-                Gui, Tab, Main
-
-                Gui, Add, Picture, x14 y60 w574 h590, %Gui_Main_Png%
-
-                Gui, Color, 0x1E1E1E
-                Gui, Add, Picture, x440 y600 w27 h19, %DiscordPNG%
-                Gui, Add, Picture, x533 y601 w18 h19, %RobloxPNG%
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-                Gui, Add, Text, x425 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-                Gui, Add, Text, x325 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
-
-                Gui, Font, s11 cWhite Normal Bold
-                Gui, Add, Text, x45 y110 w60 h25 BackgroundTrans, Status:
-                Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans c0xFF4444, Stopped
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-                Gui, Add, Button, x45 y140 w70 h35 gSTART_SCRIPT vStartBtn c0x00AA00 +0x8000, Start
-                Gui, Add, Button, x125 y140 w70 h35 gPAUSE_SCRIPT vPauseBtn c0xFFAA00 +0x8000, Pause
-                Gui, Add, Button, x205 y140 w70 h35 gSTOP_SCRIPT vStopBtn c0xFF4444 +0x8000, Stop
-
-                Gui, Font, s8 c0xCCCCCC
-                Gui, Add, Text, x45 y185 w240 h15 BackgroundTrans vKeybindLabelMainTab, Hotkeys: F1=Start - F2=Pause - F3=Stop
-
-
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x320 y110 w80 h25 BackgroundTrans, Resolution:
-                Gui, Add, DropDownList, x320 y135 w120 h200 vResolution gSelectRes, 1080p|1440p|1366x768
-
-                Gui, Font, s9 cWhite Bold, Segoe UI
-                Gui, Add, Text, x320 y165 w220 h25 vResStatusText BackgroundTrans, Ready
-
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x450 y135 w100 h25 gToggleSellAll vSellAllBtn, Toggle Sell All
-                Gui, Font, s8 c0xCCCCCC
-                Gui, Add, Text, x450 y165 w100 h25 vSellAllStatus BackgroundTrans, OFF
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x45 y240 w180 h25 BackgroundTrans, Fishing Loop Count:
-                Gui, Add, Edit, x220 y238 w60 h25 vMaxLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %maxLoopCount%
-                Gui, Font, s8 c0xCCCCCC
-                Gui, Add, Text, x285 y242 w270 h15 BackgroundTrans, (Fishing Cycles Before Reset - default: 15)
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x45 y270 w180 h25 BackgroundTrans, Sell Loop Count:
-                Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %fishingLoopCount%
-                Gui, Font, s8 c0xCCCCCC
-                Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (Sell Cycles  -  If Sell All: 22)
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x45 y301 w120 h25 BackgroundTrans, Pathing Mode:
-                Gui, Add, DropDownList, x145 y298 w135 h200 vPathingMode gSelectPathing, Vip Pathing|Non Vip Pathing|Abyssal Pathing
-
-                Gui, Add, Text, x295 y301 w120 h25 BackgroundTrans, AZERTY Pathing:
-                Gui, Add, Button, x415 y298 w80 h25 gToggleAzertyPathing vAzertyPathingBtn, Toggle
-                Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-                Gui, Add, Text, x510 y303 w60 h25 vAzertyPathingStatus BackgroundTrans, OFF
-
-                Gui, Font, s10 cWhite Bold
-
-                Gui, Color, 0x1E1E1E
-                Gui, Font, s10 cWhite Bold, Segoe UI
-
-                Gui, Font, s11 c0xFF2C00 Bold
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x270 y380 w80 h25 gToggleAdvancedFishingDetection vAdvancedFishingDetectionBtn, Toggle
-                Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-                Gui, Add, Text, x360 y384 w60 h25 vAdvancedFishingDetectionStatus BackgroundTrans, OFF
-
-                Gui, Font, s9 cWhite Bold, Segoe UI
-                Gui, Add, Text, x270 y415 w260 cWhite BackgroundTrans, Advanced Detection Threshold -
-                Gui, Font, s9 cWhite Normal
-                Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans c0xCCCCCC, Customize how many pixels are left in the fishing range before clicking.
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x400 y384 w80 h25 BackgroundTrans, Pixels:
-                Gui, Font, s9 cWhite Bold
-                Gui, Add, Text, x453 y416 w120 BackgroundTrans c0xFF4444, Max : 40 Pixels
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Edit, x455 y380 w75 h25 vAdvancedThresholdInput gUpdateAdvancedThreshold Number Background0xD3D3D3 cBlack, %advancedFishingThreshold%
-
-                Gui, Font, s9 c0xCCCCCC Normal
-                Gui, Add, Text, x50 y470 w515 h30 BackgroundTrans, Advanced Fishing Detection uses a system that clicks slightly before the bar exits the fish range, making the catch rate higher than ever.
-
-                Gui, Font, s9 c0x00D4FF Bold
-                Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans c0x00D4FF, [ Recommended For Lower End Devices ]
-
-                Gui, Font, s11 cWhite Bold, Segoe UI
-                Gui, Add, Text, x50 y375 w100 h30 BackgroundTrans, Runtime:
-                Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans c0x00DD00, 00:00:00
-
-                Gui, Add, Text, x50 y405 w100 h30 BackgroundTrans, Cycles:
-                Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans c0x00DD00, 0
-
-                Gui, Font, s9 c0xCCCCCC Normal
-                Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
-                Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
-
-            ;end
-
-            ;Misc Tab
-                Gui, Tab, Misc
-
-                Gui, Add, Picture, x14 y80 w574 h590, %Gui_Misc_Png%
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-                Gui, Font, s9 cWhite Normal
-                Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans c0xCCCCCC, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x45 y188 w80 h25 gToggleAutoUnequip vAutoUnequipBtn, Toggle
-                Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-                Gui, Add, Text, x140 y192 w60 h25 vAutoUnequipStatus BackgroundTrans, OFF
-                Gui, Font, s10 cWhite Bold, Segoe UI
-
-                Gui, Font, s11 cWhite Bold
-                Gui, Add, Text, x45 y260 w150 h25 BackgroundTrans, Strange Controller:
-                Gui, Add, Text, x45 y303 w190 h25 BackgroundTrans, Biome Randomizer:
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x200 y270 w80 h25 gToggleStrangeController vStrangeControllerBtn, Toggle
-                Gui, Add, Button, x200 y314 w80 h25 gToggleBiomeRandomizer vBiomeRandomizerBtn, Toggle
-                Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-                Gui, Add, Text, x290 y275 w60 h25 vStrangeControllerStatus BackgroundTrans, OFF
-                Gui, Add, Text, x290 y319 w60 h25 vBiomeRandomizerStatus BackgroundTrans, OFF
-
-                Gui, Add, Progress, x41 y270 w1 h27 Background696868
-                Gui, Add, Progress, x190 y270 w1 h27 Background696868
-                Gui, Add, Progress, x41 y296 w149 h1 Background696868
-                Gui, Add, Progress, x184 y269 w7 h1 Background696868
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 21 minutes.
-
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x327 y275 w500 h15 BackgroundTrans, Automatically uses Strange Controller.
-
-                Gui, Add, Progress, x41 y313 w1 h27 Background696868
-                Gui, Add, Progress, x190 y313 w1 h27 Background696868
-                Gui, Add, Progress, x41 y339 w149 h1 Background696868
-                Gui, Add, Progress, x184 y313 w7 h1 Background696868
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 36 minutes.
-
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x327 y319 w500 h15 BackgroundTrans, Automatically uses Biome Randomizer.
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-                Gui, Font, s9 cWhite Normal
-                Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans c0xCCCCCC, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x320 y188 w80 h25 gToggleAutoCloseChat vAutoCloseChatBtn, Toggle
-                Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-                Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans, OFF
-
-                Gui, Color, 0x1E1E1E
-                Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
-                Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-                Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-                Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-                
-                ;[DEV COMMENT] Please replace with better system if one comes along - Nadir
-                ;Hotkey sub menu in misc
-                    Gui, Font, s11 cWhite Normal
-                    Gui, Font, s11 cWhite Bold
-                    Gui, Add, Text, x47 y383 w150 h25 BackgroundTrans, Start`tHotkey:
-                    Gui, Add, Text, x47 y427 w150 h25 BackgroundTrans, Pause`tHotkey:
-                    Gui, Add, Text, x47 y471 w150 h25 BackgroundTrans, Stop`tHotKey:
-                    
-                    ;[DEV COMMENT] Start Key
-                    Gui, Add, Progress, x41 y392 w1 h27 Background696868
-                    Gui, Add, Progress, x190 y392 w1 h27 Background696868
-                    Gui, Add, Progress, x41 y418 w149 h1 Background696868
-                    Gui, Add, Progress, x184 y392 w7 h1 Background696868
-                    Gui, Font, s10 cWhite Normal
-                    Gui, Add, Text, x47 y400 w500 h40 BackgroundTrans c0xCCCCCC, Rebind Start hotkey
-                    Gui, Add, Hotkey, Limit129 vStart_hotkey_REBIND x225 y392 w80 h25 Center, F1
-                    Gui, Add, Checkbox, x200 y392 w25 h25 gAllowStartRebind vAllowStartRebind_CHECKBOX
-                    Gui, Font, s10 cWhite Bold
-                    Gui, Add, Button, gRebindHotkeyStart x320 y392 h25 w80 vStart_hotkey_REBIND_BUTTON, Accept
-                    
-                    ;[DEV COMMENT] Pause Key
-                    Gui, Add, Progress, x41 y436 w1 h27 Background696868
-                    Gui, Add, Progress, x190 y436 w1 h27 Background696868
-                    Gui, Add, Progress, x41 y462 w149 h1 Background696868
-                    Gui, Add, Progress, x184 y436 w7 h1 Background696868
-                    Gui, Font, s10 cWhite Normal
-                    Gui, Add, Text, x47 y444 w500 h40 BackgroundTrans c0xCCCCCC, Rebind Pause hotkey
-                    Gui, Add, Hotkey, Limit129 vPause_hotkey_REBIND x225 y436 w80 h25 Center, F2
-                    Gui, Add, Checkbox, x200 y436 w25 h25 gAllowPauseRebind vAllowPauseRebind_CHECKBOX 
-                    Gui, Font, s10 cWhite Bold
-                    Gui, Add, Button, gRebindHotkeyPause x320 y436 h25 w80 vPause_hotkey_REBIND_BUTTON, Accept
-                    
-                    ;[DEV COMMENT] Stop Key
-                    Gui, Add, Progress, x41 y480 w1 h27 Background696868
-                    Gui, Add, Progress, x190 y480 w1 h27 Background696868
-                    Gui, Add, Progress, x41 y506 w149 h1 Background696868
-                    Gui, Add, Progress, x184 y480 w7 h1 Background696868
-                    Gui, Font, s10 cWhite Normal
-                    Gui, Add, Text, x47 y488 w500 h40 BackgroundTrans c0xCCCCCC , Rebind Pause hotkey
-                    Gui, Add, Hotkey, Limit129 vStop_hotkey_REBIND x225 y480 w80 h25 Center, F3
-                    Gui, Add, Checkbox, x200 y480 w25 h25 gAllowStopRebind vAllowStopRebind_CHECKBOX
-                    Gui, Font, s10 cWhite Bold
-                    Gui, Add, Button, gRebindHotkeyStop x320 y480 h25 w80 vStop_hotkey_REBIND_BUTTON, Accept
-
-                    ;[DEV COMMENT] read the keybinds from the ini into the boxes and label at start
-                    GuiControl,, Start_hotkey_REBIND, %Start_hotkey%
-                    GuiControl,, Pause_hotkey_REBIND, %Pause_hotkey%
-                    GuiControl,, Stop_hotkey_REBIND, %Stop_hotkey%
-
-                    GuiControl,, KeybindLabelMainTab, Hotkeys: %Start_hotkey%=Start - %Pause_hotkey%=Pause - %Stop_hotkey%=Stop
-                    
-                    ;disable the controls for when the binding checkbox is clicked
-                    GuiControl, Disable, Start_hotkey_REBIND
-                    GuiControl, Disable, Pause_hotkey_REBIND
-                    GuiControl, Disable, Stop_hotkey_REBIND
-                    
-                    GuiControl, Hide, Start_hotkey_REBIND_BUTTON
-                    GuiControl, Hide, Pause_hotkey_REBIND_BUTTON
-                    GuiControl, Hide, Stop_hotkey_REBIND_BUTTON
-                ;end
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-            ;end
-
-            ;Failsafes
-                Gui, Tab, Failsafes
-
-                Gui, Add, Picture, x14 y80 w574 h590, %Gui_Failsafe_Png%
-
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans c0xCCCCCC, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
-
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Text, x50 y190 w150 h25 BackgroundTrans, Private Server Link:
-                Gui, Add, Edit, x50 y215 w500 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
-
-                Gui, Font, s8 c0xCCCCCC Normal
-                Gui, Add, Text, x50 y245 w500 h15 BackgroundTrans, Paste your Roblox private server link here (leave empty to disable)
-
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
-
-                Gui, Font, s11 cWhite Bold
-                Gui, Add, Text, x145 y275 w150 h25 BackgroundTrans, Seconds:
-                Gui, Add, Edit, x218 y272 w150 h25 vAutoRejoinFailsafeInput gUpdateAutoRejoinFailsafe Number Background0xD3D3D3 cBlack, %autoRejoinFailsafeTime%
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-
-                Gui, Font, s9 cWhite Normal
-                Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Fishing Failsafe triggers. (Default : 31)
-
-                Gui, Font, s11 cWhite Bold
-                Gui, Add, Text, x45 y413 w150 h35 BackgroundTrans, Seconds:
-                Gui, Add, Edit, x125 y411 w150 h25 vFishingFailsafeInput gUpdateFishingFailsafe Number Background0xD3D3D3 cBlack, %fishingFailsafeTime%
-
-                Gui, Font, s10 cWhite Bold, Segoe UI
-
-                Gui, Font, s9 cWhite Normal
-                Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans c0xCCCCCC, Customize how long until the Pathing Failsafe triggers. (Default : 61)
-
-                Gui, Font, s11 cWhite Bold
-                Gui, Add, Text, x320 y413 w150 h35 BackgroundTrans, Seconds:
-                Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background0xD3D3D3 cBlack, %pathingFailsafeTime%
-
-                Gui, Color, 0x1E1E1E
-                Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
-                Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-                Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-                Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
-            ;end
-
-            ;Webhook Tab
-                Gui, Tab, Webhook
-
-                Gui, Add, Picture, x14 y80 w574 h590, %Gui_Webhook_Png%
-
-                Gui, Font, s10 cWhite Normal Bold
-                Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
-                Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
-                Gui, Font, s8 c0xCCCCCC Normal
-                Gui, Add, Text, x50 y180 w500 h15 BackgroundTrans, Paste your Discord webhook URL here to be notified of actions happening in real time.
-
-                Gui, Font, s10 cWhite Normal
-                Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when a failsafe triggers.
-                Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when the macro paths to auto-sell.
-                Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
-
-                Gui, Font, s10 cWhite Bold
-                Gui, Add, Button, x60 y216 w80 h25 gToggleFailsafeWebhook vFailsafeWebhookBtn, Toggle
-                Gui, Add, Text, x150 y220 w60 h25 vfailsafeWebhookStatus BackgroundTrans, OFF
-                Gui, Add, Button, x60 y286 w80 h25 gTogglePathingWebhook vPathingWebhookBtn, Toggle
-                Gui, Add, Text, x150 y290 w60 h25 vpathingWebhookStatus BackgroundTrans, OFF
-                Gui, Add, Button, x60 y356 w80 h25 gToggleItemWebhook vItemWebhookBtn, Toggle
-                Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans, OFF
-
-                Gui, Color, 0x1E1E1E
-                Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
-                Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-                Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-                Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-            ;end
-
-            ;Credits Tab
-                Gui, Tab, Credits
-                Gui, Add, Picture, x14 y80 w574 h590, %Gui_Credits_Png%
-
-                Gui, Font, s10 cWhite Normal
-                
-                ;[DEV COMMENT] Loop over the number of devs and add them to their randomly assigned variables from before
-                    loop % Devs.Count()
-                    {
-                        ;y offset 65?
-                        yFULL_OFFSET := 65 * (A_INDEX - 1)
-                        yoff1 := 130 + yFULL_OFFSET
-                        yoff2 := 135 + yFULL_OFFSET
-                        yoff3 := 155 + yFULL_OFFSET
-                        yoff4 := 170 + yFULL_OFFSET
-
-                        Gui, Font, s11 cWhite Normal Bold
-                        Gui, Add, Picture, x50 y%yoff1% w50 h50, % dev%A_INDEX%_img
-
-                        Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, % dev%A_INDEX%_name
-
-                        Gui, Font, s9 c0xCCCCCC Normal
-                        Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, % dev%A_INDEX%_role
-                        Gui, Font, s9 c0xCCCCCC Normal Underline
-                        Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, % dev%A_INDEX%_discord
-                    }
-                ;end
-                
-                ;move http request to its own thread
-                DonoHTTP := ObjBindMethod(this, "DonoHTTP")
-                SetTimer, %DonoHTTP%, -100
-
-                Gui, Font, s10 cWhite Normal Bold
-                Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
-                Gui, Font, s9 c0xCCCCCC Normal
-                Gui, Add, Edit, x50 y370 w480 h125 +HwndHandleDonatorsList vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, LOADING....
-
-                Gui, Font, s8 c0xCCCCCC Normal
-                Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, %version% - %randomMessage%
-
-                Gui, Show, w600 h670, %version%
-
-                Gui, Color, 0x1E1E1E
-                Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
-                Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
-
-                Gui, Font, s11 cWhite Bold Underline, Segoe UI
-                Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-                Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-            ;end
-        }
-
-        DonoHTTP()
-        {
-            global DonorURL, HandleDonatorsList
-            SetBatchLines, %MAX_SPEED%
-            Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-            Http.Open("GET", DonorURL, false)
-            Http.Send()
-            content := RTrim(Http.ResponseText, " `t`n`r")
-            GuiControl, Text, %HandleDonatorsList%, %content%
-        }
-
-        ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
-        IniRead()
-        {
-            global
-            ;[DEV COMMENT] Keybinds
-                IniRead, temp_start_keybind, %iniFilePath%, "Keybinds", "StartScript"
-                if (temp_start_keybind != "ERROR")
-                {
-                    ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Pause_hotkey . "|" . Stop_hotkey
-                    if temp_start_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_start_keybind) ~= REGEX_KEYS_CHECK 
-                        Start_hotkey := "F1"
-                    else
-                        Start_hotkey := temp_start_keybind
-                }
-                Else
-                    IniWrite, % "F1", %iniFilePath%, "Keybinds", "StartScript"
-
-                Hotkey, %Start_hotkey%, START_SCRIPT
-                IniRead, temp_pause_keybind, %iniFilePath%, "Keybinds", "PauseScript"
-                if (temp_pause_keybind != "ERROR")
-                {
-                    ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Stop_hotkey
-                    if temp_pause_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_pause_keybind) ~= REGEX_KEYS_CHECK 
-                        Pause_hotkey := "F2"
-                    else
-                        Pause_hotkey := temp_pause_keybind
-                }
-                Else
-                    IniWrite, % "F2", %iniFilePath%, "Keybinds", "PauseScript"
-                Hotkey, %Pause_hotkey%, PAUSE_SCRIPT
-                
-                IniRead, temp_stop_keybind, %iniFilePath%, "Keybinds", "StopScript"
-                if (temp_stop_keybind != "ERROR")
-                {
-                    ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
-                    REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Pause_hotkey
-                    if temp_stop_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_stop_keybind) ~= REGEX_KEYS_CHECK 
-                        Stop_hotkey := "F3"
-                    else
-                        Stop_hotkey := temp_stop_keybind
-                }
-                Else
-                    IniWrite, % "F3", %iniFilePath%, "Keybinds", "StopScript"
-                Hotkey, %Stop_hotkey%, STOP_SCRIPT
-            ;end
-
-            ;[DEV COMMENT] Vanilla ini reading
-                IniRead, tempRes, %iniFilePath%, "Macro", "resolution"
-                if (tempRes != "ERROR")
-                {
-                    res := tempRes
-                }
-                Else
-                    IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
-
-                IniRead, tempMaxLoop, %iniFilePath%, "Macro", "maxLoopCount"
-                if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
-                {
-                    maxLoopCount := tempMaxLoop
-                }
-                Else
-                    IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
-
-                IniRead, tempFishingLoop, %iniFilePath%, "Macro", "fishingLoopCount"
-                if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
-                {
-                    fishingLoopCount := tempFishingLoop
-                }
-                Else
-                    IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
-
-                IniRead, tempSellAll, %iniFilePath%, "Macro", "sellAllToggle"
-                if (tempSellAll != "ERROR")
-                {
-                    sellAllToggle := (tempSellAll = "true" || tempSellAll = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "sellAllToggle"
-
-                IniRead, tempPathing, %iniFilePath%, "Macro", "pathingMode"
-                if (tempPathing != "ERROR")
-                {
-                    pathingMode := tempPathing
-                }
-                Else
-                    IniWrite, %pathingMode%, %iniFilePath%, "Macro", "pathingMode"
-
-                IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-                if (tempAzerty != "ERROR")
-                {
-                    azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
-
-                IniRead, tempPrivateServer, %iniFilePath%, "Macro", "privateServerLink"
-                if (tempPrivateServer != "ERROR")
-                {
-                    privateServerLink := tempPrivateServer
-                    code := ""
-                    if RegExMatch(privateServerLink, "code=([^&]+)", m)
-                    {
-                        code := m1
-                    }
-                }
-                Else
-                    IniWrite, % "", %iniFilePath%, "Macro", "privateServerLink"
-
-                IniRead, tempAdvancedDetection, %iniFilePath%, "Macro", "advancedFishingDetection"
-                if (tempAdvancedDetection != "ERROR")
-                {
-                    advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "advancedFishingDetection"
-
-                IniRead, tempFishingFailsafe, %iniFilePath%, "Macro", "fishingFailsafeTime"
-                if (tempFishingFailsafe != "ERROR" && tempFishingFailsafe > 0)
-                {
-                    fishingFailsafeTime := tempFishingFailsafe
-                }
-                Else
-                    IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
-
-                IniRead, tempPathingFailsafe, %iniFilePath%, "Macro", "pathingFailsafeTime"
-                if (tempPathingFailsafe != "ERROR" && tempPathingFailsafe > 0)
-                {
-                    pathingFailsafeTime := tempPathingFailsafe
-                }
-                Else
-                    IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
-
-                IniRead, tempAutoRejoinFailsafe, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-                if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
-                {
-                    autoRejoinFailsafeTime := tempAutoRejoinFailsafe
-                }
-                Else
-                    IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
-
-                IniRead, tempAutoUnequip, %iniFilePath%, "Macro", "autoUnequip"
-                if (tempAutoUnequip != "ERROR")
-                {
-                    autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "autoUnequip"
-
-                IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
-                if (tempAzerty != "ERROR")
-                {
-                    azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
-
-                IniRead, tempAdvancedThreshold, %iniFilePath%, "Macro", "advancedFishingThreshold"
-                if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
-                {
-                    advancedFishingThreshold := tempAdvancedThreshold
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "advancedFishingThreshold"
-
-                IniRead, tempStrangeController, %iniFilePath%, "Macro", "strangeController"
-                if (tempStrangeController != "ERROR")
-                {
-                    strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "strangeController"
-
-                IniRead, tempBiomeRandomizer, %iniFilePath%, "Macro", "biomeRandomizer"
-                if (tempBiomeRandomizer != "ERROR")
-                {
-                    biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "biomeRandomizer"
-
-                IniRead, tempAutoCloseChat, %iniFilePath%, "Macro", "autoCloseChat"
-                if (tempAutoCloseChat != "ERROR")
-                {
-                    autoCloseChat := (tempAutoCloseChat = "true" || tempAutoCloseChat = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "autoCloseChat"
-
-                IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
-                if (tempWebhook != "ERROR")
-                {
-                    webhookURL := tempWebhook
-                }
-                Else
-                    IniWrite, % "", %iniFilePath%, "Macro", "webhookURL"
-
-                IniRead, tempFsWebhook, %iniFilePath%, "Macro", "failsafeWebhook"
-                if (tempFsWebhook != "ERROR")
-                {
-                    failsafeWebhook := (tempFsWebhook = "true" || tempFsWebhook = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "failsafeWebhook"
-
-                IniRead, tempPathingWebhook, %iniFilePath%, "Macro", "pathingWebhook"
-                if (tempPathingWebhook != "ERROR")
-                {
-                    pathingWebhook := (tempPathingWebhook = "true" || tempPathingWebhook = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "pathingWebhook"
-
-                IniRead, tempItemWebhook, %iniFilePath%, "Macro", "itemWebhook"
-                if (tempItemWebhook != "ERROR")
-                {
-                    itemWebhook := (tempItemWebhook = "true" || tempItemWebhook = "1")
-                }
-                Else
-                    IniWrite, false, %iniFilePath%, "Macro", "itemWebhook"
-            ;end
-        }
-        
-        ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
-        GuiControlChecks()
-        {
-            ;[DEV COMMENT] using <Toggle_GuiControl> function from above to quickly loop over a bunch of duplicate code
-            Toggle_GuiControl("SellAllStatus", sellAllToggle)
-            Toggle_GuiControl("AdvancedFishingDetectionStatus", advancedFishingDetection)
-            Toggle_GuiControl("azertyPathing", AzertyPathingStatus)
-            Toggle_GuiControl("autoUnequip", AutoUnequipStatus)
-            Toggle_GuiControl("autoCloseChat", AutoCloseChatStatus)
-            Toggle_GuiControl("strangeController", StrangeControllerStatus)
-            Toggle_GuiControl("biomeRandomizer", BiomeRandomizerStatus)
-            Toggle_GuiControl("failsafeWebhook", failsafeWebhookStatus)
-            Toggle_GuiControl("pathingWebhook", pathingWebhookStatus)
-            Toggle_GuiControl("itemWebhook", itemWebhookStatus)
+ ;temp hiding in ide
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    SetupTabList()
+    {
+        ret := "Main|Misc|Failsafes|Webhook"
+        return "" ; i'm not sure this will ever be called first so for now im doing this manually
+    }
+
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
+    SetupGui()
+    {
+        global 
+        local yFULL_OFFSET, yoff1, yoff2, yoff3, yoff4, dev_img, dev_name, dev_role, dev_discord 
+        SetBatchLines, %MAX_SPEED%
+
+        ;Main Tab
+            Gui, Tab, Main
+
+            Gui, Add, Picture, x14 y60 w574 h590, %Gui_Main_Png%
+
+            Gui, Color, 0x1E1E1E
+            Gui, Add, Picture, x440 y600 w27 h19, %DiscordPNG%
+            Gui, Add, Picture, x533 y601 w18 h19, %RobloxPNG%
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+            Gui, Add, Text, x425 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
+            Gui, Add, Text, x325 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+
+
+            Gui, Font, s11 cWhite Normal Bold
+            Gui, Add, Text, x45 y110 w60 h25 BackgroundTrans, Status:
+            Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans c0xFF4444, Stopped
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+            Gui, Add, Button, x45 y140 w70 h35 gSTART_SCRIPT vStartBtn c0x00AA00 +0x8000, Start
+            Gui, Add, Button, x125 y140 w70 h35 gPAUSE_SCRIPT vPauseBtn c0xFFAA00 +0x8000, Pause
+            Gui, Add, Button, x205 y140 w70 h35 gSTOP_SCRIPT vStopBtn c0xFF4444 +0x8000, Stop
+
+            Gui, Font, s8 c0xCCCCCC
+            Gui, Add, Text, x45 y185 w240 h15 BackgroundTrans vKeybindLabelMainTab, Hotkeys: F1=Start - F2=Pause - F3=Stop
+
+
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x320 y110 w80 h25 BackgroundTrans, Resolution:
+            Gui, Add, DropDownList, x320 y135 w120 h200 vResolution gSelectRes, 1080p|1440p|1366x768
+
+            Gui, Font, s9 cWhite Bold, Segoe UI
+            Gui, Add, Text, x320 y165 w220 h25 vResStatusText BackgroundTrans, Ready
+
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x450 y135 w100 h25 gToggleSellAll vSellAllBtn, Toggle Sell All
+            Gui, Font, s8 c0xCCCCCC
+            Gui, Add, Text, x450 y165 w100 h25 vSellAllStatus BackgroundTrans, OFF
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x45 y240 w180 h25 BackgroundTrans, Fishing Loop Count:
+            Gui, Add, Edit, x220 y238 w60 h25 vMaxLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %maxLoopCount%
+            Gui, Font, s8 c0xCCCCCC
+            Gui, Add, Text, x285 y242 w270 h15 BackgroundTrans, (Fishing Cycles Before Reset - default: 15)
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x45 y270 w180 h25 BackgroundTrans, Sell Loop Count:
+            Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %fishingLoopCount%
+            Gui, Font, s8 c0xCCCCCC
+            Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (Sell Cycles  -  If Sell All: 22)
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x45 y301 w120 h25 BackgroundTrans, Pathing Mode:
+            Gui, Add, DropDownList, x145 y298 w135 h200 vPathingMode gSelectPathing, Vip Pathing|Non Vip Pathing|Abyssal Pathing
+
+            Gui, Add, Text, x295 y301 w120 h25 BackgroundTrans, AZERTY Pathing:
+            Gui, Add, Button, x415 y298 w80 h25 gToggleAzertyPathing vAzertyPathingBtn, Toggle
+            Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+            Gui, Add, Text, x510 y303 w60 h25 vAzertyPathingStatus BackgroundTrans, OFF
+
+            Gui, Font, s10 cWhite Bold
+
+            Gui, Color, 0x1E1E1E
+            Gui, Font, s10 cWhite Bold, Segoe UI
+
+            Gui, Font, s11 c0xFF2C00 Bold
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x270 y380 w80 h25 gToggleAdvancedFishingDetection vAdvancedFishingDetectionBtn, Toggle
+            Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+            Gui, Add, Text, x360 y384 w60 h25 vAdvancedFishingDetectionStatus BackgroundTrans, OFF
+
+            Gui, Font, s9 cWhite Bold, Segoe UI
+            Gui, Add, Text, x270 y415 w260 cWhite BackgroundTrans, Advanced Detection Threshold -
+            Gui, Font, s9 cWhite Normal
+            Gui, Add, Text, x270 y435 w270 h40 BackgroundTrans c0xCCCCCC, Customize how many pixels are left in the fishing range before clicking.
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x400 y384 w80 h25 BackgroundTrans, Pixels:
+            Gui, Font, s9 cWhite Bold
+            Gui, Add, Text, x453 y416 w120 BackgroundTrans c0xFF4444, Max : 40 Pixels
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Edit, x455 y380 w75 h25 vAdvancedThresholdInput gUpdateAdvancedThreshold Number Background0xD3D3D3 cBlack, %advancedFishingThreshold%
+
+            Gui, Font, s9 c0xCCCCCC Normal
+            Gui, Add, Text, x50 y470 w515 h30 BackgroundTrans, Advanced Fishing Detection uses a system that clicks slightly before the bar exits the fish range, making the catch rate higher than ever.
+
+            Gui, Font, s9 c0x00D4FF Bold
+            Gui, Add, Text, x307 y485 w515 h30 BackgroundTrans c0x00D4FF, [ Recommended For Lower End Devices ]
+
+            Gui, Font, s11 cWhite Bold, Segoe UI
+            Gui, Add, Text, x50 y375 w100 h30 BackgroundTrans, Runtime:
+            Gui, Add, Text, x120 y375 w120 h30 vRuntimeText BackgroundTrans c0x00DD00, 00:00:00
+
+            Gui, Add, Text, x50 y405 w100 h30 BackgroundTrans, Cycles:
+            Gui, Add, Text, x102 y405 w120 h30 vCyclesText BackgroundTrans c0x00DD00, 0
+
+            Gui, Font, s9 c0xCCCCCC Normal
+            Gui, Add, Text, x50 y545 w500 h20 BackgroundTrans, Requirements: 100`% Windows scaling - Roblox in fullscreen mode
+            Gui, Add, Text, x50 y563 w500 h20 BackgroundTrans, For best results, make sure you have good internet and avoid screen overlays
+
+        ;end
+
+        ;Misc Tab
+            Gui, Tab, Misc
+
+            Gui, Add, Picture, x14 y80 w574 h590, %Gui_Misc_Png%
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+            Gui, Font, s9 cWhite Normal
+            Gui, Add, Text, x45 y135 h45 w250 BackgroundTrans c0xCCCCCC, Automatically unequips rolled auras every pathing cycle, preventing lag and pathing issues.
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x45 y188 w80 h25 gToggleAutoUnequip vAutoUnequipBtn, Toggle
+            Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+            Gui, Add, Text, x140 y192 w60 h25 vAutoUnequipStatus BackgroundTrans, OFF
+            Gui, Font, s10 cWhite Bold, Segoe UI
+
+            Gui, Font, s11 cWhite Bold
+            Gui, Add, Text, x45 y260 w150 h25 BackgroundTrans, Strange Controller:
+            Gui, Add, Text, x45 y303 w190 h25 BackgroundTrans, Biome Randomizer:
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x200 y270 w80 h25 gToggleStrangeController vStrangeControllerBtn, Toggle
+            Gui, Add, Button, x200 y314 w80 h25 gToggleBiomeRandomizer vBiomeRandomizerBtn, Toggle
+            Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+            Gui, Add, Text, x290 y275 w60 h25 vStrangeControllerStatus BackgroundTrans, OFF
+            Gui, Add, Text, x290 y319 w60 h25 vBiomeRandomizerStatus BackgroundTrans, OFF
+
+            Gui, Add, Progress, x41 y270 w1 h27 Background696868
+            Gui, Add, Progress, x190 y270 w1 h27 Background696868
+            Gui, Add, Progress, x41 y296 w149 h1 Background696868
+            Gui, Add, Progress, x184 y269 w7 h1 Background696868
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x47 y278 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 21 minutes.
+
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x327 y275 w500 h15 BackgroundTrans, Automatically uses Strange Controller.
+
+            Gui, Add, Progress, x41 y313 w1 h27 Background696868
+            Gui, Add, Progress, x190 y313 w1 h27 Background696868
+            Gui, Add, Progress, x41 y339 w149 h1 Background696868
+            Gui, Add, Progress, x184 y313 w7 h1 Background696868
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x47 y321 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 36 minutes.
+
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x327 y319 w500 h15 BackgroundTrans, Automatically uses Biome Randomizer.
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+            Gui, Font, s9 cWhite Normal
+            Gui, Add, Text, x320 y135 w230 h60 BackgroundTrans c0xCCCCCC, Automatically closes chat every pathing cycle to ensure you don't get stuck in collection.
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x320 y188 w80 h25 gToggleAutoCloseChat vAutoCloseChatBtn, Toggle
+            Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+            Gui, Add, Text, x415 y192 w60 h25 vAutoCloseChatStatus BackgroundTrans, OFF
+
+            Gui, Color, 0x1E1E1E
+            Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
+            Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+            Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
+            Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
             
-            switch pathingMode
+            ;[DEV COMMENT] Please replace with better system if one comes along - Nadir
+            ;Hotkey sub menu in misc
+                Gui, Font, s11 cWhite Normal
+                Gui, Font, s11 cWhite Bold
+                Gui, Add, Text, x47 y383 w150 h25 BackgroundTrans, Start`tHotkey:
+                Gui, Add, Text, x47 y427 w150 h25 BackgroundTrans, Pause`tHotkey:
+                Gui, Add, Text, x47 y471 w150 h25 BackgroundTrans, Stop`tHotKey:
+                
+                ;[DEV COMMENT] Start Key
+                Gui, Add, Progress, x41 y392 w1 h27 Background696868
+                Gui, Add, Progress, x190 y392 w1 h27 Background696868
+                Gui, Add, Progress, x41 y418 w149 h1 Background696868
+                Gui, Add, Progress, x184 y392 w7 h1 Background696868
+                Gui, Font, s10 cWhite Normal
+                Gui, Add, Text, x47 y400 w500 h40 BackgroundTrans c0xCCCCCC, Rebind Start hotkey
+                Gui, Add, Hotkey, Limit129 vStart_hotkey_REBIND x225 y392 w80 h25 Center, F1
+                Gui, Add, Checkbox, x200 y392 w25 h25 gAllowStartRebind vAllowStartRebind_CHECKBOX
+                Gui, Font, s10 cWhite Bold
+                Gui, Add, Button, gRebindHotkeyStart x320 y392 h25 w80 vStart_hotkey_REBIND_BUTTON, Accept
+                
+                ;[DEV COMMENT] Pause Key
+                Gui, Add, Progress, x41 y436 w1 h27 Background696868
+                Gui, Add, Progress, x190 y436 w1 h27 Background696868
+                Gui, Add, Progress, x41 y462 w149 h1 Background696868
+                Gui, Add, Progress, x184 y436 w7 h1 Background696868
+                Gui, Font, s10 cWhite Normal
+                Gui, Add, Text, x47 y444 w500 h40 BackgroundTrans c0xCCCCCC, Rebind Pause hotkey
+                Gui, Add, Hotkey, Limit129 vPause_hotkey_REBIND x225 y436 w80 h25 Center, F2
+                Gui, Add, Checkbox, x200 y436 w25 h25 gAllowPauseRebind vAllowPauseRebind_CHECKBOX 
+                Gui, Font, s10 cWhite Bold
+                Gui, Add, Button, gRebindHotkeyPause x320 y436 h25 w80 vPause_hotkey_REBIND_BUTTON, Accept
+                
+                ;[DEV COMMENT] Stop Key
+                Gui, Add, Progress, x41 y480 w1 h27 Background696868
+                Gui, Add, Progress, x190 y480 w1 h27 Background696868
+                Gui, Add, Progress, x41 y506 w149 h1 Background696868
+                Gui, Add, Progress, x184 y480 w7 h1 Background696868
+                Gui, Font, s10 cWhite Normal
+                Gui, Add, Text, x47 y488 w500 h40 BackgroundTrans c0xCCCCCC , Rebind Pause hotkey
+                Gui, Add, Hotkey, Limit129 vStop_hotkey_REBIND x225 y480 w80 h25 Center, F3
+                Gui, Add, Checkbox, x200 y480 w25 h25 gAllowStopRebind vAllowStopRebind_CHECKBOX
+                Gui, Font, s10 cWhite Bold
+                Gui, Add, Button, gRebindHotkeyStop x320 y480 h25 w80 vStop_hotkey_REBIND_BUTTON, Accept
+
+                ;[DEV COMMENT] read the keybinds from the ini into the boxes and label at start
+                GuiControl,, Start_hotkey_REBIND, %Start_hotkey%
+                GuiControl,, Pause_hotkey_REBIND, %Pause_hotkey%
+                GuiControl,, Stop_hotkey_REBIND, %Stop_hotkey%
+
+                GuiControl,, KeybindLabelMainTab, Hotkeys: %Start_hotkey%=Start - %Pause_hotkey%=Pause - %Stop_hotkey%=Stop
+                
+                ;disable the controls for when the binding checkbox is clicked
+                GuiControl, Disable, Start_hotkey_REBIND
+                GuiControl, Disable, Pause_hotkey_REBIND
+                GuiControl, Disable, Stop_hotkey_REBIND
+                
+                GuiControl, Hide, Start_hotkey_REBIND_BUTTON
+                GuiControl, Hide, Pause_hotkey_REBIND_BUTTON
+                GuiControl, Hide, Stop_hotkey_REBIND_BUTTON
+            ;end
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+        ;end
+
+        ;Failsafes
+            Gui, Tab, Failsafes
+
+            Gui, Add, Picture, x14 y80 w574 h590, %Gui_Failsafe_Png%
+
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x50 y140 w500 h40 BackgroundTrans c0xCCCCCC, If the fishing minigame is not detected for the specified time, the macro will`nautomatically rejoin using the private server link below.
+
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Text, x50 y190 w150 h25 BackgroundTrans, Private Server Link:
+            Gui, Add, Edit, x50 y215 w500 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
+
+            Gui, Font, s8 c0xCCCCCC Normal
+            Gui, Add, Text, x50 y245 w500 h15 BackgroundTrans, Paste your Roblox private server link here (leave empty to disable)
+
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x79 y306 w450 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Auto-Rejoin Failsafe triggers. (Default : 320)
+
+            Gui, Font, s11 cWhite Bold
+            Gui, Add, Text, x145 y275 w150 h25 BackgroundTrans, Seconds:
+            Gui, Add, Edit, x218 y272 w150 h25 vAutoRejoinFailsafeInput gUpdateAutoRejoinFailsafe Number Background0xD3D3D3 cBlack, %autoRejoinFailsafeTime%
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+
+            Gui, Font, s9 cWhite Normal
+            Gui, Add, Text, x45 y370 w230 h40 BackgroundTrans c0xCCCCCC, Customize how long until the Fishing Failsafe triggers. (Default : 31)
+
+            Gui, Font, s11 cWhite Bold
+            Gui, Add, Text, x45 y413 w150 h35 BackgroundTrans, Seconds:
+            Gui, Add, Edit, x125 y411 w150 h25 vFishingFailsafeInput gUpdateFishingFailsafe Number Background0xD3D3D3 cBlack, %fishingFailsafeTime%
+
+            Gui, Font, s10 cWhite Bold, Segoe UI
+
+            Gui, Font, s9 cWhite Normal
+            Gui, Add, Text, x320 y370 w230 h45 BackgroundTrans c0xCCCCCC, Customize how long until the Pathing Failsafe triggers. (Default : 61)
+
+            Gui, Font, s11 cWhite Bold
+            Gui, Add, Text, x320 y413 w150 h35 BackgroundTrans, Seconds:
+            Gui, Add, Edit, x400 y411 w150 h25 vPathingFailsafeInput gUpdatePathingFailsafe Number Background0xD3D3D3 cBlack, %pathingFailsafeTime%
+
+            Gui, Color, 0x1E1E1E
+            Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
+            Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+            Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
+            Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+
+        ;end
+
+        ;Webhook Tab
+            Gui, Tab, Webhook
+
+            Gui, Add, Picture, x14 y80 w574 h590, %Gui_Webhook_Png%
+
+            Gui, Font, s10 cWhite Normal Bold
+            Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
+            Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
+            Gui, Font, s8 c0xCCCCCC Normal
+            Gui, Add, Text, x50 y180 w500 h15 BackgroundTrans, Paste your Discord webhook URL here to be notified of actions happening in real time.
+
+            Gui, Font, s10 cWhite Normal
+            Gui, Add, Text, x60 y246 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when a failsafe triggers.
+            Gui, Add, Text, x60 y316 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when the macro paths to auto-sell.
+            Gui, Add, Text, x60 y386 w500 h40 BackgroundTrans c0xCCCCCC, When toggled, this sends a message when items are used (eg. Strange Controller, Biome Randomizer).
+
+            Gui, Font, s10 cWhite Bold
+            Gui, Add, Button, x60 y216 w80 h25 gToggleFailsafeWebhook vFailsafeWebhookBtn, Toggle
+            Gui, Add, Text, x150 y220 w60 h25 vfailsafeWebhookStatus BackgroundTrans, OFF
+            Gui, Add, Button, x60 y286 w80 h25 gTogglePathingWebhook vPathingWebhookBtn, Toggle
+            Gui, Add, Text, x150 y290 w60 h25 vpathingWebhookStatus BackgroundTrans, OFF
+            Gui, Add, Button, x60 y356 w80 h25 gToggleItemWebhook vItemWebhookBtn, Toggle
+            Gui, Add, Text, x150 y360 w60 h25 vitemWebhookStatus BackgroundTrans, OFF
+
+            Gui, Color, 0x1E1E1E
+            Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
+            Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+            Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
+            Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+        ;end
+
+        ;Credits Tab
+            Gui, Tab, Credits
+            Gui, Add, Picture, x14 y80 w574 h590, %Gui_Credits_Png%
+
+            Gui, Font, s10 cWhite Normal
+            
+            ;[DEV COMMENT] Loop over the number of devs and add them to their randomly assigned variables from before
+                loop % Devs.Count()
+                {
+                    ;y offset 65?
+                    yFULL_OFFSET := 65 * (A_INDEX - 1)
+                    yoff1 := 130 + yFULL_OFFSET
+                    yoff2 := 135 + yFULL_OFFSET
+                    yoff3 := 155 + yFULL_OFFSET
+                    yoff4 := 170 + yFULL_OFFSET
+
+                    Gui, Font, s11 cWhite Normal Bold
+                    Gui, Add, Picture, x50 y%yoff1% w50 h50, % dev%A_INDEX%_img
+
+                    Gui, Add, Text, x110 y%yoff2% w200 h20 BackgroundTrans c0x0088FF gDev%A_Index%NameClick, % dev%A_INDEX%_name
+
+                    Gui, Font, s9 c0xCCCCCC Normal
+                    Gui, Add, Text, x110 y%yoff3% w300 h15 BackgroundTrans, % dev%A_INDEX%_role
+                    Gui, Font, s9 c0xCCCCCC Normal Underline
+                    Gui, Add, Text, x110 y%yoff4% w300 h15 BackgroundTrans c0x0088FF gDev%A_Index%LinkClick, % dev%A_INDEX%_discord
+                }
+            ;end
+            
+            ;move http request to its own thread
+            DonoHTTP := ObjBindMethod(this, "DonoHTTP")
+            SetTimer, %DonoHTTP%, -100
+
+            Gui, Font, s10 cWhite Normal Bold
+            Gui, Add, Text, x50 y345 w200 h20 BackgroundTrans, Thank you to our donators!
+            Gui, Font, s9 c0xCCCCCC Normal
+            Gui, Add, Edit, x50 y370 w480 h125 +HwndHandleDonatorsList vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, LOADING....
+
+            Gui, Font, s8 c0xCCCCCC Normal
+            Gui, Add, Text, x50 y518 w500 h15 BackgroundTrans, %version% - %randomMessage%
+
+            Gui, Show, w600 h670, %version%
+
+            Gui, Color, 0x1E1E1E
+            Gui, Add, Picture, x445 y600 w27 h19, %DiscordPNG%
+            Gui, Add, Picture, x538 y601 w18 h19, %RobloxPNG%
+
+            Gui, Font, s11 cWhite Bold Underline, Segoe UI
+            Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
+            Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
+        ;end
+    }
+
+    DonoHTTP()
+    {
+        global DonorURL, HandleDonatorsList
+        SetBatchLines, %MAX_SPEED%
+        Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+        Http.Open("GET", DonorURL, false)
+        Http.Send()
+        content := RTrim(Http.ResponseText, " `t`n`r")
+        GuiControl, Text, %HandleDonatorsList%, %content%
+    }
+
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    IniRead()
+    {
+        global
+        ;[DEV COMMENT] Keybinds
+            IniRead, temp_start_keybind, %iniFilePath%, "Keybinds", "StartScript"
+            if (temp_start_keybind != "ERROR")
             {
-                case "Vip Pathing" : 
-                    GuiControl, Choose, PathingMode, 1
-                case "Non Vip Pathing" : 
-                    GuiControl, Choose, PathingMode, 2
-                case "Abyssal Pathing" : 
-                    GuiControl, Choose, PathingMode, 3
-                default :
-                    GuiControl, Choose, PathingMode, 1
-                    pathingMode := "Vip Pathing"
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Pause_hotkey . "|" . Stop_hotkey
+                if temp_start_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_start_keybind) ~= REGEX_KEYS_CHECK 
+                    Start_hotkey := "F1"
+                else
+                    Start_hotkey := temp_start_keybind
             }
+            Else
+                IniWrite, % "F1", %iniFilePath%, "Keybinds", "StartScript"
+
+            Hotkey, %Start_hotkey%, START_SCRIPT
+            IniRead, temp_pause_keybind, %iniFilePath%, "Keybinds", "PauseScript"
+            if (temp_pause_keybind != "ERROR")
+            {
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Stop_hotkey
+                if temp_pause_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_pause_keybind) ~= REGEX_KEYS_CHECK 
+                    Pause_hotkey := "F2"
+                else
+                    Pause_hotkey := temp_pause_keybind
+            }
+            Else
+                IniWrite, % "F2", %iniFilePath%, "Keybinds", "PauseScript"
+            Hotkey, %Pause_hotkey%, PAUSE_SCRIPT
+            
+            IniRead, temp_stop_keybind, %iniFilePath%, "Keybinds", "StopScript"
+            if (temp_stop_keybind != "ERROR")
+            {
+                ;[DEV COMMENT] Do sanity check on keybind on load to prevent unwanted key combinations - Nadir
+                REGEX_KEYS_CHECK := REGEX_KeybindBase . "|" . Start_hotkey . "|" . Pause_hotkey
+                if temp_stop_keybind ~= REGEX_KEYS_CHECK or GetKeyName(temp_stop_keybind) ~= REGEX_KEYS_CHECK 
+                    Stop_hotkey := "F3"
+                else
+                    Stop_hotkey := temp_stop_keybind
+            }
+            Else
+                IniWrite, % "F3", %iniFilePath%, "Keybinds", "StopScript"
+            Hotkey, %Stop_hotkey%, STOP_SCRIPT
+        ;end
+
+        ;[DEV COMMENT] Vanilla ini reading
+            IniRead, tempRes, %iniFilePath%, "Macro", "resolution"
+            if (tempRes != "ERROR")
+            {
+                res := tempRes
+            }
+            Else
+                IniWrite, %res%, %iniFilePath%, "Macro", "resolution"
+
+            IniRead, tempMaxLoop, %iniFilePath%, "Macro", "maxLoopCount"
+            if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
+            {
+                maxLoopCount := tempMaxLoop
+            }
+            Else
+                IniWrite, %maxLoopCount%, %iniFilePath%, "Macro", "maxLoopCount"
+
+            IniRead, tempFishingLoop, %iniFilePath%, "Macro", "fishingLoopCount"
+            if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
+            {
+                fishingLoopCount := tempFishingLoop
+            }
+            Else
+                IniWrite, %fishingLoopCount%, %iniFilePath%, "Macro", "fishingLoopCount"
+
+            IniRead, tempSellAll, %iniFilePath%, "Macro", "sellAllToggle"
+            if (tempSellAll != "ERROR")
+            {
+                sellAllToggle := (tempSellAll = "true" || tempSellAll = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "sellAllToggle"
+
+            IniRead, tempPathing, %iniFilePath%, "Macro", "pathingMode"
+            if (tempPathing != "ERROR")
+            {
+                pathingMode := tempPathing
+            }
+            Else
+                IniWrite, %pathingMode%, %iniFilePath%, "Macro", "pathingMode"
+
+            IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
+            if (tempAzerty != "ERROR")
+            {
+                azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
+
+            IniRead, tempPrivateServer, %iniFilePath%, "Macro", "privateServerLink"
+            if (tempPrivateServer != "ERROR")
+            {
+                privateServerLink := tempPrivateServer
+                code := ""
+                if RegExMatch(privateServerLink, "code=([^&]+)", m)
+                {
+                    code := m1
+                }
+            }
+            Else
+                IniWrite, % "", %iniFilePath%, "Macro", "privateServerLink"
+
+            IniRead, tempAdvancedDetection, %iniFilePath%, "Macro", "advancedFishingDetection"
+            if (tempAdvancedDetection != "ERROR")
+            {
+                advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "advancedFishingDetection"
+
+            IniRead, tempFishingFailsafe, %iniFilePath%, "Macro", "fishingFailsafeTime"
+            if (tempFishingFailsafe != "ERROR" && tempFishingFailsafe > 0)
+            {
+                fishingFailsafeTime := tempFishingFailsafe
+            }
+            Else
+                IniWrite, %fishingFailsafeTime%, %iniFilePath%, "Macro", "fishingFailsafeTime"
+
+            IniRead, tempPathingFailsafe, %iniFilePath%, "Macro", "pathingFailsafeTime"
+            if (tempPathingFailsafe != "ERROR" && tempPathingFailsafe > 0)
+            {
+                pathingFailsafeTime := tempPathingFailsafe
+            }
+            Else
+                IniWrite, %pathingFailsafeTime%, %iniFilePath%, "Macro", "pathingFailsafeTime"
+
+            IniRead, tempAutoRejoinFailsafe, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+            if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
+            {
+                autoRejoinFailsafeTime := tempAutoRejoinFailsafe
+            }
+            Else
+                IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, "Macro", "autoRejoinFailsafeTime"
+
+            IniRead, tempAutoUnequip, %iniFilePath%, "Macro", "autoUnequip"
+            if (tempAutoUnequip != "ERROR")
+            {
+                autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "autoUnequip"
+
+            IniRead, tempAzerty, %iniFilePath%, "Macro", "azertyPathing"
+            if (tempAzerty != "ERROR")
+            {
+                azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "azertyPathing"
+
+            IniRead, tempAdvancedThreshold, %iniFilePath%, "Macro", "advancedFishingThreshold"
+            if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
+            {
+                advancedFishingThreshold := tempAdvancedThreshold
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "advancedFishingThreshold"
+
+            IniRead, tempStrangeController, %iniFilePath%, "Macro", "strangeController"
+            if (tempStrangeController != "ERROR")
+            {
+                strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "strangeController"
+
+            IniRead, tempBiomeRandomizer, %iniFilePath%, "Macro", "biomeRandomizer"
+            if (tempBiomeRandomizer != "ERROR")
+            {
+                biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "biomeRandomizer"
+
+            IniRead, tempAutoCloseChat, %iniFilePath%, "Macro", "autoCloseChat"
+            if (tempAutoCloseChat != "ERROR")
+            {
+                autoCloseChat := (tempAutoCloseChat = "true" || tempAutoCloseChat = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "autoCloseChat"
+
+            IniRead, tempWebhook, %iniFilePath%, "Macro", "webhookURL"
+            if (tempWebhook != "ERROR")
+            {
+                webhookURL := tempWebhook
+            }
+            Else
+                IniWrite, % "", %iniFilePath%, "Macro", "webhookURL"
+
+            IniRead, tempFsWebhook, %iniFilePath%, "Macro", "failsafeWebhook"
+            if (tempFsWebhook != "ERROR")
+            {
+                failsafeWebhook := (tempFsWebhook = "true" || tempFsWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "failsafeWebhook"
+
+            IniRead, tempPathingWebhook, %iniFilePath%, "Macro", "pathingWebhook"
+            if (tempPathingWebhook != "ERROR")
+            {
+                pathingWebhook := (tempPathingWebhook = "true" || tempPathingWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "pathingWebhook"
+
+            IniRead, tempItemWebhook, %iniFilePath%, "Macro", "itemWebhook"
+            if (tempItemWebhook != "ERROR")
+            {
+                itemWebhook := (tempItemWebhook = "true" || tempItemWebhook = "1")
+            }
+            Else
+                IniWrite, false, %iniFilePath%, "Macro", "itemWebhook"
+        ;end
+    }
+    
+    ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
+    GuiControlChecks()
+    {
+        ;[DEV COMMENT] using <Toggle_GuiControl> function from above to quickly loop over a bunch of duplicate code
+        Toggle_GuiControl("SellAllStatus", sellAllToggle)
+        Toggle_GuiControl("AdvancedFishingDetectionStatus", advancedFishingDetection)
+        Toggle_GuiControl("azertyPathing", AzertyPathingStatus)
+        Toggle_GuiControl("autoUnequip", AutoUnequipStatus)
+        Toggle_GuiControl("autoCloseChat", AutoCloseChatStatus)
+        Toggle_GuiControl("strangeController", StrangeControllerStatus)
+        Toggle_GuiControl("biomeRandomizer", BiomeRandomizerStatus)
+        Toggle_GuiControl("failsafeWebhook", failsafeWebhookStatus)
+        Toggle_GuiControl("pathingWebhook", pathingWebhookStatus)
+        Toggle_GuiControl("itemWebhook", itemWebhookStatus)
+        
+        switch pathingMode
+        {
+            case "Vip Pathing" : 
+                GuiControl, Choose, PathingMode, 1
+            case "Non Vip Pathing" : 
+                GuiControl, Choose, PathingMode, 2
+            case "Abyssal Pathing" : 
+                GuiControl, Choose, PathingMode, 3
+            default :
+                GuiControl, Choose, PathingMode, 1
+                pathingMode := "Vip Pathing"
         }
-    ;end
+    }
+ ;end
 
     RunLoop(byref loopCount, byref restartPathing)
     {
@@ -2253,163 +2228,163 @@ class CoreProto extends Plugin
 class CorePlugin_BiomeRandomizer extends CoreProto
 {
     ; [DEV COMMENT] temporarily and manually disabled during testing and porting of each function
-    ; PluginRun(byref restartPathing)
-    ; {
-    ;     ; BR Toggle
-    ;     if (biomeRandomizer) {
-    ;         elapsed := A_TickCount - startTick
+    PluginRun(byref restartPathing)
+    {
+        ; BR Toggle
+        if (biomeRandomizer) {
+            elapsed := A_TickCount - startTick
             
-    ;         ; if (biomeRandomizerLastRun = 0 and elapsed >= biomeRandomizerTime) {
-    ;         ;     this.RunBiomeRandomizer()
-    ;         ;     biomeRandomizerLastRun := elapsed
-    ;         ; } else 
-    ;         ;[DEV COMMENT] Testing this out
+            ; if (biomeRandomizerLastRun = 0 and elapsed >= biomeRandomizerTime) {
+            ;     this.RunBiomeRandomizer()
+            ;     biomeRandomizerLastRun := elapsed
+            ; } else 
+            ;[DEV COMMENT] Testing this out
 
-    ;         if (biomeRandomizerLastRun >= 0 and (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
-    ;             this.RunBiomeRandomizer()
-    ;             biomeRandomizerLastRun := elapsed
-    ;         }
-    ;     }
-    ;     Return true
-    ; }
+            if (biomeRandomizerLastRun >= 0 and (elapsed - biomeRandomizerLastRun) >= biomeRandomizerInterval) {
+                this.RunBiomeRandomizer()
+                biomeRandomizerLastRun := elapsed
+            }
+        }
+        Return true
+    }
 
-    ; ; BR Toggle
-    ; RunBiomeRandomizer() {
-    ;     global res
-    ;     global itemWebhook
-    ;     this.Sleep()
-    ;     this.OpenInventory.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     ;[DEV COMMENT] same as before just we skip the last sleep action on the function side - Nadir
-    ;     this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300, 0)
-    ;     this.setClipboard("Biome Randomizer")
-    ;     this.Sleep()
-    ;     Send, ^v
-    ;     this.Sleep()
-    ;     this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
+    ; BR Toggle
+    RunBiomeRandomizer() {
+        global res
+        global itemWebhook
+        this.Sleep()
+        this.OpenInventory.MouseMoveAndClickWithSleep("Left", 3, 300)
+        this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
+        ;[DEV COMMENT] same as before just we skip the last sleep action on the function side - Nadir
+        this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300, 0)
+        this.setClipboard("Biome Randomizer")
+        this.Sleep()
+        Send, ^v
+        this.Sleep()
+        this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
 
-    ;     Loop {
-    ;         if (res = "1366x768")
-    ;             error_level := this.PixSearchController.PixelSearch(Px, Py, 0x8b8b8b, 3, "FAST RGB")
-    ;         Else
-    ;             error_level := this.PixSearchController.PixelSearch(Px, Py, 0x457dff, 3, "FAST RGB")
-    ;         if (!error_level) {
-    ;             break
-    ;         } else {
-    ;             this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;             this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;         }
-    ;     }
-    ;     this.restoreClipboard()
-    ;     this.InventoryItemUseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     this.InventoryCloseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     if (itemWebhook) {
-    ;         try this.SendWebhook(":joystick: Biome Randomizer was used.") ;[DEV COMMENT] go get color back i removed it and forgot to put it back in lol oops
-    ;     }
-    ; }
+        Loop {
+            if (res = "1366x768")
+                error_level := this.PixSearchController.PixelSearch(Px, Py, 0x8b8b8b, 3, "FAST RGB")
+            Else
+                error_level := this.PixSearchController.PixelSearch(Px, Py, 0x457dff, 3, "FAST RGB")
+            if (!error_level) {
+                break
+            } else {
+                this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
+                this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
+            }
+        }
+        this.restoreClipboard()
+        this.InventoryItemUseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
+        this.InventoryCloseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
+        if (itemWebhook) {
+            try this.SendWebhook(":joystick: Biome Randomizer was used.") ;[DEV COMMENT] go get color back i removed it and forgot to put it back in lol oops
+        }
+    }
 
-    ; PluginSetup()
-    ; {
-    ;     this.OpenInventory          := this.RegisterPoint(52  , 693, this.S_LEFT  ,           "SC-OpenInventory")
-    ;     this.InventoryItemsTab      := this.RegisterPoint(1704, 452, this.S_CENTER,           "SC-InventoryItemsTab") ; x2
-    ;     this.InventorySearchBar     := this.RegisterPoint(1473, 489, this.S_CENTER,           "SC-InventorySearchBar")
-    ;     this.PixSearchController    := this.RegisterSearchXY2(755,916,913,928, this.S_CENTER, "SC-PixSearchController") ;[DEV COMMENT] might need to expand this one
-    ;     this.InventoryFirstItemSlot := this.RegisterPoint(1144, 643, this.S_CENTER,           "SC-InventoryFirstItemSlot") ; x2
-    ;     this.InventoryItemUseButton := this.RegisterPoint(920 , 774, this.S_CENTER,           "SC-InventoryItemUseButton")
-    ;     this.InventoryCloseButton   := this.RegisterPoint(1896, 403, this.S_CENTER,           "SC-InventoryCloseButton")
-    ; }
+    PluginSetup()
+    {
+        this.OpenInventory          := this.RegisterPoint(52  , 693, this.S_LEFT  ,           "SC-OpenInventory")
+        this.InventoryItemsTab      := this.RegisterPoint(1704, 452, this.S_CENTER,           "SC-InventoryItemsTab") ; x2
+        this.InventorySearchBar     := this.RegisterPoint(1473, 489, this.S_CENTER,           "SC-InventorySearchBar")
+        this.PixSearchController    := this.RegisterSearchXY2(755,916,913,928, this.S_CENTER, "SC-PixSearchController") ;[DEV COMMENT] might need to expand this one
+        this.InventoryFirstItemSlot := this.RegisterPoint(1144, 643, this.S_CENTER,           "SC-InventoryFirstItemSlot") ; x2
+        this.InventoryItemUseButton := this.RegisterPoint(920 , 774, this.S_CENTER,           "SC-InventoryItemUseButton")
+        this.InventoryCloseButton   := this.RegisterPoint(1896, 403, this.S_CENTER,           "SC-InventoryCloseButton")
+    }
 
-    ; SetupGui()
-    ; {
-    ; }    
+    SetupGui()
+    {
+    }    
 
-    ; IniRead()
-    ; {
-    ; }
+    IniRead()
+    {
+    }
 
-    ; GuiControlChecks()
-    ; {
-    ; }
+    GuiControlChecks()
+    {
+    }
 }
 
 class CorePlugin_StrangeController extends CoreProto
 {
     ; [DEV COMMENT] temporarily and manually disabled during testing and porting of each function
-    ; PluginRun(byref restartPathing)
-    ; {
-    ;     ; SC Toggle
-    ;     if (strangeController) {
-    ;         elapsed := A_TickCount - startTick
-    ;         ; if (strangeControllerLastRun = 0 and elapsed >= strangeControllerTime) {
-    ;         ;     this.RunStrangeController()
-    ;         ;     strangeControllerLastRun := elapsed
-    ;         ; } else 
-    ;         if (strangeControllerLastRun >= 0 and (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
-    ;             this.RunStrangeController()
-    ;             strangeControllerLastRun := elapsed
-    ;         }
-    ;     }
-    ;     Return true
-    ; }
+    PluginRun(byref restartPathing)
+    {
+        ; SC Toggle
+        if (strangeController) {
+            elapsed := A_TickCount - startTick
+            ; if (strangeControllerLastRun = 0 and elapsed >= strangeControllerTime) {
+            ;     this.RunStrangeController()
+            ;     strangeControllerLastRun := elapsed
+            ; } else 
+            if (strangeControllerLastRun >= 0 and (elapsed - strangeControllerLastRun) >= strangeControllerInterval) {
+                this.RunStrangeController()
+                strangeControllerLastRun := elapsed
+            }
+        }
+        Return true
+    }
 
-    ; ; SC toggle
-    ; RunStrangeController() {
-    ;     global res
-    ;     global itemWebhook
-    ;     this.Sleep()
-    ;     this.OpenInventory.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     this.InventorySearchBar.MouseMoveAndClickWithSleep("Left", 3, 300, 0)
-    ;     this.setClipboard("Strange Controller")
-    ;     this.Sleep()
-    ;     Send, ^v
-    ;     this.Sleep()
-    ;     this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
+    ; SC toggle
+    RunStrangeController() {
+        global res
+        global itemWebhook
+        this.Sleep()
+        this.OpenInventory.MouseMoveAndClickWithSleep("Left", 3, 300)
+        this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
+        this.InventorySearchBar.MouseMoveAndClickWithSleep("Left", 3, 300, 0)
+        this.setClipboard("Strange Controller")
+        this.Sleep()
+        Send, ^v
+        this.Sleep()
+        this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
 
-    ;     Loop {
-    ;         error_level := this.PixSearchController.PixelSearch(Px, Py, 0x457dff, 3, "FAST RGB")
-    ;         if (!error_level) {
-    ;             break
-    ;         } else {
-    ;             this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;             this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;         }
-    ;     }
-    ;     this.restoreClipboard()
-    ;     this.InventoryItemUseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     this.InventoryCloseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
-    ;     if (itemWebhook) {
-    ;         try this.SendWebhook(":joystick: Strange Controller was used.") ;[DEV COMMENT] go get color back i removed it and forgot to put it back in lol oops
-    ;     }
-    ; }
-
-
+        Loop {
+            error_level := this.PixSearchController.PixelSearch(Px, Py, 0x457dff, 3, "FAST RGB")
+            if (!error_level) {
+                break
+            } else {
+                this.InventoryItemsTab.MouseMoveAndClickWithSleep("Left", 3, 300)
+                this.InventoryFirstItemSlot.MouseMoveAndClickWithSleep("Left", 3, 300)
+            }
+        }
+        this.restoreClipboard()
+        this.InventoryItemUseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
+        this.InventoryCloseButton.MouseMoveAndClickWithSleep("Left", 3, 300)
+        if (itemWebhook) {
+            try this.SendWebhook(":joystick: Strange Controller was used.") ;[DEV COMMENT] go get color back i removed it and forgot to put it back in lol oops
+        }
+    }
 
 
-    ; ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
-    ; PluginSetup()
-    ; {
-    ;     this.OpenInventory          := this.RegisterPoint(52, 693, this.S_LEFT,               "SC-OpenInventory")
-    ;     this.InventoryItemsTab      := this.RegisterPoint(1704, 452, this.S_CENTER,           "SC-InventoryItemsTab")
-    ;     this.InventorySearchBar     := this.RegisterPoint(1473, 489, this.S_CENTER,           "SC-InventorySearchBar")
-    ;     this.PixSearchController    := this.RegisterSearchXY2(655,916,914,929, this.S_CENTER, "SC-PixSearchController")
-    ;     this.InventoryFirstItemSlot := this.RegisterPoint(1144, 643, this.S_CENTER,           "SC-InventoryFirstItemSlot")
-    ;     this.InventoryItemUseButton := this.RegisterPoint(920, 774, this.S_CENTER,            "SC-InventoryItemUseButton")
-    ;     this.InventoryCloseButton   := this.RegisterPoint(1896, 403, this.S_CENTER,           "SC-InventoryCloseButton")
-    ; }
 
-    ; ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
-    ; SetupGui()
-    ; {
-    ; }    
 
-    ; ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
-    ; IniRead()
-    ; {
-    ; }
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    PluginSetup()
+    {
+        this.OpenInventory          := this.RegisterPoint(52, 693, this.S_LEFT,               "SC-OpenInventory")
+        this.InventoryItemsTab      := this.RegisterPoint(1704, 452, this.S_CENTER,           "SC-InventoryItemsTab")
+        this.InventorySearchBar     := this.RegisterPoint(1473, 489, this.S_CENTER,           "SC-InventorySearchBar")
+        this.PixSearchController    := this.RegisterSearchXY2(655,916,914,929, this.S_CENTER, "SC-PixSearchController")
+        this.InventoryFirstItemSlot := this.RegisterPoint(1144, 643, this.S_CENTER,           "SC-InventoryFirstItemSlot")
+        this.InventoryItemUseButton := this.RegisterPoint(920, 774, this.S_CENTER,            "SC-InventoryItemUseButton")
+        this.InventoryCloseButton   := this.RegisterPoint(1896, 403, this.S_CENTER,           "SC-InventoryCloseButton")
+    }
 
-    ; ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
-    ; GuiControlChecks()
-    ; {
-    ; }
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF TO CLASS ON CREATION
+    SetupGui()
+    {
+    }    
+
+    ;OVERRIDE THIS FUNCTION TO ADD STUFF ON CREATION
+    IniRead()
+    {
+    }
+
+    ;OVERRIDE THIS FUNCTION TO DO GUICONTROL CHECKS
+    GuiControlChecks()
+    {
+    }
 }

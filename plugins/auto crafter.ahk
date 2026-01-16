@@ -1,10 +1,11 @@
+
 /*
-{
-ClassName: AutoCrafterPlugin,
-Width: 2560,
-Height: 1440
-}
-*/
+ * // {
+ * // ClassName: AutoCrafterPlugin,
+ * // Width: 2560,
+ * // Height: 1440
+ * // }
+ */
 class AutoCrafterPlugin extends Plugin
 {
     ;[DEV COMMENT] the above metadata isn't really needed for the plugin but is requried to have it even be

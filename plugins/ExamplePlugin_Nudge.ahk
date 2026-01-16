@@ -1,8 +1,9 @@
+
 /*
-{ClassName: ExamplePlugin_Nudge
-Width: 2560,
-Height: 1440
-}
+ * // {ClassName: ExamplePlugin_Nudge
+ * // Width: 2560,
+ * // Height: 1440
+ * // }
 */
 class ExamplePlugin_Nudge extends Plugin
 {

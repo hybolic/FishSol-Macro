@@ -1,5 +1,4 @@
 /*
- *
  * // {ClassName: BiomesPlugin,
  * // Width: 2560,
  * // Height: 1440
@@ -142,7 +141,7 @@ global BiomesPlugin_can_run := true
  global maxstellar_biome_thumbnail := "https://maxstellar.github.io/biome_thumb/"
  global Gui_Biomes_Png   := A_ScriptDir . "\gui\Biomes.png"
  EnvGet, LocalAppData, LOCALAPPDATA
- global logDir := LocalAppData "\Roblox\logs"
+ global logDir := LocalAppData . "\Roblox\logs"
 ;
 
 
@@ -157,8 +156,7 @@ return
 
 CheckBiome:
     if BiomesPlugin_can_run
-    {
-        ;[DEV COMMENT] made so garbage collection is done after each call ie, less of a memory leak - Nadir
+    {   ;[DEV COMMENT] made so garbage collection is done after each call ie, less of a memory leak - Nadir
         CheckBiomeFunction()       
     }else ;[DEV COMMENT] quickly recall the label to disable the timer essentially killing it with <-1> - Nadir
         SetTimer, CheckBiome, -1
